@@ -1,13 +1,18 @@
-# abk_env repo
-ABK MacOS, Linux, Windows environment setup
+# README: tool-env repo
+ABK tool environment setup for developers
 
 [TOC]
 
 
 ## What is this repository for?
 
-* For quick automated installation of required developer tools
+* Quick automated install of required developer tools
+* Quick automated install of required developer apps
+* Quick automated install of developer fonts
 * Easy updates
+* Easy user friendly prompt config
+* Useful aliases
+* Company wide password manager (WIP)
 
 
 ## Support for
@@ -52,24 +57,27 @@ There are no pre-requisites for Linux. We will use <code>apt</code> tool to inst
 ## Tools installed
 If you want to specify which tools are installed, please take a look at the file <code>tools.json</code>
 
-| tool                                                          | description                                                                  |
-| :------------------------------------------------------------ | :--------------------------------------------------------------------------- |
-| [awscli](https://github.com/aws/aws-cli)                      | provides a unified command line interface to Amazon Web Services             |
-| [direnv](https://github.com/direnv/direnv)                    | can load and unload env variables depending on the current project directory |
-| [git](https://github.com/git/git)                             | Newest version of git                                                        |
-| [gnuPG](https://github.com/gpg/gnupg)                         | Gnu Privacy Guard: tool to create and maintain GPG keys                      |
-| [jq](https://github.com/jqlang/jq)                            | is a lightweight and flexible command-line JSON processor                    |
-| [pass](https://www.passwordstore.org)                         | password manager, which works well with <code>direnv</code> tool             |
-| [nodenv](https://github.com/nodenv/nodenv)                    | lets you easily switch between multiple versions of nodejs                   |
-| [oh-my-posh](https://ohmyposh.dev/)                           | lets you easiliy configure your terminal prompt                              |
-| [parallel](https://github.com/flesler/parallel)               | CLI tool to execute shell commands in parallel                               |
-| [pyenv](https://github.com/pyenv/pyenv)                       | lets you easily switch between multiple versions of Python                   |
-| [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) | is a pyenv plugin, which manages virtualenvs for Python                      |
-| [serverless](https://www.serverless.com/framework/docs)       | lets you deploy serverless infrastructure services to AWS                    |
-| [tfenv](https://github.com/tfutils/tfenv)                     | lets you easily switch between multiple versions of Terraform                |
-| [tree](https://linuxhandbook.com/tree-command/)               | lists files in tree from                                                     |
-| [wget](https://linuxize.com/post/wget-command-examples/)      | utility for downloading files from the **web**                               |
-| [yq](https://github.com/mikefarah/yq)                         | is a lightweight and flexible command-line YAML, JSON and XML processor      |
+| tool                                                                            | description                                                                  |
+| :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------- |
+| [awscli](https://github.com/aws/aws-cli)                                        | provides a unified command line interface to Amazon Web Services             |
+| [direnv](https://github.com/direnv/direnv)                                      | can load and unload env variables depending on the current project directory |
+| [git](https://github.com/git/git)                                               | Newest version of git                                                        |
+| [gnuPG](https://github.com/gpg/gnupg)                                           | Gnu Privacy Guard: tool to create and maintain GPG keys                      |
+| [jq](https://github.com/jqlang/jq)                                              | is a lightweight and flexible command-line JSON processor                    |
+| [nmap](https://nmap.org/)                                                       | network scanner to discover hosts and services on a computer network         |
+| [nodenv](https://github.com/nodenv/nodenv)                                      | lets you easily switch between multiple versions of nodejs                   |
+| [oh-my-posh](https://ohmyposh.dev/)                                             | lets you easiliy configure your terminal prompt                              |
+| [parallel](https://github.com/flesler/parallel)                                 | CLI tool to execute shell commands in parallel                               |
+| [pass](https://www.passwordstore.org)                                           | password manager, which works well with <code>direnv</code> tool             |
+| [pyenv](https://github.com/pyenv/pyenv)                                         | lets you easily switch between multiple versions of Python                   |
+| [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)                   | is a pyenv plugin, which manages virtualenvs for Python                      |
+| [serverless](https://www.serverless.com/framework/docs)                         | lets you deploy serverless infrastructure services to AWS                    |
+| [tfenv](https://github.com/tfutils/tfenv)                                       | lets you easily switch between multiple versions of Terraform                |
+| [tree](https://linuxhandbook.com/tree-command/)                                 | lists files in tree from                                                     |
+| [wget](https://linuxize.com/post/wget-command-examples/)                        | utility for downloading files from the web                                   |
+| [yq](https://github.com/mikefarah/yq)                                           | is a lightweight and flexible command-line YAML, JSON and XML processor      |
+| [zsh-autocomplete](https://github.com/marlonrichert/zsh-autocomplete)           | Autocomplete for Zsh adds real-time type-ahead autocompletion to Zsh         |
+| [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | syntax highlighting for the shell zsh Zsh                                    |
 
 
 ## Additional MacOS apps installed
@@ -83,42 +91,64 @@ If you want to specify which tools are installed, please take a look at the file
 | [iterm2](https://github.com/gnachman/iTerm2)                       | MacOS terminal app                                                      |
 | [microsoft-teams](https://www.microsoft.com/en-us/microsoft-teams) | Company's online meeting app                                            |
 | [mqttx](https://mqttx.app/)                                        | MQTTX makes developing and testing MQTT applications faster and easier. |
+| [onedrive](https://www.microsoft.com/en-us/microsoft-365/onedrive) | Company's online storage.                                               |
 | [raspberry-pi-imager](https://github.com/raspberrypi/rpi-imager)   | Raspberry Pi Imaging Utility                                            |
-| [visual-studio-code](https://github.com/microsoft/vscode)          | THe best code editor ever :)                                            |
+| [slack](https://slack.com/)                                        | Company's quick message communication app                               |
+| [visual-studio-code](https://github.com/microsoft/vscode)          | The best code editor ever :)                                            |
 | [vlc](https://github.com/videolan/vlc)                             | VLC is a libre and open source media player and multimedia engine       |
 
 
-## Additional MacOS apps installed
-
+## Fonts installed
 Those font are useful for coding and for oh-my-posh
-- font-agave-nerd-font
-- font-comic-shanns-mono-nerd-font
-- font-droid-sans-mono-nerd-font"
-- font-cascadia-code
-- font-cascadia-code-pl
-- font-caskaydia-cove-nerd-font
-- font-hack-nerd-font
+
+* font-agave-nerd-font
+* font-comic-shanns-mono-nerd-font
+* font-droid-sans-mono-nerd-font"
+* font-cascadia-code
+* font-cascadia-code-pl
+* font-caskaydia-cove-nerd-font
+* font-hack-nerd-font
 
 
 ## oh-my-posh configuration
-There is a preconfigured theme located in folder <code>./unixBin/env/omp/themes</code>. If you like to configure your own theme follow: [oh-my-posh documentation](https://ohmyposh.dev/docs). There are also many other predefined themes. You can activate them in the file: <code>./unixBin/env/XXX_oh-my-posh.env</code>
+There is a pre-configured theme located in folder <code>./unixBin/env/omp/themes</code>. If you like to configure your own theme follow: [oh-my-posh documentation](https://ohmyposh.dev/docs). There are also many other predefined themes. You can activate them in the file: <code>./unixBin/env/XXX_oh-my-posh.env</code> Default is configured fro ABK customized prompt: code>./unixBin/env/omp/themes/powerlevel10k_abk.omp.json</code>, which looks like this:
+![powerlevel10k_abk](./unixBin/env/omp/themes/powerlevel10k_abk.png "pl10k_abk")
+
+* Note 1: if you don't see correct symbols in the prompt, please use font which is capable to display glyphs (symbols) in your terminal app settings. A good font example: Hack Nerd Font
+* Note 2: The default oh-my-posh theme is based on dark background terminal app profile. If you like to use my profile please import it from <code>./unixBin/env/terminal/profiles/Solarized Dark.terminal</code>
 
 
-## How do I get set up?
+## Aliases
+Don't forget to check out many aliases configured in <code>./unixBin/env/002_aliases.env</code> and <code>./unixBin/env/002_abk_aliases.env</code>. Here are few good examples:
+
+| alias         | description                                                   |
+| :------------ | :------------------------------------------------------------ |
+| epoch         | copies current epoch time into clipboard                      |
+| getAwsAccount | copies currently configured AWS account number into clipboard |
+| glrt          | Git List Remote Tags                                          |
+| dpps          | Display Python Package Size                                   |
+| ncpu          | Number of CPUs                                                |
+| ppp           | Pretty Print PATH                                             |
+| pppp          | Pretty Print PYTHONPATH                                       |
+| prg           | git push - Push it Real Good - when deploying new release     |
+| snp           | git push - Salt 'N Pepper version                             |
+
+
+## What to do?
 ### Install
-Simple execute following command in your terminal:
+This script will install tools and apps described in the <code>tools.json</code>. If you already installed a tool previously, the installation will skip that tool installation and configuration. All installed tools are recorded in <code>./unixPackages/installed.json</code>
 ```shell
 ./install.sh
 ```
 
 ### Update
-Simply run <code>./update.sh</code>, it will update all installed tools. This script is still WIP.
+This script will update tools and apps described in the <code>tools.json</code>.
 ```shell
 ./update.sh
 ```
 
 ### Uninstall
-If you at some point want to uninstall everything installed, simply run:
+If at some point you'd like to uninstall everything installed (the installed tools are recorded in <code>./unixPackages/installed.json</code>), simply run:
 ```shell
 ./uninstall.sh
 ```
