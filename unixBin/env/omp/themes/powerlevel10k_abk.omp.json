@@ -9,6 +9,7 @@
                     "background": "#ffffff",
                     "foreground": "#000000",
                     "style": "diamond",
+                    "leading_diamond": "\n",
                     "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} ",
                     "trailing_diamond": "\ue0b0",
                     "type": "os"
@@ -111,14 +112,27 @@
                     ],
                     "foreground": "#100e23",
                     "invert_powerline": true,
+                    "powerline_symbol": "\ue0b2",
                     "properties": {
                         "display_default": false
                     },
-                    "style": "diamond",
+                    "style": "powerline",
                     "template": " \uf270 {{ .Profile }}",
-                    "trailing_diamond": "\ue0b4",
                     "type": "aws"
+                },
+                {
+                    "background": "#424242",
+                    "foreground": "#ebebeb",
+                    "invert_powerline": true,
+                    "powerline_symbol": "\ue0b0",
+                    "properties": {
+                        "time_format": "15:04:05"
+                    },
+                    "style": "diamond",
+                    "template": " {{ .CurrentDate | date .Format }} ",
+                    "type": "time"
                 }
+
             ],
             "type": "prompt"
         },
@@ -127,24 +141,12 @@
             "newline": true,
             "segments": [
                 {
-                    "background": "transparent",
-                    "foreground": "#898989",
+                    "background": "#ebebeb",
+                    "foreground": "#100e23",
                     "style": "diamond",
-                    "template": "{{ .HostName }} ",
-                    "trailing_diamond": "\ue0b4",
-                    "type": "session"
-                },
-                {
-                    "background": "#424242",
-                    "foreground": "#ebebeb",
-                    "invert_powerline": true,
-                    "properties": {
-                        "time_format": "15:04:05"
-                    },
-                    "style": "diamond",
-                    "template": " {{ .CurrentDate | date .Format }} ",
+                    "template": "{{ .UserName }}@{{ .HostName }} ",
                     "trailing_diamond": "\ue0b4🖖 ",
-                    "type": "time"
+                    "type": "session"
                 }
             ],
             "type": "prompt"
