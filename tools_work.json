@@ -9,7 +9,6 @@
             "check": {
                 "aws": ["command -v aws"],
                 "direnv": ["command -v direnv"],
-                "exiftool": ["command -v exiftool"],
                 "git": ["command -v git"],
                 "pass": ["command -v pass"],
                 "gpg": ["command -v gpg"],
@@ -38,7 +37,6 @@
                     "brew install direnv",
                     "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
                 ],
-                "exiftool": ["brew install exiftool"],
                 "git": ["brew install git"],
                 "pass": ["brew install pass"],
                 "gpg": ["brew install gnupg"],
@@ -62,6 +60,8 @@
                     "brew install pyenv-virtualenv",
                     "pyenv install 3.11.5",
                     "pyenv virtualenv 3.11.5 bwp",
+                    "pyenv virtualenv 3.11.5 cloud",
+                    "pyenv virtualenv 3.11.5 itest",
                     "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
                 ],
                 "serverless": ["brew install serverless"],
@@ -95,7 +95,6 @@
                     "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
                     "brew uninstall direnv"
                 ],
-                "exiftool": ["brew uninstall exiftool"],
                 "git": ["brew uninstall git"],
                 "pass": ["brew uninstall pass"],
                 "gpg": ["brew uninstall gnupg"],
@@ -149,10 +148,10 @@
         },
         "apps": {
             "check": {
-                "adobe-dng-converter": [
-                    "brew list --cask | grep ^adobe-dng-converter$",
-                    "ls \"/Applications/Adobe DNG Converter.app\"",
-                    "ls \"~/Applications/Adobe DNG Converter.app\""
+                "balenaetcher": [
+                    "brew list --cask | grep ^balenaetcher$",
+                    "ls \"/Applications/balenaEtcher.app\"",
+                    "ls \"~/Applications/balenaEtcher.app\""
                 ],
                 "brave-browser": [
                     "brew list --cask | grep ^brave-browser$",
@@ -169,6 +168,16 @@
                     "ls \"/Applications/Flycut.app\"",
                     "ls \"~/Applications/Flycut.app\""
                 ],
+                "iterm2": [
+                    "brew list --cask | grep ^iterm2$",
+                    "ls \"/Applications/iTerm.app\"",
+                    "ls \"~/Applications/iTerm.app\""
+                ],
+                "microsoft-teams": [
+                    "brew list --cask | grep ^microsoft-teams$",
+                    "ls \"/Applications/Microsoft Teams (work or school).app\"",
+                    "ls \"~/Applications/Microsoft Teams (work or school).app\""
+                ],
                 "mqttx": [
                     "brew list --cask | grep ^mqttx$",
                     "ls \"/Applications/MQTTX.app\"",
@@ -184,10 +193,10 @@
                     "ls \"/Applications/Raspberry Pi Imager.app\"",
                     "ls \"~/Applications/Raspberry Pi Imager.app\""
                 ],
-                "spotify": [
-                    "brew list --cask | grep ^spotify$",
-                    "ls \"/Applications/Spotify.app\"",
-                    "ls \"~/Applications/Spotify.app\""
+                "slack": [
+                    "brew list --cask | grep ^slack$",
+                    "ls \"/Applications/Slack.app\"",
+                    "ls \"~/Applications/Slack.app\""
                 ],
                 "visual-studio-code": [
                     "brew list --cask | grep ^visual-studio-code$",
@@ -201,14 +210,19 @@
                 ]
             },
             "install": {
-                "adobe-dng-converter": ["brew install --cask adobe-dng-converter"],
+                "balenaetcher": ["brew install --cask balenaetcher"],
                 "brave-browser": ["brew install --cask brave-browser"],
                 "docker": ["brew install --cask docker"],
                 "flycut": ["brew install --cask flycut"],
+                "iterm2": ["brew install --cask iterm2"],
+                "microsoft-teams": [
+                    "brew install --cask microsoft-teams",
+                    "brew uninstall --cask microsoft-auto-update"
+                ],
                 "mqttx": ["brew install --cask mqttx"],
                 "onedrive": ["brew install --cask onedrive"],
                 "raspberry-pi-imager": ["brew install --cask raspberry-pi-imager"],
-                "spotify": ["brew install --cask spotify"],
+                "slack": ["brew install --cask slack"],
                 "visual-studio-code": [
                     "brew install --cask visual-studio-code",
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
@@ -225,14 +239,16 @@
                 "vlc": ["brew install --cask vlc"]
             },
             "uninstall": {
-                "adobe-dng-converter": ["brew uninstall --cask adobe-dng-converter"],
+                "balenaetcher": ["brew uninstall --cask balenaetcher"],
                 "brave-browser": ["brew uninstall --cask brave-browser"],
                 "docker": ["brew uninstall --cask docker"],
                 "flycut": ["brew uninstall --cask flycut"],
+                "iterm2": ["brew uninstall --cask iterm2"],
+                "microsoft-teams": ["brew uninstall --cask microsoft-teams"],
                 "mqttx": ["brew uninstall --cask mqttx"],
                 "onedrive": ["brew uninstall --cask onedrive"],
                 "raspberry-pi-imager": ["brew uninstall --cask raspberry-pi-imager"],
-                "spotify": ["brew uninstall --cask spotify"],
+                "slack": ["brew uninstall --cask slack"],
                 "visual-studio-code": ["brew uninstall --cask visual-studio-code"],
                 "vlc": ["brew uninstall --cask vlc"]
             }
@@ -347,9 +363,11 @@
                         "(cd ~/.pyenv && src/configure && make -C src || true)",
                         "mkdir -p ~/.pyenv/plugins",
                         "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
+                        "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env",
                         "pyenv install 3.11.5",
                         "pyenv virtualenv 3.11.5 bwp",
-                        "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                        "pyenv virtualenv 3.11.5 cloud",
+                        "pyenv virtualenv 3.11.5 itest"
                     ],
                     "serverless": ["sudo npm install -g serverless"],
                     "tfenv": [
