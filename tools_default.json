@@ -1,6 +1,6 @@
 {
     "macOS": {
-        "description": "Installing AAI tool set for MacOS",
+        "description": "Installing ABK tool set for MacOS",
         "supported_versions": {
             "macOS": ["11", "12", "13", "14"]
         },
@@ -24,9 +24,9 @@
                 "typescript": ["command -v tsc"],
                 "wget": ["command -v wget"],
                 "yq": ["command -v yq"],
-                "zsh-autocomplete": ["[ \"$AAI_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
-                "zsh-autosuggestions": ["[ \"$AAI_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
-                "zsh-syntax-highlighting": ["[ \"$AAI_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
                 "aws": [
@@ -51,7 +51,7 @@
                 ],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
-                    "oh-my-posh init $AAI_SHELL",
+                    "oh-my-posh init $ABK_SHELL",
                     "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
                 ],
                 "parallel": ["brew install parallel"],
@@ -225,16 +225,16 @@
                 "slack": ["brew install --cask slack"],
                 "visual-studio-code": [
                     "brew install --cask visual-studio-code",
-                    "AAI_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
-                    "AAI_VSCODE_USER_CONFIG_SETTING=\"$AAI_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                    "mkdir -p $AAI_VSCODE_USER_CONFIG_DIR",
-                    "[ ! -f \"$AAI_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$AAI_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                    "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                    "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                    "jq '. + {\"terminal.integrated.shellIntegration.enabled\": true}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                    "jq '. + {\"terminal.integrated.tabs.enabled\": true}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                    "jq '. + {\"terminal.integrated.tabs.title\": \"${cwd}\"}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                    "jq '. + {\"files.autoSave\": \"afterDelay\"}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\""
+                    "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
+                    "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+                    "mkdir -p $ABK_VSCODE_USER_CONFIG_DIR",
+                    "[ ! -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$ABK_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "jq '. + {\"terminal.integrated.shellIntegration.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "jq '. + {\"terminal.integrated.tabs.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "jq '. + {\"terminal.integrated.tabs.title\": \"${cwd}\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "jq '. + {\"files.autoSave\": \"afterDelay\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\""
                 ],
                 "vlc": ["brew install --cask vlc"]
             },
@@ -288,7 +288,7 @@
     },
     "linux": {
         "debian": {
-            "description": "Installing AAI tool set for Linux / Debian based distro",
+            "description": "Installing ABK tool set for Linux / Debian based distro",
             "supported_versions": {
                 "debian": ["9", "10", "11", "12"],
                 "raspbian": ["9", "10", "11", "12"],
@@ -316,8 +316,8 @@
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
-                    "zsh-autosuggestions": ["[ \"$AAI_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
-                    "zsh-syntax-highlighting": ["[ \"$AAI_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
                     "aws": [
@@ -456,16 +456,16 @@
                 "install":{
                     "visual-studio-code": [
                         "sudo snap install --classic code",
-                        "AAI_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
-                        "AAI_VSCODE_USER_CONFIG_SETTING=\"$AAI_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                        "mkdir -p $AAI_VSCODE_USER_CONFIG_DIR",
-                        "[ ! -f \"$AAI_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$AAI_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.shellIntegration.enabled\": true}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.tabs.enabled\": true}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.tabs.title\": \"${cwd}\"}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"files.autoSave\": \"afterDelay\"}' \"$AAI_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$AAI_VSCODE_USER_CONFIG_SETTING\""
+                        "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
+                        "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+                        "mkdir -p $ABK_VSCODE_USER_CONFIG_DIR",
+                        "[ ! -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$ABK_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.shellIntegration.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.tabs.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.tabs.title\": \"${cwd}\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"files.autoSave\": \"afterDelay\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\""
                     ]
                 },
                 "uninstall": {
@@ -485,42 +485,42 @@
                 "install": {
                     "font_installation_start": ["mkdir -p ~/.fonts"],
                     "font-agave-nerd-font": [
-                        "AAI_FONT_NAME=Agave",
-                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${AAI_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "ABK_FONT_NAME=Agave",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
-                        "mv ./fonts/${AAI_FONT_NAME}NerdFont* ~/.fonts/",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
                         "rm fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-comic-shanns-mono-nerd-font": [
-                        "AAI_FONT_NAME=ComicShannsMono",
-                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${AAI_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "ABK_FONT_NAME=ComicShannsMono",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
-                        "mv ./fonts/${AAI_FONT_NAME}NerdFont* ~/.fonts/",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
                         "rm fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-droid-sans-mono-nerd-font": [
-                        "AAI_FONT_NAME=DroidSansMono",
-                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${AAI_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "ABK_FONT_NAME=DroidSansMono",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/DroidSansMNerdFont* ~/.fonts/",
                         "rm fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-cascadia-code": [
-                        "AAI_FONT_NAME=CascadiaCode",
-                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${AAI_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "ABK_FONT_NAME=CascadiaCode",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/CaskaydiaCoveNerdFont* ~/.fonts/",
                         "rm fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-hack-nerd-font": [
-                        "AAI_FONT_NAME=Hack",
-                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${AAI_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "ABK_FONT_NAME=Hack",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
-                        "mv ./fonts/${AAI_FONT_NAME}NerdFont* ~/.fonts/",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
                         "rm fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
