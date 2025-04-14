@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
-    "version": 3,
+    "version": 2,
     "blocks": [
         {
             "alignment": "left",
@@ -68,7 +68,7 @@
                     },
                     "style": "diamond",
                     "invert_powerline": true,
-                    "template": " {{ if gt .Code 0 }}{{.Code}}✗{{ else }}✔{{ end }} ",
+                    "template": " {{ if gt .Code 0 }}{{.Code}}\u2717{{ else }}\u2714{{ end }} ",
                     "type": "status"
                 },
                 {
@@ -84,16 +84,16 @@
                     "type": "executiontime"
                 },
                 {
+                    "background": "#88ff8e",
+                    "foreground": "#100e23",
+                    "invert_powerline": true,
+                    "powerline_symbol": "\ue0b2",
                     "properties": {
                         "fetch_version": true
                     },
                     "style": "powerline",
                     "template": " \ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }} ",
-                    "foreground": "#100e23",
-                    "powerline_symbol": "\ue0b2",
-                    "background": "#88ff8e",
-                    "type": "node",
-                    "invert_powerline": true
+                    "type": "node"
                 },
                 {
                     "background": "#6aadff",
@@ -105,8 +105,12 @@
                     "type": "python"
                 },
                 {
+                    "background_templates": [
+                        "{{if contains \"dev\" .Profile}}#FFA400{{end}}",
+                        "{{if contains \"qa\" .Profile}}#FFA400{{end}}",
+                        "{{if contains \"prod\" .Profile}}#f1184c{{end}}"
+                    ],
                     "foreground": "#100e23",
-                    "background": "#ffa400",
                     "invert_powerline": true,
                     "powerline_symbol": "\ue0b2",
                     "properties": {
@@ -128,6 +132,7 @@
                     "template": " {{ .CurrentDate | date .Format }} ",
                     "type": "time"
                 }
+
             ],
             "type": "prompt"
         },
