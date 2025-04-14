@@ -32,6 +32,7 @@
         "readlink",
         "serverlessrc",
         "shanns",
+        "subkey",
         "tcsh",
         "tfenv",
         "Venv",
