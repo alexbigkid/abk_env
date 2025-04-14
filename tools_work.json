@@ -168,11 +168,6 @@
                     "ls \"/Applications/Flycut.app\"",
                     "ls \"~/Applications/Flycut.app\""
                 ],
-                "iterm2": [
-                    "brew list --cask | grep ^iterm2$",
-                    "ls \"/Applications/iTerm.app\"",
-                    "ls \"~/Applications/iTerm.app\""
-                ],
                 "microsoft-teams": [
                     "brew list --cask | grep ^microsoft-teams$",
                     "ls \"/Applications/Microsoft Teams (work or school).app\"",
@@ -214,7 +209,6 @@
                 "brave-browser": ["brew install --cask brave-browser"],
                 "docker": ["brew install --cask docker"],
                 "flycut": ["brew install --cask flycut"],
-                "iterm2": ["brew install --cask iterm2"],
                 "microsoft-teams": [
                     "brew install --cask microsoft-teams",
                     "brew uninstall --cask microsoft-auto-update"
@@ -243,7 +237,6 @@
                 "brave-browser": ["brew uninstall --cask brave-browser"],
                 "docker": ["brew uninstall --cask docker"],
                 "flycut": ["brew uninstall --cask flycut"],
-                "iterm2": ["brew uninstall --cask iterm2"],
                 "microsoft-teams": ["brew uninstall --cask microsoft-teams"],
                 "mqttx": ["brew uninstall --cask mqttx"],
                 "onedrive": ["brew uninstall --cask onedrive"],

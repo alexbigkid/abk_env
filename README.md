@@ -88,7 +88,6 @@ If you want to specify which tools are installed, please take a look at the file
 | [brave-browser](https://github.com/brave/brave-browser)            | Secure, fast Web browser based on Chromium just like Chrome             |
 | [docker](https://github.com/docker)                                | Docker helps developers to abstract virtual environments                |
 | [flycut](https://github.com/TermiT/Flycut)                         | Flycut is a clean and simple clipboard manager for developers           |
-| [iterm2](https://github.com/gnachman/iTerm2)                       | MacOS terminal app                                                      |
 | [microsoft-teams](https://www.microsoft.com/en-us/microsoft-teams) | Company's online meeting app                                            |
 | [mqttx](https://mqttx.app/)                                        | MQTTX makes developing and testing MQTT applications faster and easier. |
 | [onedrive](https://www.microsoft.com/en-us/microsoft-365/onedrive) | Company's online storage.                                               |
