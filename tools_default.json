@@ -14,6 +14,7 @@
                 "pass": ["command -v pass"],
                 "gpg": ["command -v gpg"],
                 "jq": ["command -v jq"],
+                "kind": ["command -v kind"],
                 "nmap": ["command -v nmap"],
                 "nodenv": ["command -v nodenv"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
@@ -43,6 +44,7 @@
                 "pass": ["brew install pass"],
                 "gpg": ["brew install gnupg"],
                 "jq": ["brew install jq"],
+                "kind": ["brew install kind"],
                 "nmap": ["brew install nmap"],
                 "nodenv": [
                     "brew install nodenv",
@@ -100,6 +102,7 @@
                 "pass": ["brew uninstall pass"],
                 "gpg": ["brew uninstall gnupg"],
                 "jq": ["brew uninstall jq"],
+                "kind": ["brew uninstall kind"],
                 "nmap": ["brew uninstall nmap"],
                 "nodenv": [
                     "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
@@ -288,6 +291,7 @@
                     "pass": ["command -v pass"],
                     "gpg": ["command -v gpg"],
                     "jq": ["command -v jq"],
+                    "kind": ["command -v kind"],
                     "mplayer": ["command -v mplayer"],
                     "nmap": ["command -v nmap"],
                     "nodenv": ["command -v nodenv"],
@@ -320,6 +324,7 @@
                     "pass": ["sudo apt install -y pass"],
                     "gpg": ["sudo apt install -y gnupg"],
                     "jq": ["sudo apt install -y jq"],
+                    "kind": ["sudo apt install -y kind"],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "nmap": ["sudo apt install -y nmap"],
                     "nodenv": [
@@ -386,6 +391,7 @@
                     "pass": ["sudo apt remove -y pass"],
                     "gpg": ["sudo apt remove -y gnupg"],
                     "jq": ["sudo apt remove -y jq"],
+                    "kind": ["sudo apt remove -y kind"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "nmap": ["sudo apt remove -y nmap"],
                     "nodenv": [
