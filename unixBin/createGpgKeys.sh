@@ -227,7 +227,7 @@ backupGpgSubkeys () {
     PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
     mkdir -p "$LCL_BACKUP_DIR"
 
-    PrintTrace $TRACE_INFO "📋 Getting subkey IDs and usage types for $LCL_FINGER_PRINT..."
+    PrintTrace $TRACE_INFO "📋 Getting subkey IDs and usage types for $LCL_FINGER_PRINT"
 
     gpg --with-colons --list-secret-keys "$LCL_FINGER_PRINT" | awk -F: '
         $1 == "ssb" {
@@ -260,8 +260,16 @@ backupGpgSubkeys () {
 
 resetYubiKeyPgpApplet () {
     PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
-    PrintTrace $TRACE_INFO "📝  Resetting YubiKey OpenPGP Applet using ykman..."
+    PrintTrace $TRACE_INFO "🔐  Checking the keys on YubiKey..."
+    gpg --card-status
 
+    PrintTrace $TRACE_CRITICAL "⚠️ This will overwrite existing keys on the YubiKey. Continue? (y/n)"
+    read -r CONFIRM
+    if [[ "$CONFIRM" != "y" ]]; then
+        PrintUsageAndExitWithCode 1 "${RED}❌ Operation cancelled.${NC}"
+    fi
+
+    PrintTrace $TRACE_INFO "📝  Resetting YubiKey OpenPGP Applet using ykman..."
     ykman openpgp reset --force
     local LCL_EXIT_CODE=$?
 
@@ -308,16 +316,7 @@ storeGpgSubKeysOnYubiKey () {
     local LCL_FINGER_PRINT="$1"
 
     PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
-    PrintTrace $TRACE_INFO "🔐 Checking the keys on YubiKey..."
-    gpg --card-status
-
-    PrintTrace $TRACE_CRITICAL "⚠️ This will overwrite existing keys on the YubiKey. Continue? (y/n)"
-    read -r CONFIRM
-    if [[ "$CONFIRM" != "y" ]]; then
-        PrintUsageAndExitWithCode 1 "${RED}❌ Operation cancelled.${NC}"
-    fi
-
-    PrintTrace $TRACE_INFO "🔐 Moving subkeys to YubiKey for $LCL_FINGER_PRINT..."
+    PrintTrace $TRACE_INFO "🔐 Moving subkeys to YubiKey for $LCL_FINGER_PRINT"
 
     expect <<EOF
         log_user 1
@@ -358,6 +357,78 @@ EOF
     [ $LCL_EXIT_CODE -ne 0 ] &&  PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to move subkeys to YubiKey.${NC}"
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
     return $EXIT_CODE
+}
+
+
+setYubiKeyCardholderName () {
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    local LCL_CONFIG_FILE=$1
+
+    local LCL_FIRST_NAME=$(yq '.first_name' "$LCL_CONFIG_FILE")
+    local LCL_LAST_NAME=$(yq '.last_name' "$LCL_CONFIG_FILE")
+
+    if [[ -z "$LCL_FIRST_NAME" ]]; then
+        PrintUsageAndExitWithCode 1 "${RED}❌ Cardholder first name is required.${NC}"
+    fi
+
+    if [[ -z "$LCL_LAST_NAME" ]]; then
+        PrintUsageAndExitWithCode 1 "${RED}❌ Cardholder last name is required.${NC}"
+    fi
+
+    PrintTrace $TRACE_INFO "📝 Setting YubiKey cardholder name to: $LCL_FIRST_NAME $LCL_LAST_NAME"
+
+    expect <<EOF
+        log_user 1
+        set timeout 60
+        spawn gpg --card-edit
+        expect "gpg/card>" { send "admin\r" }
+        expect "gpg/card>" { send "name\r" }
+        expect "Cardholder's surname:" { send "$LCL_LAST_NAME\r" }
+        expect "Cardholder's given name:" { send "$LCL_FIRST_NAME\r" }
+        expect {
+            "gpg/card>" { send "quit\r" }
+            timeout { puts "❌ Timeout while setting cardholder name"; exit 1 }
+        }
+        expect eof
+EOF
+    local LCL_EXIT_CODE=$?
+
+    [ $LCL_EXIT_CODE -ne 0 ] && PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to set cardholder name on YubiKey.${NC}"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+setYubiKeyLanguage () {
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    local LCL_CONFIG_FILE=$1
+
+    local LCL_LANG_CODE=$(yq '.lang_code' "$LCL_CONFIG_FILE")
+
+    if [[ -z "$LCL_LANG_CODE" || ${#LCL_LANG_CODE} -ne 2 ]]; then
+        PrintUsageAndExitWithCode 1 "${RED}❌ Please provide a valid 2-letter language code (e.g., 'en', 'fr', 'de').${NC}"
+    fi
+
+    PrintTrace $TRACE_INFO "🌐 Setting language on YubiKey to: $LCL_LANG_CODE"
+
+    expect <<EOF
+        log_user 1
+        set timeout 60
+        spawn gpg --card-edit
+        expect "gpg/card>" { send "admin\r" }
+        expect "gpg/card>" { send "lang\r" }
+        expect "Language preferences:" { send "$LCL_LANG_CODE\r" }
+        expect {
+            "gpg/card>" { send "quit\r" }
+            timeout { puts "❌ Timeout while setting language"; exit 1 }
+        }
+        expect eof
+EOF
+    local LCL_EXIT_CODE=$?
+
+    [ $LCL_EXIT_CODE -ne 0 ] && PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to set language on YubiKey.${NC}"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
 }
 
 
@@ -410,7 +481,8 @@ backupGpgSubkeys "$BACKUP_DIR" "$FINGERPRINT" "$BASE_NAME"
 resetYubiKeyPgpApplet
 setYubiKeyResetCode
 storeGpgSubKeysOnYubiKey "$FINGERPRINT"
-
+setYubiKeyCardholderName "$CONFIG_FILE"
+setYubiKeyLanguage "$CONFIG_FILE"
 
 # echo -e "${GREEN}✨ All set. Use 'gpg --edit-key $FINGERPRINT' and run 'keytocard' to move keys manually.${NC}"
 # echo "💡 Reminder: after moving, you may remove the local secret keys using:"
