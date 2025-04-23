@@ -8,6 +8,16 @@ ABK_LIB_FILE_DIR=$(dirname "$BASH_SOURCE")
 # echo "ABK_LIB_FILE_DIR = $ABK_LIB_FILE_DIR"
 ABK_ENV_FILE="$PWD/$ABK_LIB_FILE_DIR/env/abk.env"
 # echo "ABK_ENV_FILE = $ABK_ENV_FILE"
+export TRUE=0
+export FALSE=1
+
+export TRACE_NONE=0
+export TRACE_CRITICAL=1
+export TRACE_ERROR=2
+export TRACE_FUNCTION=3
+export TRACE_INFO=4
+export TRACE_DEBUG=5
+export TRACE_ALL=6
 
 #---------------------------
 # variables
@@ -429,4 +439,15 @@ AbkLib_CheckInstallationCompability() {
 
     PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
+}
+
+PrintTrace() {
+    local LCL_TRACE_LEVEL=$1
+    shift
+    local LCL_PRINT_STRING=("$@")
+    if [ "$LCL_TRACE_LEVEL" -eq "$TRACE_FUNCTION" ]; then
+        [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${CYAN}${LCL_PRINT_STRING[@]}${NC}"
+    else
+        [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${LCL_PRINT_STRING[@]}"
+    fi
 }
