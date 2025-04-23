@@ -32,7 +32,7 @@ PrintUsageAndExitWithCode () {
 checkPrerequisiteToolsAreInstalled () {
     PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
     local LCL_EXIT_CODE=0
-    declare -a required_tools=(gpg gpg-agent yq)
+    declare -a required_tools=(gpg gpg-agent yq ykman)
     for tool in "${required_tools[@]}"; do
       if ! command -v "$tool" &>/dev/null; then
         PrintUsageAndExitWithCode 1 "❌ Required tool '$tool' is not installed. Aborting."
@@ -79,7 +79,8 @@ createMasterGpgKey () {
     local LCL_CONFIG_FILE=$2
     local LCL_EXIT_CODE=0
 
-    name=$(yq '.name' "$LCL_CONFIG_FILE")
+    first_name=$(yq '.first_name' "$LCL_CONFIG_FILE")
+    last_name=$(yq '.last_name' "$LCL_CONFIG_FILE")
     email=$(yq '.email' "$LCL_CONFIG_FILE")
     key_type=$(yq '.key_type // "ed25519"' "$LCL_CONFIG_FILE")
     curve=$(yq '.curve // "ed25519"' "$LCL_CONFIG_FILE")
@@ -97,7 +98,7 @@ createMasterGpgKey () {
 Key-Type: $key_type
 Key-Curve: $curve
 Key-Usage: cert
-Name-Real: $name
+Name-Real: $first_name $last_name
 Name-Email: $email
 Expire-Date: $expiration
 %commit
@@ -256,6 +257,110 @@ backupGpgSubkeys () {
     return $LCL_EXIT_CODE
 }
 
+
+resetYubiKeyPgpApplet () {
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
+    PrintTrace $TRACE_INFO "📝  Resetting YubiKey OpenPGP Applet using ykman..."
+
+    ykman openpgp reset --force
+    local LCL_EXIT_CODE=$?
+
+    [ $LCL_EXIT_CODE -ne 0 ] && PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to reset YubiKey OpenPGP Applet.${NC}"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+setYubiKeyResetCode () {
+    local ADMIN_PIN="12345678"
+    local RESET_CODE="12345678"
+    local LCL_EXIT_CODE=0
+
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
+    PrintTrace $TRACE_INFO "🔐 Setting YubiKey OpenPGP Reset Code..."
+
+    expect <<EOF
+        log_user 1
+        set timeout 60
+        spawn gpg --card-edit
+        expect "gpg/card>" { send "admin\r" }
+        expect "gpg/card>" { send "passwd\r" }
+        expect "Your selection?" { send "4\r" }
+        expect "Admin PIN" { send "$ADMIN_PIN\r" }
+        expect "Reset Code" { send "$RESET_CODE\r" }
+        expect "Reset Code" { send "$RESET_CODE\r" }
+        expect "Your selection?" { send "Q\r" }
+
+        expect {
+            "gpg/card>" { send "quit\r" }
+            timeout { puts "❌ Timeout while setting Reset Code"; exit 1 }
+        }
+        expect eof
+EOF
+    local LCL_EXIT_CODE=$?
+
+    [ $LCL_EXIT_CODE -ne 0 ] && PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to set YubiKey Reset Code.${NC}"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+storeGpgSubKeysOnYubiKey () {
+    local LCL_FINGER_PRINT="$1"
+
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
+    PrintTrace $TRACE_INFO "🔐 Checking the keys on YubiKey..."
+    gpg --card-status
+
+    PrintTrace $TRACE_CRITICAL "⚠️ This will overwrite existing keys on the YubiKey. Continue? (y/n)"
+    read -r CONFIRM
+    if [[ "$CONFIRM" != "y" ]]; then
+        PrintUsageAndExitWithCode 1 "${RED}❌ Operation cancelled.${NC}"
+    fi
+
+    PrintTrace $TRACE_INFO "🔐 Moving subkeys to YubiKey for $LCL_FINGER_PRINT..."
+
+    expect <<EOF
+        log_user 1
+        set timeout 60
+        spawn gpg --edit-key "$LCL_FINGER_PRINT"
+
+        # Select signing subkey (S)
+        expect "gpg>" { send "key 1\r" }
+        expect "gpg>" { send "keytocard\r" }
+        expect "Your selection?" { send "1\r" }
+        expect "Admin PIN" { send "12345678\r" }
+        expect "gpg>" { send "key 1\r" } ;# Deselect
+
+        # Select encryption subkey (E)
+        expect "gpg>" { send "key 2\r" }
+        expect "gpg>" { send "keytocard\r" }
+        expect "Your selection?" { send "2\r" }
+        expect "Admin PIN" { send "12345678\r" }
+        expect "gpg>" { send "key 2\r" } ;# Deselect
+
+        # Select authentication subkey (A)
+        expect "gpg>" { send "key 3\r" }
+        expect "gpg>" { send "keytocard\r" }
+        expect "Your selection?" { send "3\r" }
+        expect "Admin PIN" { send "12345678\r" }
+        expect "gpg>" { send "key 3\r" } ;# Deselect
+
+        # Save changes
+        expect {
+            "gpg>" { send "save\r" }
+            timeout { puts "❌ Timeout moving subkeys to YubiKey"; exit 1 }
+        }
+        expect eof
+EOF
+
+    local LCL_EXIT_CODE=$?
+
+    [ $LCL_EXIT_CODE -ne 0 ] &&  PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to move subkeys to YubiKey.${NC}"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $EXIT_CODE
+}
+
+
 test () {
     PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
 
@@ -302,21 +407,10 @@ createGpgRevocationKey "$BACKUP_DIR" "$FINGERPRINT" "$REVOCATION_KEY"
 backupMasterSecretGpgKey "$BACKUP_DIR" "$FINGERPRINT" "$SECRET_MASTER_KEY"
 backupMasterPublicGpgKey "$BACKUP_DIR" "$FINGERPRINT" "$PUBLIC_MASTER_KEY"
 backupGpgSubkeys "$BACKUP_DIR" "$FINGERPRINT" "$BASE_NAME"
+resetYubiKeyPgpApplet
+setYubiKeyResetCode
+storeGpgSubKeysOnYubiKey "$FINGERPRINT"
 
-
-# ---------------------------
-# Backup secret keys
-# ---------------------------
-# PrintTrace $TRACE_INFO "💾  Backing up keys to $BACKUP_DIR..."
-# gpg --export-secret-keys "$FINGERPRINT" > "$BACKUP_DIR/secret-master.key"
-# gpg --export-secret-subkeys "$FINGERPRINT" > "$BACKUP_DIR/secret-subkeys.key"
-# gpg --export "$FINGERPRINT" > "$BACKUP_DIR/public.key"
-
-# Prompt for moving keys to YubiKey
-# read -rp "🚚 Ready to move keys to YubiKey. Press Enter to continue..."
-
-# Launch keytocard for manual move
-# NOTE: This step still requires some interaction unless scripted with gpg --edit-key + keytocard
 
 # echo -e "${GREEN}✨ All set. Use 'gpg --edit-key $FINGERPRINT' and run 'keytocard' to move keys manually.${NC}"
 # echo "💡 Reminder: after moving, you may remove the local secret keys using:"
