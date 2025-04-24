@@ -38,6 +38,7 @@
         "Venv",
         "virtualenv",
         "virtualenvs",
-        "xclip"
+        "xclip",
+        "yubikey"
     ]
 }
