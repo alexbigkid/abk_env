@@ -432,6 +432,98 @@ EOF
 }
 
 
+setYubiKeyLoginData () {
+    local LCL_CONFIG_FILE="$1"
+
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+
+    local LCL_LOGIN_DATA=$(yq '.login_data' "$LCL_CONFIG_FILE")
+
+    if [[ -z "$LCL_LOGIN_DATA" ]]; then
+        PrintTrace $TRACE_INFO "${YLW}No Login data found in: $LCL_CONFIG_FILE.${NC}"
+        return 1
+    fi
+
+    PrintTrace $TRACE_INFO "📝  Updating YubiKey Login data to: $LCL_LOGIN_DATA"
+
+    expect <<EOF
+        log_user 1
+        set timeout 60
+        spawn gpg --card-edit
+        expect "gpg/card>" { send "admin\r" }
+        expect "gpg/card>" { send "login\r" }
+        expect "Login data (account name):" { send "$LCL_LOGIN_DATA\r" }
+        expect {
+            "gpg/card>" { send "quit\r" }
+            timeout { puts "❌ Timeout while setting Login data"; exit 1 }
+        }
+        expect eof
+EOF
+    local LCL_EXIT_CODE=$?
+
+    if [ $LCL_EXIT_CODE -ne 0 ]; then
+        PrintTrace $TRACE_ERROR "${RED}❌ Failed to update YubiKey Login data.${NC}"
+    else
+        PrintTrace $TRACE_INFO "✅ YubiKey Login data updated successfully."
+    fi
+
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    return $LCL_EXIT_CODE
+}
+
+
+createSshPublicKey () {
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    local LCL_FINGER_PRINT="$1"
+    local LCL_BACKUP_DIR="$2"
+    local LCL_PUBLIC_SSH_KEY_FILE="$3"
+
+    PrintTrace $TRACE_INFO "🔑 Generating SSH public key for $LCL_FINGER_PRINT"
+    gpg --export-ssh-key "$LCL_FINGER_PRINT" > "$LCL_BACKUP_DIR/$LCL_PUBLIC_SSH_KEY_FILE"
+    local LCL_EXIT_CODE=$?
+
+    [ $LCL_EXIT_CODE -ne 0 ] && PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to generate SSH public key.${NC}"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+deleteLocalGpgSecretKeys () {
+    local LCL_FINGER_PRINT="$1"
+    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_INFO "🗑️  Deleting ALL local secret key material for $LCL_FINGER_PRINT"
+
+
+    PrintTrace $TRACE_INFO "🔑 Listing secret keys... before"
+    gpg --list-secret-keys
+
+    # Collect keygrips for master and subkeys
+    # local KEYGRIPS
+    # KEYGRIPS=$(gpg --with-keygrip --list-secret-keys "$LCL_FINGER_PRINT" 2>/dev/null | awk '/Keygrip/ { print $3 }')
+
+    # # Delete each keygrip's private file
+    # for KEYGRIP in $KEYGRIPS; do
+    #     local FILE="$HOME/.gnupg/private-keys-v1.d/${KEYGRIP}.key"
+    #     if [[ -f "$FILE" ]]; then
+    #         PrintTrace $TRACE_INFO "🔑 Deleting private key file: $FILE"
+    #         rm -f "$FILE"
+    #     else
+    #         PrintTrace $TRACE_INFO "⚠️  Key file $FILE not found or already deleted"
+    #     fi
+    # done
+
+    # Delete the reference from GnuPG's keyring (optional cleanup)
+    gpg --batch --yes --delete-secret-keys "$LCL_FINGER_PRINT" || PrintTrace $TRACE_ERROR "⚠️ Could not delete key reference from secret keyring (probably already deleted)"
+    # gpg --batch --yes --delete-keys "$LCL_FINGER_PRINT" || PrintTrace $TRACE_ERROR "⚠️ Could not delete key reference from public keyring (probably already deleted)"
+
+    PrintTrace $TRACE_INFO "🔑 Listing secret keys... after"
+    gpg --list-secret-keys
+
+    PrintTrace $TRACE_INFO "✅ All secret keys for $LCL_FINGER_PRINT removed from local machine."
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+}
+
+
 test () {
     PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]}"
 
@@ -473,26 +565,22 @@ BASE_NAME=$(basename "$CONFIG_FILE" .yaml)
 REVOCATION_KEY="$BASE_NAME.revocation.asc"
 SECRET_MASTER_KEY="$BASE_NAME.master.sec.asc"
 PUBLIC_MASTER_KEY="$BASE_NAME.master.pub.asc"
+PUBLIC_SSH_KEY="$BASE_NAME.ssh.pub"
 
 createGpgRevocationKey "$BACKUP_DIR" "$FINGERPRINT" "$REVOCATION_KEY"
 backupMasterSecretGpgKey "$BACKUP_DIR" "$FINGERPRINT" "$SECRET_MASTER_KEY"
 backupMasterPublicGpgKey "$BACKUP_DIR" "$FINGERPRINT" "$PUBLIC_MASTER_KEY"
 backupGpgSubkeys "$BACKUP_DIR" "$FINGERPRINT" "$BASE_NAME"
+
 resetYubiKeyPgpApplet
 setYubiKeyResetCode
 storeGpgSubKeysOnYubiKey "$FINGERPRINT"
 setYubiKeyCardholderName "$CONFIG_FILE"
 setYubiKeyLanguage "$CONFIG_FILE"
+setYubiKeyLoginData "$CONFIG_FILE"
 
-# echo -e "${GREEN}✨ All set. Use 'gpg --edit-key $FINGERPRINT' and run 'keytocard' to move keys manually.${NC}"
-# echo "💡 Reminder: after moving, you may remove the local secret keys using:"
-# echo "    gpg --delete-secret-key $FINGERPRINT"
-# echo "    gpg --import $BACKUP_DIR/secret-subkeys.key  # If needed for access without YubiKey"
-
-
-
-# end
-
+createSshPublicKey "$FINGERPRINT" "$BACKUP_DIR" "$PUBLIC_SSH_KEY"
+deleteLocalGpgSecretKeys "$FINGERPRINT"
 
 PrintTrace $TRACE_FUNCTION "<- $0 ($EXIT_CODE)"
 echo
