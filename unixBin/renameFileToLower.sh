@@ -14,7 +14,7 @@ GenerateRandomNumber ()
     local LCL_EXIT_CODE=0
     local LCL_RETURN_VALUE=
 
-    [ $TRACE != 0 ] && echo "-> ${FUNCNAME[0]} ($@)"
+    [ $TRACE != 0 ] && echo "-> ${FUNCNAME[0]} ($*)"
     # [ $TRACE != 0 ] && echo "   \$LCL_NUMBER_OF_DIGITS = $LCL_NUMBER_OF_DIGITS"
 
     for (( c=0; c<=$LCL_NUMBER_OF_DIGITS; c++ ))
@@ -33,7 +33,7 @@ LowerFileName ()
     local LCL_TEMP_SUFFIX=$2
     local LCL_EXIT_CODE=0
 
-    [ $TRACE != 0 ] && echo "-> ${FUNCNAME[0]} ($@)"
+    [ $TRACE != 0 ] && echo "-> ${FUNCNAME[0]} ($*)"
     # [ $TRACE != 0 ] && echo "   \$LCL_FILE_NAME = $LCL_FILE_NAME"
     # [ $TRACE != 0 ] && echo "   \$LCL_TEMP_SUFFIX = $LCL_TEMP_SUFFIX"
 

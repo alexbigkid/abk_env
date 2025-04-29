@@ -314,7 +314,7 @@ AbkLib_GetJsonInstructions() {
 }
 
 AbkLib_CheckPreRequisites_macOS() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_EXIT_CODE=0
     local IS_BREW_INSTALLED=$FALSE
 
@@ -337,7 +337,7 @@ AbkLib_CheckPreRequisites_macOS() {
 
 
 AbkLib_CheckPreRequisites_linux() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_EXIT_CODE=0
 
     AbkLib_GetIdLike_linux LINUX_ID_LIKE || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} AbkLib_GetIdLike_linux failed"
@@ -355,7 +355,7 @@ AbkLib_CheckPreRequisites_linux() {
 
 
 AbkLib_CheckPreRequisites() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_EXIT_CODE=0
 
     # is $SHELL supported
