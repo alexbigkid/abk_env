@@ -69,36 +69,119 @@ printYubiKeyInfo () {
 fetchPublicKeyFromYubiKey() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]}"
     local LCL_EXIT_CODE=0
+    local LCL_MAX_RETRIES=3
+    local LCL_RETRY_COUNT=0
+    local LCL_RETRY_DELAY=4 # seconds
+
     PrintTrace $TRACE_INFO "🔍 Fetching public key from YubiKey"
     # local public_key=$(gpg --card-status | grep "public key" | awk '{print $6}')
     # PrintTrace $TRACE_INFO "✅ Public key: $public_key"
+
+    while [ $LCL_RETRY_COUNT -le $LCL_MAX_RETRIES ]; do
+        PrintTrace $TRACE_INFO "🔍 Fetching public key attempt: $LCL_RETRY_COUNT"
+
+        expect <<EOF
+            log_user 1
+            set timeout 60
+            spawn gpg --card-edit
+            expect {
+                "gpg/card>" { send "fetch\r" }
+                timeout { puts "❌ Timeout while starting card edit"; exit 1 }
+            }
+            expect {
+                -re "gpg: WARNING: unable to fetch URI.*" {
+                    puts "❌ Failed to fetch public key from URL"
+                    exit 1
+                }
+                "gpg/card>" {
+                    send "quit\r"
+                }
+                timeout {
+                    puts "❌ Timeout while waiting for fetch to complete"
+                    exit 1
+                }
+            }
+            expect eof
+EOF
+        LCL_EXIT_CODE=$?
+
+        if [ $LCL_EXIT_CODE -eq 0 ]; then
+            PrintTrace $TRACE_INFO "✅ Public key fetched successfully on attempt: $LCL_RETRY_COUNT"
+            break
+        elif [ $LCL_RETRY_COUNT -lt $LCL_MAX_RETRIES ]; then
+            PrintTrace $TRACE_INFO "❌ Attempt: $LCL_RETRY_COUNT failed to fetch public. Retrying..."
+        else
+            PrintTrace $TRACE_INFO "❌ Failed to fetch public key after attempts: $LCL_RETRY_COUNT. Exit code: $LCL_EXIT_CODE"
+            break
+        fi
+        ((LCL_RETRY_COUNT++))
+        sleep $LCL_RETRY_DELAY
+    done
+
+    [ $LCL_EXIT_CODE -ne 0 ] && PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to fetch public key from YubiKey. Aborting.${NC}"
+    PrintTrace $TRACE_INFO "✅ Public key fetched successfully."
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+getGpGFingerprint() {
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_RETURN_VAR=$1
+    local LCL_EXIT_CODE=0
+
+    # local LCL_KEY_URL=$(gpg --card-status | grep "URL of public key" | awk '{print $6}')
+    # PrintTrace $TRACE_INFO "✅ Public key fingerprint: $LCL_KEY_FP"
+    local LCL_KEY_URL=$(gpg --card-status | awk -F': ' '/URL of public key/ {print $2}')
+    [ -z "$LCL_KEY_URL" ] && PrintUsageAndExitWithCode 1 "${RED}❌ Could not extract public key URL from YubiKey.${NC}"
+    PrintTrace $TRACE_INFO "🔍 Public key URL: $LCL_KEY_URL"
+
+    local LCL_KEY_FP=$(basename "$LCL_KEY_URL" | sed 's/\.pub\.asc$//')
+    [ -z "$LCL_KEY_FP" ] && PrintUsageAndExitWithCode 1 "${RED}❌ Failed to extract fingerprint from URL: $LCL_KEY_URL${NC}"
+
+    PrintTrace $TRACE_INFO "✅ Public key fingerprint: $LCL_KEY_FP"
+    eval $LCL_RETURN_VAR=\$LCL_KEY_FP
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+setGpgKeyTrustToUltimate() {
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_KEY_FP="$1"
+    local LCL_EXIT_CODE=0
+
+    if [[ -z "$LCL_KEY_FP" ]]; then
+        PrintUsageAndExitWithCode 1 "${RED}❌ No key fingerprint provided. Aborting.${NC}"
+    fi
+
+    PrintTrace $TRACE_INFO "🔐 Setting trust level of key $LCL_KEY_FP to ultimate"
+
     expect <<EOF
         log_user 1
-        set timeout 60
-        spawn gpg --card-edit
+        set timeout 30
+        spawn gpg --edit-key $LCL_KEY_FP
+        expect "gpg>" { send "trust\r" }
         expect {
-            "gpg/card>" { send "fetch\r" }
-            timeout { puts "❌ Timeout while starting card edit"; exit 1 }
+            "Your decision?" { send "5\r" }  # ultimate
+            timeout { puts "❌ Timeout during trust selection"; exit 1 }
         }
         expect {
-            -re "gpg: WARNING: unable to fetch URI.*" {
-                puts "❌ Failed to fetch public key from URL"
-                exit 1
-            }
-            "gpg/card>" {
-                send "quit\r"
-            }
-            timeout {
-                puts "❌ Timeout while waiting for fetch to complete"
-                exit 1
-            }
+            "Do you really want to set this key to ultimate trust?" { send "y\r" }
+            timeout { puts "❌ Timeout during trust confirmation"; exit 1 }
         }
+        expect "gpg>" { send "quit\r" }
         expect eof
 EOF
+
     LCL_EXIT_CODE=$?
 
-    [ $LCL_EXIT_CODE -ne 0 ] && PrintUsageAndExitWithCode 1 "${RED}❌ Failed to fetch public key from YubiKey. Aborting.${NC}"
-    PrintTrace $TRACE_INFO "✅ Public key fetched successfully."
+    if [ $LCL_EXIT_CODE -ne 0 ]; then
+        PrintTrace $TRACE_ERROR "❌ Failed to set trust level for $LCL_KEY_FP"
+    else
+        PrintTrace $TRACE_INFO "✅ Trust level set to ultimate for key $LCL_KEY_FP"
+    fi
+
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
 }
@@ -130,7 +213,8 @@ checkYubiKeyPresence
 
 printYubiKeyInfo
 fetchPublicKeyFromYubiKey
-
+getGpGFingerprint KEY_FP
+setGpgKeyTrustToUltimate "$KEY_FP"
 
 PrintTrace $TRACE_FUNCTION "<- $0 ($EXIT_CODE)"
 echo
