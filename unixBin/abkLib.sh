@@ -61,7 +61,7 @@ ABK_ENV_NAME="ABK_ENV"
 # functions
 #---------------------------
 AbkLib_AddEnvironmentSettings() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_ENV_NAME=$1
     local LCL_FILE_TO_ADD_CONTENT_TO=$2
     shift
@@ -91,7 +91,7 @@ TEXT_TO_ADD
 }
 
 AbkLib_RemoveEnvironmentSettings() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_ENV_NAME=$1
     local LCL_FILE_TO_REMOVE_CONTENT_FROM=$2
     local LCL_RESULT=$FALSE
@@ -114,7 +114,7 @@ AbkLib_RemoveEnvironmentSettings() {
 }
 
 AbkLib_IsParameterHelp() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local NUMBER_OF_PARAMETERS=$1
     local PARAMETER=$2
     if [ $NUMBER_OF_PARAMETERS -eq 1 ] && [ "$PARAMETER" == "--help" ]; then
@@ -140,7 +140,7 @@ AbkLib_GetPathFromLink() {
 }
 
 AbkLib_IsStringInArray() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_STRING_TO_SEARCH_FOR=$1
     shift
     local LCL_ARRAY_TO_SEARCH_IN=("$@")
@@ -158,7 +158,7 @@ AbkLib_IsStringInArray() {
 }
 
 AbkLib_IsBrewInstalled() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RESULT=$TRUE
     # homebrew installed?
     if [[ $(command -v brew) == "" ]]; then
@@ -179,7 +179,7 @@ AbkLib_SourceEnvironment() {
 
 
 AbkLib_CheckNumberOfParameters() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
     local LCL_EXPECTED_NUMBER_OF_PARAMS=$1
     shift
     local LCL_PARAMETERS_PASSED_IN=("$@")
@@ -198,7 +198,7 @@ AbkLib_CheckNumberOfParameters() {
 }
 
 AbkLib_GetIdLike_linux() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_LINUX_ID_LIKE=
@@ -215,7 +215,7 @@ AbkLib_GetIdLike_linux() {
 }
 
 AbkLib_GetId_linux() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_LINUX_ID="$(cat /etc/os-release | grep '^ID=.*' | cut -d'=' -f2)"
@@ -228,7 +228,7 @@ AbkLib_GetId_linux() {
 }
 
 AbkLib_GetId_macOS() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_MACOS_ID="macOS"
@@ -242,7 +242,7 @@ AbkLib_GetId_macOS() {
 }
 
 AbkLib_GetId_unix() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_UNIX_ID=
@@ -254,7 +254,7 @@ AbkLib_GetId_unix() {
 }
 
 AbkLib_GetVersionId_linux() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_LINUX_VERSION_ID="$(cat /etc/os-release | grep '^VERSION_ID=.*' | cut -d'=' -f2 | sed 's/"//g')"
@@ -267,7 +267,7 @@ AbkLib_GetVersionId_linux() {
 }
 
 AbkLib_GetVersionId_macOS() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_MACOS_VERSION_ID="$(sw_vers -productVersion | cut -d'.' -f1)"
@@ -280,7 +280,7 @@ AbkLib_GetVersionId_macOS() {
 }
 
 AbkLib_GetVersionId_unix() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_UNIX_VERSION_ID=
@@ -292,7 +292,7 @@ AbkLib_GetVersionId_unix() {
 }
 
 AbkLib_GetJsonInstructions() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_JSON_FILE=$2
     local LCL_EXIT_CODE=0
@@ -374,7 +374,7 @@ AbkLib_CheckPreRequisites() {
 
 
 AbkLib_MarkInstalledStep() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_INSTALLED_TYPE=$1
     local LCL_INSTALLED_TOOL=$2
     local LCL_INSTALLED_STEP=$3
@@ -398,7 +398,7 @@ AbkLib_MarkInstalledStep() {
 
 
 AbkLib_InstallTool() {
-    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "    -> ${FUNCNAME[0]} ($*)"
     local LCL_TOOL=$1
     local LCL_INSTALL_INSTRACTIONS=$2
     local LCL_EXIT_CODE=0
