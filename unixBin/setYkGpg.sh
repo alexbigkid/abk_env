@@ -10,6 +10,7 @@ EXPECTED_NUMBER_OF_PARAMETERS=0
 SCRIPT_NAME=$(basename $0)
 SCRIPT_PATH=$(dirname $0)
 ABK_LIB_FILE="$SCRIPT_PATH/abkLib.sh"
+GNUPG_DIR="$HOME/.gnupg"
 
 
 #---------------------------
@@ -32,7 +33,14 @@ PrintUsageAndExitWithCode ()
 checkPrerequisiteToolsAreInstalled () {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]}"
     local LCL_EXIT_CODE=0
-    declare -a required_tools=(gpg gpg-agent yq ykman)
+    if [ "$ABK_UNIX_TYPE" = "macOS" ]; then
+        declare -a required_tools=(gpg gpg-agent yq ykman pinentry-mac)
+    elif [ "$ABK_UNIX_TYPE" = "linux" ]; then
+        declare -a required_tools=(gpg gpg-agent yq ykman pinentry)
+    else
+        PrintTrace $TRACE_ERROR "${RED}❌ Unknown OS type: $ABK_UNIX_TYPE${NC}"
+    fi
+
     for tool in "${required_tools[@]}"; do
       if ! command -v "$tool" &>/dev/null; then
         PrintUsageAndExitWithCode 1 "${RED}❌ Required tool '$tool' is not installed. Please install: $tool. Aborting.${NC}"
@@ -187,6 +195,54 @@ EOF
 }
 
 
+setGitGpgSigningConfig() {
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_KEY_FP="$1"
+    local LCL_EXIT_CODE=0
+
+    PrintTrace $TRACE_INFO "🔐 Setting gpg to use long key format"
+    gpg --list-secret-keys --keyid-format=long
+    [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ gpg failed to set long format${NC}"
+
+    PrintTrace $TRACE_INFO "🔐 Setting git to use sign key: $LCL_KEY_FP"
+    git config --global user.signingkey "$LCL_KEY_FP"
+    [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign key${NC}"
+
+    PrintTrace $TRACE_INFO "🔐 Setting git to sign commits"
+    git config --global commit.gpgsign true
+    [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign commits${NC}"
+
+    PrintTrace $TRACE_INFO "🔐 Setting git to sign tags"
+    git config --global tag.gpgsign true
+    [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign tags${NC}"
+
+    PrintTrace $TRACE_INFO "🔐 Setting git to sign push"
+    git config --global push.gpgsign true
+    [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign push${NC}"
+
+    PrintTrace $TRACE_INFO "🔐 Setting up gpg tool"
+    git config --global gpg.program $(which gpg)
+
+    PrintTrace $TRACE_INFO "🔐 Setting git to use gpg for signing"
+    mkdir -p $GNUPG_DIR
+    chmod 700 $GNUPG_DIR
+
+    local LCL_PIN_ENTRY_PATH=""
+    if [ "$ABK_UNIX_TYPE" = "macOS" ]; then
+        LCL_PIN_ENTRY_PATH=$(which pinentry-mac 2>/dev/null)
+    elif [ "$ABK_UNIX_TYPE" = "linux" ]; then
+        LCL_PIN_ENTRY_PATH=$(which pinentry 2>/dev/null)
+    else
+        PrintTrace $TRACE_ERROR "${RED}❌ Unknown OS type: $ABK_UNIX_TYPE${NC}"
+    fi
+    grep -qxF "pinentry-program $LCL_PIN_ENTRY_PATH" $GNUPG_DIR/gpg-agent.conf || AbkLib_AddEnvironmentSettings "PIN_ENTRY" "$GNUPG_DIR/gpg-agent.conf" "pinentry-program $LCL_PIN_ENTRY_PATH"
+    gpgconf --kill gpg-agent
+
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
 #---------------------------
 # main
 #---------------------------
@@ -215,6 +271,7 @@ printYubiKeyInfo
 fetchPublicKeyFromYubiKey
 getGpGFingerprint KEY_FP
 setGpgKeyTrustToUltimate "$KEY_FP"
+setGitGpgSigningConfig "$KEY_FP"
 
 PrintTrace $TRACE_FUNCTION "<- $0 ($EXIT_CODE)"
 echo
