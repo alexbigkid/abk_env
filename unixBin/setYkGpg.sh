@@ -33,13 +33,7 @@ PrintUsageAndExitWithCode ()
 checkPrerequisiteToolsAreInstalled () {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]}"
     local LCL_EXIT_CODE=0
-    if [ "$ABK_UNIX_TYPE" = "macOS" ]; then
-        declare -a required_tools=(gpg gpg-agent yq ykman pinentry-mac)
-    elif [ "$ABK_UNIX_TYPE" = "linux" ]; then
-        declare -a required_tools=(gpg gpg-agent yq ykman pinentry)
-    else
-        PrintTrace $TRACE_ERROR "${RED}❌ Unknown OS type: $ABK_UNIX_TYPE${NC}"
-    fi
+    declare -a required_tools=(gpg gpg-agent yq ykman)
 
     for tool in "${required_tools[@]}"; do
       if ! command -v "$tool" &>/dev/null; then
@@ -133,7 +127,7 @@ EOF
 }
 
 
-getGpGFingerprint() {
+getGpgFingerprint() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
@@ -223,20 +217,76 @@ setGitGpgSigningConfig() {
     PrintTrace $TRACE_INFO "🔐 Setting up gpg tool"
     git config --global gpg.program $(which gpg)
 
-    PrintTrace $TRACE_INFO "🔐 Setting git to use gpg for signing"
-    mkdir -p $GNUPG_DIR
-    chmod 700 $GNUPG_DIR
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
 
-    local LCL_PIN_ENTRY_PATH=""
-    if [ "$ABK_UNIX_TYPE" = "macOS" ]; then
-        LCL_PIN_ENTRY_PATH=$(which pinentry-mac 2>/dev/null)
-    elif [ "$ABK_UNIX_TYPE" = "linux" ]; then
-        LCL_PIN_ENTRY_PATH=$(which pinentry 2>/dev/null)
-    else
-        PrintTrace $TRACE_ERROR "${RED}❌ Unknown OS type: $ABK_UNIX_TYPE${NC}"
-    fi
-    grep -qxF "pinentry-program $LCL_PIN_ENTRY_PATH" $GNUPG_DIR/gpg-agent.conf || AbkLib_AddEnvironmentSettings "PIN_ENTRY" "$GNUPG_DIR/gpg-agent.conf" "pinentry-program $LCL_PIN_ENTRY_PATH"
+
+setSshGpgConfig() {
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_KEY_FP="$1"
+    local LCL_EXIT_CODE=0
+
+    PrintTrace $TRACE_INFO "🔐 Setting GPG directory"
+    mkdir -p "$GNUPG_DIR"
+    chmod 700 "$GNUPG_DIR"
+    touch "$GNUPG_DIR/gpg-agent.conf"
+    chmod 600 "$GNUPG_DIR/gpg-agent.conf"
+
+    PrintTrace $TRACE_INFO "🔐 Enabling SSH support"
+    local LCL_CONTENT_TO_ADD_ARRAY=(
+        'enable-ssh-support'
+    )
+    grep -q "enable-ssh-support" $GNUPG_DIR/gpg-agent.conf || AbkLib_AddEnvironmentSettings "ENABLE_SSH_SUPPORT" "$GNUPG_DIR/gpg-agent.conf" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
+
+    PrintTrace $TRACE_INFO "🔐 Restarting gpg-agent"
     gpgconf --kill gpg-agent
+    [ $? -eq 0 ] && PrintTrace $TRACE_INFO "✅ gpg-agent stopped" || Printrace $TRACE_ERROR "${RED}❌ gpg-agent failed to stop${NC}"
+    sleep 1
+    gpgconf --launch gpg-agent
+    [ $? -eq 0 ] && PrintTrace $TRACE_INFO "✅ gpg-agent started" || Printrace $TRACE_ERROR "${RED}❌ gpg-agent failed to start${NC}"
+
+    PrintTrace $TRACE_INFO "🔐 Setting up SSH key for GPG"
+    LCL_CONTENT_TO_ADD_ARRAY=(
+        'export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)'
+    )
+    grep -q "export SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || AbkLib_AddEnvironmentSettings "SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
+
+    PrintTrace $TRACE_INFO "🔐 Reloading environment"
+    if [ "$ABK_SHELL" = "zsh" ]; then
+        zsh -c "source $HOME/$ABK_USER_CONFIG_FILE_SHELL"
+    elif [ "$ABK_SHELL" = "bash" ]; then
+        source "$HOME/$ABK_USER_CONFIG_FILE_SHELL"
+    else
+        PrintTrace $TRACE_ERROR "${RED}❌ Unsupported shell: $ABK_SHELL${NC}"
+    fi
+
+    PrintTrace $TRACE_INFO "🔐 Available SSH keys:"
+    ssh-add -L | grep cardno: || PrintTrace $TRACE_INFO "${YLW}⚠️  No GPG-based SSH key found.${NC}"
+
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+exportSshPubKeyFromYubikey() {
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_KEY_FP="$1"
+    local LCL_EXIT_CODE=0
+    local LCL_SSH_DIR="$HOME/.ssh"
+
+    mkdir -p "$LCL_SSH_DIR"
+    chmod 700 "$LCL_SSH_DIR"
+
+    PrintTrace $TRACE_INFO "🔐 Exporting SSH public key from YubiKey"
+    gpg --export-ssh-key "$LCL_KEY_FP" > "$LCL_SSH_DIR/$LCL_KEY_FP.ssh.pub"
+    LCL_EXIT_CODE=$?
+
+    if [ $LCL_EXIT_CODE -ne 0 ]; then
+        PrintTrace $TRACE_ERROR "❌ Failed to export SSH public key from YubiKey"
+    else
+        PrintTrace $TRACE_INFO "✅ SSH public key exported successfully from YubiKey"
+    fi
 
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
@@ -269,9 +319,11 @@ checkYubiKeyPresence
 
 printYubiKeyInfo
 fetchPublicKeyFromYubiKey
-getGpGFingerprint KEY_FP
+getGpgFingerprint KEY_FP
 setGpgKeyTrustToUltimate "$KEY_FP"
 setGitGpgSigningConfig "$KEY_FP"
+setSshGpgConfig "$KEY_FP"
+exportSshPubKeyFromYubikey "$KEY_FP"
 
 PrintTrace $TRACE_FUNCTION "<- $0 ($EXIT_CODE)"
 echo
