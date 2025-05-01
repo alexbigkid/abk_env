@@ -4,7 +4,6 @@
 #---------------------------
 # variables definitions
 #---------------------------
-TRACE=1
 EXIT_CODE=0
 EXPECTED_NUMBER_OF_PARAMETERS=0
 SCRIPT_NAME=$(basename $0)
@@ -19,10 +18,9 @@ GNUPG_DIR="$HOME/.gnupg"
 PrintUsageAndExitWithCode ()
 {
     echo "-> PrintUsageAndExitWithCode"
-    echo "$0 - extracts pass passwords"
+    echo "$0 - sets up GPG/SSH config with YubiKey"
     echo "usage: $0"
     echo "  $0 --help   - display this info"
-    echo "  <pass path to extract> - name of password directory to extract passwords for"
     echo "<- PrintUsageAndExitWithCode ($1)"
     echo
     echo $2
@@ -264,14 +262,14 @@ setSshGpgConfig() {
         "max-cache-ttl 7200"
         "pinentry-program $LCL_PIN_ENTRY_PATH"
     )
-    grep -q "enable-ssh-support" $GNUPG_DIR/gpg-agent.conf || AbkLib_AddEnvironmentSettings "ENABLE_SSH_SUPPORT" "$GNUPG_DIR/gpg-agent.conf" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
+    AbkLib_AddEnvironmentSettings "ENABLE_SSH_SUPPORT" "$GNUPG_DIR/gpg-agent.conf" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
 
     PrintTrace $TRACE_INFO "🔐 Restarting gpg-agent"
     gpgconf --kill gpg-agent
-    [ $? -eq 0 ] && PrintTrace $TRACE_INFO "✅ gpg-agent stopped" || Printrace $TRACE_ERROR "${RED}❌ gpg-agent failed to stop${NC}"
+    [ $? -eq 0 ] && PrintTrace $TRACE_INFO "✅ gpg-agent stopped" || PrintTrace $TRACE_ERROR "${RED}❌ gpg-agent failed to stop${NC}"
     sleep 1
     gpgconf --launch gpg-agent
-    [ $? -eq 0 ] && PrintTrace $TRACE_INFO "✅ gpg-agent started" || Printrace $TRACE_ERROR "${RED}❌ gpg-agent failed to start${NC}"
+    [ $? -eq 0 ] && PrintTrace $TRACE_INFO "✅ gpg-agent started" || PrintTrace $TRACE_ERROR "${RED}❌ gpg-agent failed to start${NC}"
 
     PrintTrace $TRACE_INFO "🔐 Setting up SSH key for GPG"
     LCL_CONTENT_TO_ADD_ARRAY=(
@@ -280,7 +278,7 @@ setSshGpgConfig() {
         'gpgconf --kill gpg-agent'
         'gpgconf --launch gpg-agent'
     )
-    grep -q "export SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || AbkLib_AddEnvironmentSettings "SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
+    AbkLib_AddEnvironmentSettings "SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
 
     PrintTrace $TRACE_INFO "🔐 Reloading environment"
     if [ "$ABK_SHELL" = "zsh" ]; then
@@ -307,9 +305,12 @@ addGpgAuthKeyToSshControl() {
 
     touch "$LCL_SSHCONTROL_FILE"
     chmod 600 "$LCL_SSHCONTROL_FILE"
+    local LCL_CONTENT_TO_ADD_ARRAY=(
+        "$LCL_AUTH_KEYGRIP"
+    )
 
     PrintTrace $TRACE_INFO "🔐 Adding GPG auth key to $LCL_SSHCONTROL_FILE"
-    grep -q "$LCL_AUTH_KEYGRIP" "$LCL_SSHCONTROL_FILE" || echo "$LCL_AUTH_KEYGRIP" >> "$LCL_SSHCONTROL_FILE"
+    AbkLib_AddEnvironmentSettings "$LCL_AUTH_KEYGRIP" "$LCL_SSHCONTROL_FILE" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
     LCL_EXIT_CODE=$?
 
     if [ $LCL_EXIT_CODE -ne 0 ]; then
