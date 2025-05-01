@@ -33,7 +33,13 @@ PrintUsageAndExitWithCode ()
 checkPrerequisiteToolsAreInstalled () {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]}"
     local LCL_EXIT_CODE=0
-    declare -a required_tools=(gpg gpg-agent yq ykman)
+    if [ "$ABK_UNIX_TYPE" = "macOS" ]; then
+        declare -a required_tools=(gpg gpg-agent yq ykman pinentry-mac)
+    elif [ "$ABK_UNIX_TYPE" = "linux" ]; then
+        declare -a required_tools=(gpg gpg-agent yq ykman pinentry)
+    else
+        PrintTrace $TRACE_ERROR "${RED}❌ Unknown OS type: $ABK_UNIX_TYPE${NC}"
+    fi
 
     for tool in "${required_tools[@]}"; do
       if ! command -v "$tool" &>/dev/null; then
@@ -211,13 +217,28 @@ setGitGpgSigningConfig() {
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign tags${NC}"
 
     PrintTrace $TRACE_INFO "🔐 Setting git to sign push"
-    git config --global push.gpgsign true
+    git config --global push.gpgsign false
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign push${NC}"
 
     PrintTrace $TRACE_INFO "🔐 Setting up gpg tool"
     git config --global gpg.program $(which gpg)
 
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+extractGpgAuthKey() {
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_RETURN_VAR=$1
+    local LCL_EXIT_CODE=0
+
+    local LCL_AUTH_KEYGRIPS
+    LCL_AUTH_KEYGRIPS=$(gpg --with-keygrip -K | awk '/^ssb/ { t=0 } /\[A\]/ { t=1 } t && /Keygrip/ { print $3 }')
+    [ -z "$LCL_AUTH_KEYGRIPS" ] && LCL_EXIT_CODE=1
+
+    eval $LCL_RETURN_VAR=\$LCL_AUTH_KEYGRIPS
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_AUTH_KEYGRIPS)"
     return $LCL_EXIT_CODE
 }
 
@@ -234,8 +255,14 @@ setSshGpgConfig() {
     chmod 600 "$GNUPG_DIR/gpg-agent.conf"
 
     PrintTrace $TRACE_INFO "🔐 Enabling SSH support"
+    local LCL_PIN_ENTRY_PATH
+    [ "$ABK_UNIX_TYPE" = "macOS" ] && LCL_PIN_ENTRY_PATH=$(which pinentry-mac) || LCL_PIN_ENTRY_PATH=$(which pinentry)
+    [ -z "$LCL_PIN_ENTRY_PATH" ] && PrintUsageAndExitWithCode 1 "${RED}❌ Failed to find pinentry program.${NC}"
     local LCL_CONTENT_TO_ADD_ARRAY=(
-        'enable-ssh-support'
+        "enable-ssh-support"
+        "default-cache-ttl 600"
+        "max-cache-ttl 7200"
+        "pinentry-program $LCL_PIN_ENTRY_PATH"
     )
     grep -q "enable-ssh-support" $GNUPG_DIR/gpg-agent.conf || AbkLib_AddEnvironmentSettings "ENABLE_SSH_SUPPORT" "$GNUPG_DIR/gpg-agent.conf" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
 
@@ -248,7 +275,10 @@ setSshGpgConfig() {
 
     PrintTrace $TRACE_INFO "🔐 Setting up SSH key for GPG"
     LCL_CONTENT_TO_ADD_ARRAY=(
+        'export GPG_TTY=$(tty)'
         'export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)'
+        'gpgconf --kill gpg-agent'
+        'gpgconf --launch gpg-agent'
     )
     grep -q "export SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || AbkLib_AddEnvironmentSettings "SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
 
@@ -263,6 +293,30 @@ setSshGpgConfig() {
 
     PrintTrace $TRACE_INFO "🔐 Available SSH keys:"
     ssh-add -L | grep cardno: || PrintTrace $TRACE_INFO "${YLW}⚠️  No GPG-based SSH key found.${NC}"
+
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+addGpgAuthKeyToSshControl() {
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_AUTH_KEYGRIP="$1"
+    local LCL_SSHCONTROL_FILE="$GNUPG_DIR/sshcontrol"
+    local LCL_EXIT_CODE=0
+
+    touch "$LCL_SSHCONTROL_FILE"
+    chmod 600 "$LCL_SSHCONTROL_FILE"
+
+    PrintTrace $TRACE_INFO "🔐 Adding GPG auth key to $LCL_SSHCONTROL_FILE"
+    grep -q "$LCL_AUTH_KEYGRIP" "$LCL_SSHCONTROL_FILE" || echo "$LCL_AUTH_KEYGRIP" >> "$LCL_SSHCONTROL_FILE"
+    LCL_EXIT_CODE=$?
+
+    if [ $LCL_EXIT_CODE -ne 0 ]; then
+        PrintTrace $TRACE_ERROR "❌ Failed to add GPG key to $LCL_SSHCONTROL_FILE"
+    else
+        PrintTrace $TRACE_INFO "✅ GPG key added to $LCL_SSHCONTROL_FILE"
+    fi
 
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
@@ -323,6 +377,7 @@ getGpgFingerprint KEY_FP
 setGpgKeyTrustToUltimate "$KEY_FP"
 setGitGpgSigningConfig "$KEY_FP"
 setSshGpgConfig "$KEY_FP"
+extractGpgAuthKey AUTH_SUB_KEY_FP && addGpgAuthKeyToSshControl "$AUTH_SUB_KEY_FP"
 exportSshPubKeyFromYubikey "$KEY_FP"
 
 PrintTrace $TRACE_FUNCTION "<- $0 ($EXIT_CODE)"
