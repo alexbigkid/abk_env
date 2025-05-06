@@ -198,28 +198,30 @@ setGitGpgSigningConfig() {
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
 
-    PrintTrace $TRACE_INFO "🔐 Setting gpg to use long key format"
+    PrintTrace $TRACE_INFO "🔐 Setting gpg long key format"
     gpg --list-secret-keys --keyid-format=long
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ gpg failed to set long format${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Setting git to use sign key: $LCL_KEY_FP"
+    PrintTrace $TRACE_INFO "🔐 Setting git user.signingkey: $LCL_KEY_FP"
     git config --global user.signingkey "$LCL_KEY_FP"
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign key${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Setting git to sign commits"
+    PrintTrace $TRACE_INFO "🔐 Setting git commit.gpgsign to true"
     git config --global commit.gpgsign true
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign commits${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Setting git to sign tags"
+    PrintTrace $TRACE_INFO "🔐 Setting git tag.gpgsign to true"
     git config --global tag.gpgsign true
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign tags${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Setting git to sign push"
+    PrintTrace $TRACE_INFO "🔐 Setting git push.gpgsign to false"
     git config --global push.gpgsign false
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ git failed to set sign push${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Setting up gpg tool"
-    git config --global gpg.program $(which gpg)
+    local LCL_GPG_PROGRAM_PATH
+    LCL_GPG_PROGRAM_PATH=$(which gpg)
+    PrintTrace $TRACE_INFO "🔐 Setting up gpg.program to $LCL_GPG_PROGRAM_PATH"
+    git config --global gpg.program "$LCL_GPG_PROGRAM_PATH"
 
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
@@ -245,24 +247,32 @@ setSshGpgConfig() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
+    local LCL_GPG_AGENT_CONTENT_ARRAY=()
+    local LCL_SHELL_CONTENT_ARRAY=()
+    local LCL_GPG_AGENT_CONFIG="$GNUPG_DIR/gpg-agent.conf"
+    local LCL_ENV_SCRIPT_NAME="SET_YK_GPG"
+    local LCL_PIN_ENTRY_PATH
 
     PrintTrace $TRACE_INFO "🔐 Setting GPG directory"
     mkdir -p "$GNUPG_DIR"
     chmod 700 "$GNUPG_DIR"
-    touch "$GNUPG_DIR/gpg-agent.conf"
-    chmod 600 "$GNUPG_DIR/gpg-agent.conf"
+    touch "$LCL_GPG_AGENT_CONFIG"
+    chmod 600 "$LCL_GPG_AGENT_CONFIG"
 
     PrintTrace $TRACE_INFO "🔐 Enabling SSH support"
-    local LCL_PIN_ENTRY_PATH
     [ "$ABK_UNIX_TYPE" = "macOS" ] && LCL_PIN_ENTRY_PATH=$(which pinentry-mac) || LCL_PIN_ENTRY_PATH=$(which pinentry)
+    PrintTrace $TRACE_INFO "🔐 Pinentry program: $LCL_PIN_ENTRY_PATH"
     [ -z "$LCL_PIN_ENTRY_PATH" ] && PrintUsageAndExitWithCode 1 "${RED}❌ Failed to find pinentry program.${NC}"
-    local LCL_CONTENT_TO_ADD_ARRAY=(
-        "enable-ssh-support"
-        "default-cache-ttl 600"
-        "max-cache-ttl 7200"
-        "pinentry-program $LCL_PIN_ENTRY_PATH"
-    )
-    AbkLib_AddEnvironmentSettings "ENABLE_SSH_SUPPORT" "$GNUPG_DIR/gpg-agent.conf" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
+    PrintTrace $TRACE_INFO "🔐 Checking $LCL_GPG_AGENT_CONFIG"
+    grep -q "enable-ssh-support" "$LCL_GPG_AGENT_CONFIG" || LCL_GPG_AGENT_CONTENT_ARRAY+=("enable-ssh-support")
+    PrintTrace $TRACE_INFO "🔐 enable-ssh-support: ${LCL_GPG_AGENT_CONTENT_ARRAY[@]}"
+    grep -q "default-cache-ttl 600" "$LCL_GPG_AGENT_CONFIG" || LCL_GPG_AGENT_CONTENT_ARRAY+=("default-cache-ttl 600")
+    PrintTrace $TRACE_INFO "🔐 default-cache-ttl: ${LCL_GPG_AGENT_CONTENT_ARRAY[@]}"
+    grep -q "max-cache-ttl 7200" "$LCL_GPG_AGENT_CONFIG" || LCL_GPG_AGENT_CONTENT_ARRAY+=("max-cache-ttl 7200")
+    PrintTrace $TRACE_INFO "🔐 max-cache-ttl: ${LCL_GPG_AGENT_CONTENT_ARRAY[@]}"
+    grep -q "pinentry-program $LCL_PIN_ENTRY_PATH" "$LCL_GPG_AGENT_CONFIG" || LCL_GPG_AGENT_CONTENT_ARRAY+=("pinentry-program $LCL_PIN_ENTRY_PATH")
+    PrintTrace $TRACE_INFO "🔐 pinentry-program: ${LCL_GPG_AGENT_CONTENT_ARRAY[@]}"
+    [ ${#LCL_GPG_AGENT_CONTENT_ARRAY[@]} -ne 0 ] && AbkLib_AddEnvironmentSettings "$LCL_ENV_SCRIPT_NAME" "$LCL_GPG_AGENT_CONFIG" "${LCL_GPG_AGENT_CONTENT_ARRAY[@]}"
 
     PrintTrace $TRACE_INFO "🔐 Restarting gpg-agent"
     gpgconf --kill gpg-agent
@@ -272,13 +282,11 @@ setSshGpgConfig() {
     [ $? -eq 0 ] && PrintTrace $TRACE_INFO "✅ gpg-agent started" || PrintTrace $TRACE_ERROR "${RED}❌ gpg-agent failed to start${NC}"
 
     PrintTrace $TRACE_INFO "🔐 Setting up SSH key for GPG"
-    LCL_CONTENT_TO_ADD_ARRAY=(
-        'export GPG_TTY=$(tty)'
-        'export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)'
-        'gpgconf --kill gpg-agent'
-        'gpgconf --launch gpg-agent'
-    )
-    AbkLib_AddEnvironmentSettings "SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
+    grep -q 'export GPG_TTY=$(tty)' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('export GPG_TTY=$(tty)')
+    grep -q 'export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)')
+    grep -q 'gpgconf --kill gpg-agent' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('gpgconf --kill gpg-agent')
+    grep -q 'gpgconf --launch gpg-agent' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('gpgconf --launch gpg-agent')
+    [ ${#LCL_SHELL_CONTENT_ARRAY[@]} -ne 0 ] && AbkLib_AddEnvironmentSettings "$LCL_ENV_SCRIPT_NAME" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" "${LCL_SHELL_CONTENT_ARRAY[@]}"
 
     PrintTrace $TRACE_INFO "🔐 Reloading environment"
     if [ "$ABK_SHELL" = "zsh" ]; then

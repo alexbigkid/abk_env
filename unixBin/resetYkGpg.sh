@@ -144,10 +144,10 @@ resetSshGpgConfig() {
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
     local LCL_GPG_AGENT_CONF_FILE="$GNUPG_DIR/gpg-agent.conf"
-
+    local LCL_ENV_SCRIPT_NAME="SET_YK_GPG"
 
     PrintTrace $TRACE_INFO "🔐 Resetting SSH key for GPG"
-    AbkLib_RemoveEnvironmentSettings "SSH_AUTH_SOCK" "$HOME/$ABK_USER_CONFIG_FILE_SHELL"
+    AbkLib_RemoveEnvironmentSettings "$LCL_ENV_SCRIPT_NAME" "$HOME/$ABK_USER_CONFIG_FILE_SHELL"
 
     PrintTrace $TRACE_INFO "🔐 Reloading environment"
     if [ "$ABK_SHELL" = "zsh" ]; then
@@ -160,7 +160,7 @@ resetSshGpgConfig() {
 
     PrintTrace $TRACE_INFO "🔐 Disabling SSH support"
     if [ -f "$LCL_GPG_AGENT_CONF_FILE" ]; then
-        AbkLib_RemoveEnvironmentSettings "ENABLE_SSH_SUPPORT" "$LCL_GPG_AGENT_CONF_FILE"
+        AbkLib_RemoveEnvironmentSettings "$LCL_ENV_SCRIPT_NAME" "$LCL_GPG_AGENT_CONF_FILE"
         [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}❌ Failed to remove SSH support from gpg-agent.conf${NC}"
     else
         PrintTrace $TRACE_WARNING "⚠️ gpg-agent.conf file does not exist: $LCL_GPG_AGENT_CONF_FILE"
@@ -187,23 +187,23 @@ resetGitGpgSigningConfig() {
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
 
-    PrintTrace $TRACE_INFO "🔐 Unsetting git to use sign key: $LCL_KEY_FP"
+    PrintTrace $TRACE_INFO "🔐 Unsetting git user.signingkey: $LCL_KEY_FP"
     git config --global --unset user.signingkey
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${YLW}⚠️ git failed to unset sign key${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Unsetting git to sign commits"
+    PrintTrace $TRACE_INFO "🔐 Unsetting git commit.gpgsign"
     git config --global --unset commit.gpgsign
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}⚠️ git failed to unset sign commits${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Unsetting git to sign tags"
+    PrintTrace $TRACE_INFO "🔐 Unsetting git tag.gpgsign"
     git config --global --unset tag.gpgsign
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}⚠️ git failed to unset sign tags${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Unsetting git to sign push"
+    PrintTrace $TRACE_INFO "🔐 Unsetting git push.gpgsign"
     git config --global --unset push.gpgsign
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}⚠️ git failed to unset sign push${NC}"
 
-    PrintTrace $TRACE_INFO "🔐 Unsetting up gpg tool"
+    PrintTrace $TRACE_INFO "🔐 Unsetting up gpg.program"
     git config --global --unset gpg.program
     [ $? -ne 0 ] && PrintTrace $TRACE_ERROR "${RED}⚠️ git failed to unset gpg tool${NC}"
 
