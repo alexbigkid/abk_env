@@ -12,6 +12,7 @@ ABK tool environment setup for developers
 * Easy updates
 * Easy user friendly prompt config
 * Useful aliases
+* using YubiKey for setting up security (SSH/GPG)
 * Company wide password manager (WIP)
 
 
