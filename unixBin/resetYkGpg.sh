@@ -54,10 +54,11 @@ printYubiKeyInfo () {
 extractGpgAuthKey() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
+    local LCL_KEY_FP="$2"
     local LCL_EXIT_CODE=0
 
     local LCL_AUTH_KEYGRIPS
-    LCL_AUTH_KEYGRIPS=$(gpg --with-keygrip -K | awk '/^ssb/ { t=0 } /\[A\]/ { t=1 } t && /Keygrip/ { print $3 }')
+    LCL_AUTH_KEYGRIPS=$(gpg --with-keygrip -K "$LCL_KEY_FP" | awk '/^ssb/ { t=0 } /\[A\]/ { t=1 } t && /Keygrip/ { print $3 }')
     [ -z "$LCL_AUTH_KEYGRIPS" ] && LCL_EXIT_CODE=1
 
     eval $LCL_RETURN_VAR=\$LCL_AUTH_KEYGRIPS
@@ -296,9 +297,9 @@ set -e
 checkYubiKeyPresence
 printYubiKeyInfo
 
-extractGpgAuthKey AUTH_SUB_KEY_FP && removeGpgAuthKeyFromSshControl "$AUTH_SUB_KEY_FP"
 getGpgFingerprint KEY_FP
 PrintTrace $TRACE_INFO "🔐 GPG key fingerprint: $KEY_FP"
+extractGpgAuthKey AUTH_SUB_KEY_FP "$KEY_FP" && removeGpgAuthKeyFromSshControl "$AUTH_SUB_KEY_FP"
 deleteSshPubKeyFile "$KEY_FP"
 resetSshGpgConfig "$KEY_FP"
 resetGitGpgSigningConfig "$KEY_FP"
