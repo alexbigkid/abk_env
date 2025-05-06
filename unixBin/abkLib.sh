@@ -72,7 +72,7 @@ AbkLib_AddEnvironmentSettings() {
     if [ "$LCL_ENV_NAME" != "" ] && [ -f "$LCL_FILE_TO_ADD_CONTENT_TO" ] && [ ${#LCL_SETTINGS_TO_ADD[@]} -ne 0 ]; then
         LCL_RESULT=$TRUE
 
-        if grep -q -e "$IROBOT_ENV_BEGIN $LCL_ENV_NAME" $LCL_FILE_TO_ADD_CONTENT_TO; then
+        if grep -q -e "$ABK_ENV_BEGIN $LCL_ENV_NAME" $LCL_FILE_TO_ADD_CONTENT_TO; then
             PrintTrace $TRACE_INFO "    [Environment already added. Nothing to do here.]"
         else
             PrintTrace $TRACE_INFO "    [Adding $LCL_ENV_NAME environment ...]"
