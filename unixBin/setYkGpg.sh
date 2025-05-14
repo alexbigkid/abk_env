@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# export passwords to external file
 
 #---------------------------
 # variables definitions
