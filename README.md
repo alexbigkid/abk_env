@@ -1,4 +1,4 @@
-# README: tool-env repo
+# README: abk_env repo
 ABK tool environment setup for developers
 
 [TOC]
