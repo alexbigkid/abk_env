@@ -24,6 +24,7 @@
                 "tree": ["command -v tree"],
                 "tfenv": ["command -v tfenv"],
                 "typescript": ["command -v tsc"],
+                "uv": ["command -v uv"],
                 "wget": ["command -v wget"],
                 "yq": ["command -v yq"],
                 "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
@@ -73,6 +74,7 @@
                 ],
                 "tree": ["brew install tree"],
                 "typescript": ["brew install typescript"],
+                "uv": ["brew install uv"],
                 "wget": ["brew install wget"],
                 "yq": ["brew install yq"],
                 "zsh-autocomplete": [
@@ -134,6 +136,7 @@
                 ],
                 "tree": ["brew uninstall tree"],
                 "typescript": ["brew uninstall typescript"],
+                "uv": ["brew uninstall uv"],
                 "wget": ["brew uninstall wget"],
                 "yq": ["brew uninstall yq"],
                 "zsh-autocomplete": [
@@ -301,6 +304,7 @@
                     "serverless": ["command -v serverless"],
                     "tfenv": ["command -v tfenv"],
                     "tree": ["command -v tree"],
+                    "uv": ["command -v uv"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
@@ -364,6 +368,7 @@
                         "tfenv install 1.3.9"
                     ],
                     "tree": ["sudo apt install -y tree"],
+                    "uv": ["curl -LsSf https://astral.sh/uv/install.sh | sh"],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo snap install yq"],
                     "xclip": ["sudo apt install -y xclip"],
@@ -424,6 +429,12 @@
                         "rm -Rf ~/.tfenv"
                     ],
                     "tree": ["sudo apt remove -y tree"],
+                    "uv": [
+                        "uv cache clean",
+                        "rm -r \"$(uv python dir)\"",
+                        "rm -r \"$(uv tool dir)\"",
+                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                    ],
                     "wget": ["sudo apt remove -y wget"],
                     "yq": ["sudo snap remove yq"],
                     "xclip": ["sudo apt remove -y xclip"],
