@@ -6,38 +6,60 @@ on:
 
 jobs:
   MacOS:
-    name: MacOS ${{ matrix.macos-version }}
-    runs-on: macos-${{ matrix.macos-version }}
+    name: MacOS ${{ matrix.version }} - ${{ matrix.shell }}
+    runs-on: macos-${{ matrix.version }}
     strategy:
       matrix:
-        macos-version: [13, 14, 15]
+        version: [13, 14, 15]
+        shell: [bash, zsh]
     steps:
       - uses: actions/checkout@v4
-      - name: Run tool install/uninstall tests on macOS
+      - name: Run tool install/uninstall in ${{ matrix.shell }}
         run: |
-          echo "Running on macOS ${{ matrix.macos-version }}"
-          ./install.sh
-          ls -la unixPackages
-          cat unixPackages/installed.json
-          ./uninstall.sh
-          ls -la unixPackages
+          echo "Running on macOS ${{ matrix.version }} with ${{ matrix.shell }}"
+          ${{ matrix.shell }} -c "
+            ./install.sh
+            echo
+            echo 'content of directory unixPackages'
+            ls -la unixPackages
+            echo
+            echo 'content of installed.json'
+            cat unixPackages/installed.json
+            echo
+            echo content of .${{ matrix.shell }}rc'
+            cat ~/.${{ matrix.shell }}rc
+            ./uninstall.sh
+            echo 'content of directory unixPackages'
+            ls -la unixPackages
+            "
 
   Ubuntu:
-    name: Ubuntu ${{ matrix.ubuntu-version }}
-    runs-on: ubuntu-${{ matrix.ubuntu-version }}
+    name: Ubuntu ${{ matrix.version }}
+    runs-on: ubuntu-${{ matrix.version }}
     strategy:
       matrix:
-        ubuntu-version: [22.04, 24.04]
+        version: [22.04, 24.04]
+        shell: [bash, zsh]
     steps:
       - uses: actions/checkout@v4
-      - name: Run tool install/uninstall tests on Ubuntu
+      - name: Run tool install/uninstall in ${{ matrix.shell }}
         run: |
-          echo "Running on Ubuntu ${{ matrix.ubuntu-version }}"
-          ./install.sh
-          ls -la unixPackages
-          cat unixPackages/installed.json
-          ./uninstall.sh
-          ls -la unixPackages
+          echo "Running on Ubuntu ${{ matrix.version }} with ${{ matrix.shell }}"
+          ${{ matrix.shell }} -c "
+            ./install.sh
+            echo
+            echo 'content of directory unixPackages'
+            ls -la unixPackages
+            echo
+            echo 'content of installed.json'
+            cat unixPackages/installed.json
+            echo
+            echo content of .${{ matrix.shell }}rc'
+            cat ~/.${{ matrix.shell }}rc
+            ./uninstall.sh
+            echo 'content of directory unixPackages'
+            ls -la unixPackages
+          "
 
 #   Docker:
 #     name: Linux Docker - ${{ matrix.os }}:${{ matrix.version }}
