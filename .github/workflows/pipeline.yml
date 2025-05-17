@@ -18,6 +18,9 @@ jobs:
         run: |
           echo "Running on macOS ${{ matrix.version }} with ${{ matrix.shell }}"
           ${{ matrix.shell }} -c "
+            echo SHELL = $SHELL
+            echo
+            echo
             ./install.sh
             echo
             echo 'content of directory unixPackages'
@@ -34,7 +37,7 @@ jobs:
             "
 
   Ubuntu:
-    name: Ubuntu ${{ matrix.version }}
+    name: Ubuntu ${{ matrix.version }} - ${{ matrix.shell }}
     runs-on: ubuntu-${{ matrix.version }}
     strategy:
       matrix:
@@ -46,6 +49,8 @@ jobs:
         run: |
           echo "Running on Ubuntu ${{ matrix.version }} with ${{ matrix.shell }}"
           ${{ matrix.shell }} -c "
+            echo SHELL = $SHELL
+            echo
             ./install.sh
             echo
             echo 'content of directory unixPackages'
