@@ -1,4 +1,4 @@
-name: Test Tool Install/Uninstall
+name: abk_env
 
 on:
   push:
@@ -23,16 +23,16 @@ jobs:
             echo
             ./install.sh
             echo
-            echo 'content of directory unixPackages'
+            echo content of directory unixPackages
             ls -la unixPackages
             echo
-            echo 'content of installed.json'
+            echo content of installed.json
             cat unixPackages/installed.json
             echo
-            echo content of .${{ matrix.shell }}rc'
+            echo content of .${{ matrix.shell }}rc
             cat ~/.${{ matrix.shell }}rc
             ./uninstall.sh
-            echo 'content of directory unixPackages'
+            echo content of directory unixPackages
             ls -la unixPackages
             "
 
@@ -53,16 +53,16 @@ jobs:
             echo
             ./install.sh
             echo
-            echo 'content of directory unixPackages'
+            echo content of directory unixPackages
             ls -la unixPackages
             echo
-            echo 'content of installed.json'
+            echo content of installed.json
             cat unixPackages/installed.json
             echo
-            echo content of .${{ matrix.shell }}rc'
+            echo content of .${{ matrix.shell }}rc
             cat ~/.${{ matrix.shell }}rc
             ./uninstall.sh
-            echo 'content of directory unixPackages'
+            echo content of directory unixPackages
             ls -la unixPackages
           "
 
