@@ -14,6 +14,19 @@ jobs:
         shell: [bash, zsh]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ensure ${{ matrix.shell }} is installed
+        run: |
+            SHELL_CMD="${{ matrix.shell }}"
+            echo "Checking if $SHELL_CMD is installed..."
+            if ! command -v "$SHELL_CMD" &> /dev/null; then
+                echo "$SHELL_CMD not found, attempting to install..."
+                sudo apt-get update
+                sudo apt-get install -y "$SHELL_CMD"
+            else
+                echo "$SHELL_CMD is already installed."
+            fi
+
       - name: Run tool install/uninstall in ${{ matrix.shell }}
         run: |
           echo "Running on macOS ${{ matrix.version }} with ${{ matrix.shell }}"
@@ -45,6 +58,19 @@ jobs:
         shell: [bash, zsh]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ensure ${{ matrix.shell }} is installed
+        run: |
+            SHELL_CMD="${{ matrix.shell }}"
+            echo "Checking if $SHELL_CMD is installed..."
+            if ! command -v "$SHELL_CMD" &> /dev/null; then
+                echo "$SHELL_CMD not found, attempting to install..."
+                sudo apt-get update
+                sudo apt-get install -y "$SHELL_CMD"
+            else
+                echo "$SHELL_CMD is already installed."
+            fi
+
       - name: Run tool install/uninstall in ${{ matrix.shell }}
         run: |
           echo "Running on Ubuntu ${{ matrix.version }} with ${{ matrix.shell }}"
