@@ -1,4 +1,4 @@
-# README: abk_env repo
+# README: abk_env repo ![Tests](https://github.com/alexbigkid/abk_env/actions/workflows/pipeline.yml/badge.svg)
 ABK tool environment setup for developers
 
 [TOC]
