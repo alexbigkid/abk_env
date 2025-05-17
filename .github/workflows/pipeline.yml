@@ -1,0 +1,79 @@
+name: Test Tool Install/Uninstall
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  MacOS:
+    name: MacOS ${{ matrix.macos-version }}
+    runs-on: macos-${{ matrix.macos-version }}
+    strategy:
+      matrix:
+        macos-version: [13, 14, 15]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tool install/uninstall tests on macOS
+        run: |
+          echo "Running on macOS ${{ matrix.macos-version }}"
+          ./install.sh
+          ls -la unixPackages
+          cat unixPackages/installed.json
+          ./uninstall.sh
+          ls -la unixPackages
+
+  Ubuntu:
+    name: Ubuntu ${{ matrix.ubuntu-version }}
+    runs-on: ubuntu-${{ matrix.ubuntu-version }}
+    strategy:
+      matrix:
+        ubuntu-version: [22.04, 24.04]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tool install/uninstall tests on Ubuntu
+        run: |
+          echo "Running on Ubuntu ${{ matrix.ubuntu-version }}"
+          ./install.sh
+          ls -la unixPackages
+          cat unixPackages/installed.json
+          ./uninstall.sh
+          ls -la unixPackages
+
+#   Docker:
+#     name: Linux Docker - ${{ matrix.os }}:${{ matrix.version }}
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         include:
+#           - os: debian
+#             version: "9"
+#           - os: debian
+#             version: "10"
+#           - os: debian
+#             version: "11"
+#           - os: debian
+#             version: "12"
+#           - os: raspbian
+#             version: "9"
+#           - os: raspbian
+#             version: "10"
+#           - os: raspbian
+#             version: "11"
+#           - os: raspbian
+#             version: "12"
+#           - os: ubuntu
+#             version: "20.10"
+#           - os: ubuntu
+#             version: "22.10"
+#           - os: ubuntu
+#             version: "24.04"
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Run tool install/uninstall tests in Docker
+#         run: |
+#           docker pull ${{ matrix.os }}:${{ matrix.version }}
+#           docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace ${{ matrix.os }}:${{ matrix.version }} /bin/bash -c "
+#             apt-get update && apt-get install -y bash sudo curl gnupg
+#             ./test-install.sh
+#             ./test-uninstall.sh
+#           "
