@@ -50,9 +50,10 @@
                 "nmap": ["brew install nmap"],
                 "nodenv": [
                     "brew install nodenv",
-                    "nodenv install 16.20.2",
-                    "nodenv install 18.18.2",
-                    "nodenv install 21.5.0",
+                    "nodenv install 20.19.1",
+                    "nodenv install 22.15.0",
+                    "nodenv install 24.0.1",
+                    "nodenv global 22.15.0",
                     "ln -s ./XXX_nodenv.env ./unixBin/env/LINK_nodenv.env"
                 ],
                 "oh-my-posh": [
@@ -113,9 +114,9 @@
                 "nmap": ["brew uninstall nmap"],
                 "nodenv": [
                     "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
-                    "nodenv uninstall -f 16.20.2",
-                    "nodenv uninstall -f 18.18.2",
-                    "nodenv uninstall -f 21.5.0",
+                    "nodenv uninstall -f 20.19.1",
+                    "nodenv uninstall -f 22.15.0",
+                    "nodenv uninstall -f 24.0.1",
                     "brew uninstall nodenv",
                     "rm -Rf ~/.nodenv"
                 ],
@@ -349,10 +350,10 @@
                         "git clone https://github.com/nodenv/node-build.git $(nodenv root)/plugins/node-build",
                         "git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases",
                         "ln -s ./XXX_nodenv.env ./unixBin/env/LINK_nodenv.env",
-                        "nodenv install 16.20.2",
-                        "nodenv install 18.18.2",
-                        "nodenv install 21.5.0",
-                        "nodenv global 21.5.0"
+                        "nodenv install 20.19.1",
+                        "nodenv install 22.15.0",
+                        "nodenv install 24.0.1",
+                        "nodenv global 22.15.0"
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
@@ -415,9 +416,9 @@
                     "nmap": ["sudo apt remove -y nmap"],
                     "nodenv": [
                         "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
-                        "nodenv uninstall -f 16.20.2",
-                        "nodenv uninstall -f 18.18.2",
-                        "nodenv uninstall -f 21.5.0",
+                        "nodenv uninstall -f 20.19.1",
+                        "nodenv uninstall -f 22.15.0",
+                        "nodenv uninstall -f 24.0.1",
                         "sudo find /usr/local/bin -type l -name 'nodenv' -delete",
                         "rm -Rf ~/.nodenv"
                     ],
