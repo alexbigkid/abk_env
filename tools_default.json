@@ -2,7 +2,7 @@
     "macOS": {
         "description": "Installing ABK tool set for MacOS",
         "supported_versions": {
-            "macOS": ["11", "12", "13", "14"]
+            "macOS": ["11", "12", "13", "14", "15"]
         },
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
@@ -20,6 +20,7 @@
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "parallel": ["command -v parallel"],
                 "pyenv": ["command -v pyenv"],
+                "ruff": ["command -v ruff"],
                 "serverless": ["command -v serverless"],
                 "tree": ["command -v tree"],
                 "tfenv": ["command -v tfenv"],
@@ -67,6 +68,7 @@
                     "pyenv virtualenv 3.11.5 bwp",
                     "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
                 ],
+                "ruff": ["brew install ruff"],
                 "serverless": ["brew install serverless"],
                 "tfenv": [
                     "brew install tfenv",
@@ -74,7 +76,10 @@
                 ],
                 "tree": ["brew install tree"],
                 "typescript": ["brew install typescript"],
-                "uv": ["brew install uv"],
+                "uv": [
+                    "brew install uv",
+                    "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                ],
                 "wget": ["brew install wget"],
                 "yq": ["brew install yq"],
                 "zsh-autocomplete": [
@@ -129,6 +134,7 @@
                     "brew uninstall pyenv",
                     "rm -Rf ~/.pyenv"
                 ],
+                "ruff": ["brew uninstall ruff"],
                 "serverless": ["brew uninstall serverless"],
                 "tfenv": [
                     "tfenv uninstall 1.3.9",
@@ -136,7 +142,10 @@
                 ],
                 "tree": ["brew uninstall tree"],
                 "typescript": ["brew uninstall typescript"],
-                "uv": ["brew uninstall uv"],
+                "uv": [
+                    "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                    "brew uninstall uv"
+                ],
                 "wget": ["brew uninstall wget"],
                 "yq": ["brew uninstall yq"],
                 "zsh-autocomplete": [
@@ -282,7 +291,7 @@
             "supported_versions": {
                 "debian": ["9", "10", "11", "12"],
                 "raspbian": ["9", "10", "11", "12"],
-                "ubuntu": ["20.04", "20.10", "22.04"]
+                "ubuntu": ["20.04", "20.10", "22.04", "22.10", "24.04"]
             },
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
@@ -301,6 +310,7 @@
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
+                    "ruff": ["command -v ruff"],
                     "serverless": ["command -v serverless"],
                     "tfenv": ["command -v tfenv"],
                     "tree": ["command -v tree"],
@@ -360,6 +370,7 @@
                         "pyenv virtualenv 3.11.5 bwp",
                         "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
                     ],
+                    "ruff": ["pip install ruff"],
                     "serverless": ["sudo npm install -g serverless"],
                     "tfenv": [
                         "git clone https://github.com/tfutils/tfenv.git ~/.tfenv",
@@ -368,7 +379,10 @@
                         "tfenv install 1.3.9"
                     ],
                     "tree": ["sudo apt install -y tree"],
-                    "uv": ["curl -LsSf https://astral.sh/uv/install.sh | sh"],
+                    "uv": [
+                        "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                    ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo snap install yq"],
                     "xclip": ["sudo apt install -y xclip"],
@@ -421,6 +435,7 @@
                         "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
                         "rm -Rf ~/.pyenv"
                     ],
+                    "ruff": ["pip uninstall ruff"],
                     "serverless": ["sudo npm uninstall -g serverless"],
                     "tfenv": [
                         "tfenv uninstall 1.3.9",
@@ -430,6 +445,7 @@
                     ],
                     "tree": ["sudo apt remove -y tree"],
                     "uv": [
+                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
                         "uv cache clean",
                         "rm -r \"$(uv python dir)\"",
                         "rm -r \"$(uv tool dir)\"",
