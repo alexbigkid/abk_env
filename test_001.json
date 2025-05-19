@@ -1,0 +1,213 @@
+{
+    "macOS": {
+        "description": "Installing ABK tool set for MacOS",
+        "supported_versions": {
+            "macOS": ["11", "12", "13", "14", "15"]
+        },
+        "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
+        "tools": {
+            "check": {
+                "aws": ["command -v aws"],
+                "direnv": ["command -v direnv"],
+                "oh-my-posh": ["brew list | grep oh-my-posh"],
+                "parallel": ["command -v parallel"],
+                "pyenv": ["command -v pyenv"],
+                "ruff": ["command -v ruff"],
+                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+            },
+            "install": {
+                "aws": [
+                    "brew install awscli",
+                    "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
+                ],
+                "direnv": [
+                    "brew install direnv",
+                    "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                ],
+                "oh-my-posh": [
+                    "brew install oh-my-posh",
+                    "oh-my-posh init $ABK_SHELL",
+                    "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                ],
+                "parallel": ["brew install parallel"],
+                "pyenv": [
+                    "brew install pyenv",
+                    "brew install pyenv-virtualenv",
+                    "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                ],
+                "ruff": ["brew install ruff"],
+                "zsh-autocomplete": [
+                    "brew install zsh-autocomplete",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ],
+                "zsh-autosuggestions": [
+                    "brew install zsh-autosuggestions",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ],
+                "zsh-syntax-highlighting": [
+                    "brew install zsh-syntax-highlighting",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ]
+            },
+            "uninstall": {
+                "aws": [
+                    "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
+                    "brew uninstall awscli"
+                ],
+                "direnv": [
+                    "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+                    "brew uninstall direnv"
+                ],
+                "oh-my-posh": [
+                    "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                    "brew uninstall oh-my-posh"
+                ],
+                "parallel": ["brew uninstall parallel"],
+                "pyenv": [
+                    "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
+                    "brew uninstall pyenv-virtualenv",
+                    "brew uninstall pyenv",
+                    "rm -Rf ~/.pyenv"
+                ],
+                "ruff": ["brew uninstall ruff"],
+                "zsh-autocomplete": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autocomplete"
+                ],
+                "zsh-autosuggestions": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autosuggestions"
+                ],
+                "zsh-syntax-highlighting": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-syntax-highlighting"
+                ]
+            }
+        },
+        "apps": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        },
+        "fonts": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        }
+    },
+    "linux": {
+        "debian": {
+            "description": "Installing ABK tool set for Linux / Debian based distro",
+            "supported_versions": {
+                "debian": ["9", "10", "11", "12"],
+                "raspbian": ["9", "10", "11", "12"],
+                "ubuntu": ["20.04", "20.10", "22.04", "22.10", "24.04"]
+            },
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "tools": {
+                "check": {
+                    "aws": ["command -v aws"],
+                    "direnv": ["command -v direnv"],
+                    "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
+                    "parallel": ["command -v parallel"],
+                    "pyenv": ["command -v pyenv"],
+                    "ruff": ["command -v ruff"],
+                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                },
+                "install": {
+                    "aws": [
+                        "curl \"https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip\" -o \"awscliv2.zip\"",
+                        "unzip awscliv2.zip",
+                        "sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli",
+                        "[ -d ./aws ] && rm -Rf aws",
+                        "[ -e ./awscliv2.zip ] && rm awscliv2.zip",
+                        "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
+                    ],
+                    "direnv": [
+                        "sudo apt install -y direnv",
+                        "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                    ],
+                    "oh-my-posh": [
+                        "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
+                        "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                    ],
+                    "parallel": ["sudo apt install -y parallel"],
+                    "pyenv": [
+                        "sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git",
+                        "git clone https://github.com/pyenv/pyenv.git ~/.pyenv",
+                        "sudo ln -vs ~/.pyenv/bin/pyenv /usr/local/bin/pyenv",
+                        "(cd ~/.pyenv && src/configure && make -C src || true)",
+                        "mkdir -p ~/.pyenv/plugins",
+                        "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
+                        "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                    ],
+                    "ruff": ["pip install ruff"],
+                    "zsh-autosuggestions": [
+                        "sudo apt install -y zsh-autosuggestions",
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "sudo apt install -y zsh-syntax-highlighting",
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    ]
+                },
+                "uninstall": {
+                    "aws": [
+                        "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
+                        "sudo find /usr/local/bin -type l -name 'aws' -delete",
+                        "sudo find /usr/local/bin -type l -name 'aws_completer' -delete",
+                        "[ -d /usr/local/aws-cli ] && sudo rm -Rf /usr/local/aws-cli"
+                    ],
+                    "direnv": [
+                        "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+                        "sudo apt remove -y direnv"
+                    ],
+                    "oh-my-posh": [
+                        "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                        "rm ./unixBin/oh-my-posh"
+                    ],
+                    "parallel": ["sudo apt remove -y parallel"],
+                    "pyenv": [
+                        "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
+                        "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
+                        "rm -Rf ~/.pyenv"
+                    ],
+                    "ruff": ["pip uninstall ruff"],
+                    "zsh-autosuggestions": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-autosuggestions"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-syntax-highlighting"
+                    ]
+                }
+            },
+            "apps": {
+                "check": {
+                },
+                "install":{
+                },
+                "uninstall": {
+                }
+            },
+            "fonts": {
+                "check": {
+                },
+                "install": {
+                },
+                "uninstall": {
+                }
+            }
+        }
+    }
+}

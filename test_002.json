@@ -1,0 +1,217 @@
+{
+    "macOS": {
+        "description": "Installing ABK tool set for MacOS",
+        "supported_versions": {
+            "macOS": ["11", "12", "13", "14", "15"]
+        },
+        "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
+        "tools": {
+            "check": {
+                "aws": ["command -v aws"],
+                "direnv": ["command -v direnv"],
+                "exiftool": ["command -v exiftool"],
+                "typescript": ["command -v tsc"],
+                "uv": ["command -v uv"],
+                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+            },
+            "install": {
+                "aws": [
+                    "brew install awscli",
+                    "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
+                ],
+                "direnv": [
+                    "brew install direnv",
+                    "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                ],
+                "exiftool": ["brew install exiftool"],
+                "typescript": ["brew install typescript"],
+                "uv": [
+                    "brew install uv",
+                    "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                ],
+                "zsh-autocomplete": [
+                    "brew install zsh-autocomplete",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ],
+                "zsh-autosuggestions": [
+                    "brew install zsh-autosuggestions",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ],
+                "zsh-syntax-highlighting": [
+                    "brew install zsh-syntax-highlighting",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ]
+            },
+            "uninstall": {
+                "aws": [
+                    "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
+                    "brew uninstall awscli"
+                ],
+                "direnv": [
+                    "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+                    "brew uninstall direnv"
+                ],
+                "exiftool": ["brew uninstall exiftool"],
+                "typescript": ["brew uninstall typescript"],
+                "uv": [
+                    "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                    "brew uninstall uv"
+                ],
+                "zsh-autocomplete": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autocomplete"
+                ],
+                "zsh-autosuggestions": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autosuggestions"
+                ],
+                "zsh-syntax-highlighting": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-syntax-highlighting"
+                ]
+            }
+        },
+        "apps": {
+            "check": {
+                "brave-browser": [
+                    "brew list --cask | grep ^brave-browser$",
+                    "ls \"/Applications/Brave Browser.app\"",
+                    "ls \"~/Applications/Brave Browser.app\""
+                ],
+                "flycut": [
+                    "brew list --cask | grep ^flycut$",
+                    "ls \"/Applications/Flycut.app\"",
+                    "ls \"~/Applications/Flycut.app\""
+                ]
+            },
+            "install": {
+                "brave-browser": ["brew install --cask brave-browser"],
+                "flycut": ["brew install --cask flycut"]
+            },
+            "uninstall": {
+                "brave-browser": ["brew uninstall --cask brave-browser"],
+                "flycut": ["brew uninstall --cask flycut"]
+            }
+        },
+        "fonts": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        }
+    },
+    "linux": {
+        "debian": {
+            "description": "Installing ABK tool set for Linux / Debian based distro",
+            "supported_versions": {
+                "debian": ["9", "10", "11", "12"],
+                "raspbian": ["9", "10", "11", "12"],
+                "ubuntu": ["20.04", "20.10", "22.04", "22.10", "24.04"]
+            },
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "tools": {
+                "check": {
+                    "aws": ["command -v aws"],
+                    "direnv": ["command -v direnv"],
+                    "ffmpeg": ["command -v ffmpeg"],
+                    "tree": ["command -v tree"],
+                    "uv": ["command -v uv"],
+                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                },
+                "install": {
+                    "aws": [
+                        "curl \"https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip\" -o \"awscliv2.zip\"",
+                        "unzip awscliv2.zip",
+                        "sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli",
+                        "[ -d ./aws ] && rm -Rf aws",
+                        "[ -e ./awscliv2.zip ] && rm awscliv2.zip",
+                        "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
+                    ],
+                    "direnv": [
+                        "sudo apt install -y direnv",
+                        "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                    ],
+                    "ffmpeg": ["sudo apt install -y ffmpeg"],
+                    "tree": ["sudo apt install -y tree"],
+                    "uv": [
+                        "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                    ],
+                    "zsh-autosuggestions": [
+                        "sudo apt install -y zsh-autosuggestions",
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "sudo apt install -y zsh-syntax-highlighting",
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    ]
+                },
+                "uninstall": {
+                    "aws": [
+                        "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
+                        "sudo find /usr/local/bin -type l -name 'aws' -delete",
+                        "sudo find /usr/local/bin -type l -name 'aws_completer' -delete",
+                        "[ -d /usr/local/aws-cli ] && sudo rm -Rf /usr/local/aws-cli"
+                    ],
+                    "direnv": [
+                        "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+                        "sudo apt remove -y direnv"
+                    ],
+                    "ffmpeg": ["sudo apt remove -y ffmpeg"],
+                    "tree": ["sudo apt remove -y tree"],
+                    "uv": [
+                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                        "uv cache clean",
+                        "rm -r \"$(uv python dir)\"",
+                        "rm -r \"$(uv tool dir)\"",
+                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                    ],
+                    "zsh-autosuggestions": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-autosuggestions"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-syntax-highlighting"
+                    ]
+                }
+            },
+            "apps": {
+                "check": {
+                    "visual-studio-code": ["command -v code"]
+                },
+                "install":{
+                    "visual-studio-code": [
+                        "sudo snap install --classic code",
+                        "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
+                        "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+                        "mkdir -p $ABK_VSCODE_USER_CONFIG_DIR",
+                        "[ ! -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$ABK_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.shellIntegration.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.tabs.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"terminal.integrated.tabs.title\": \"${cwd}\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "jq '. + {\"files.autoSave\": \"afterDelay\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\""
+                    ]
+                },
+                "uninstall": {
+                    "visual-studio-code": ["sudo snap remove code"]
+                }
+            },
+            "fonts": {
+                "check": {
+                },
+                "install": {
+                },
+                "uninstall": {
+                }
+            }
+        }
+    }
+}

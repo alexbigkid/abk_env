@@ -1,0 +1,25 @@
+{
+  "installed_fonts": {
+    "font-agave-nerd-font": [
+      "brew uninstall --cask font-agave-nerd-font"
+    ],
+    "font-comic-shanns-mono-nerd-font": [
+      "brew uninstall --cask font-comic-shanns-mono-nerd-font"
+    ],
+    "font-droid-sans-mono-nerd-font": [
+      "brew uninstall --cask font-droid-sans-mono-nerd-font"
+    ],
+    "font-cascadia-code": [
+      "brew uninstall --cask font-cascadia-code"
+    ],
+    "font-cascadia-code-pl": [
+      "brew uninstall --cask font-cascadia-code-pl"
+    ],
+    "font-caskaydia-cove-nerd-font": [
+      "brew uninstall --cask font-caskaydia-cove-nerd-font"
+    ],
+    "font-hack-nerd-font": [
+      "brew uninstall --cask font-hack-nerd-font"
+    ]
+  }
+}

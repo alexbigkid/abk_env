@@ -1,0 +1,149 @@
+{
+    "macOS": {
+        "description": "Installing ABK tool set for MacOS",
+        "supported_versions": {
+            "macOS": ["11", "12", "13", "14", "15"]
+        },
+        "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
+        "tools": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        },
+        "apps": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        },
+        "fonts": {
+            "check": {
+                "homebrew/cask-fonts": ["brew tap | grep ^homebrew/cask-fonts$"],
+                "font-agave-nerd-font": ["brew list --cask | grep ^font-agave-nerd-font$"],
+                "font-comic-shanns-mono-nerd-font": ["brew list --cask | grep ^font-comic-shanns-mono-nerd-font$"],
+                "font-droid-sans-mono-nerd-font": ["brew list --cask | grep ^font-droid-sans-mono-nerd-font$"],
+                "font-cascadia-code": ["brew list --cask | grep ^font-cascadia-code$"],
+                "font-cascadia-code-pl": ["brew list --cask | grep ^font-cascadia-code-pl$"],
+                "font-caskaydia-cove-nerd-font": ["brew list --cask | grep ^font-caskaydia-cove-nerd-font$"],
+                "font-hack-nerd-font": ["brew list --cask | grep ^font-hack-nerd-font$"]
+            },
+            "install": {
+                "homebrew/cask-fonts": ["brew tap homebrew/cask-fonts"],
+                "font-agave-nerd-font": ["brew install --cask font-agave-nerd-font"],
+                "font-comic-shanns-mono-nerd-font": ["brew install --cask font-comic-shanns-mono-nerd-font"],
+                "font-droid-sans-mono-nerd-font": ["brew install --cask font-droid-sans-mono-nerd-font"],
+                "font-cascadia-code": ["brew install --cask font-cascadia-code"],
+                "font-cascadia-code-pl": ["brew install --cask font-cascadia-code-pl"],
+                "font-caskaydia-cove-nerd-font": ["brew install --cask font-caskaydia-cove-nerd-font"],
+                "font-hack-nerd-font": ["brew install --cask font-hack-nerd-font"]
+            },
+            "uninstall": {
+                "font-agave-nerd-font": ["brew uninstall --cask font-agave-nerd-font"],
+                "font-comic-shanns-mono-nerd-font": ["brew uninstall --cask font-comic-shanns-mono-nerd-font"],
+                "font-droid-sans-mono-nerd-font": ["brew uninstall --cask font-droid-sans-mono-nerd-font"],
+                "font-cascadia-code": ["brew uninstall --cask font-cascadia-code"],
+                "font-cascadia-code-pl": ["brew uninstall --cask font-cascadia-code-pl"],
+                "font-caskaydia-cove-nerd-font": ["brew uninstall --cask font-caskaydia-cove-nerd-font"],
+                "font-hack-nerd-font": ["brew uninstall --cask font-hack-nerd-font"],
+                "homebrew/cask-fonts": ["brew tap homebrew/cask-fonts"]
+            }
+        }
+    },
+    "linux": {
+        "debian": {
+            "description": "Installing ABK tool set for Linux / Debian based distro",
+            "supported_versions": {
+                "debian": ["9", "10", "11", "12"],
+                "raspbian": ["9", "10", "11", "12"],
+                "ubuntu": ["20.04", "20.10", "22.04", "22.10", "24.04"]
+            },
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "tools": {
+                "check": {
+                },
+                "install": {
+                },
+                "uninstall": {
+                }
+            },
+            "apps": {
+                "check": {
+                },
+                "install":{
+                },
+                "uninstall": {
+                }
+            },
+            "fonts": {
+                "check": {
+                    "font_installation_start": [""],
+                    "font-agave-nerd-font": ["ls ~/.fonts/AgaveNerdFont*"],
+                    "font-comic-shanns-mono-nerd-font": ["ls ~/.fonts/ComicShannsMonoNerdFont*"],
+                    "font-droid-sans-mono-nerd-font": ["ls ~/.fonts/DroidSansMNerdFont*"],
+                    "font-cascadia-code": ["ls ~/.fonts/CaskaydiaCoveNerdFont*"],
+                    "font-hack-nerd-font": ["ls ~/.fonts/Hack*"],
+                    "font_installation_cleanup": [""]
+                },
+                "install": {
+                    "font_installation_start": ["mkdir -p ~/.fonts"],
+                    "font-agave-nerd-font": [
+                        "ABK_FONT_NAME=Agave",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
+                        "rm fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-comic-shanns-mono-nerd-font": [
+                        "ABK_FONT_NAME=ComicShannsMono",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
+                        "rm fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-droid-sans-mono-nerd-font": [
+                        "ABK_FONT_NAME=DroidSansMono",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/DroidSansMNerdFont* ~/.fonts/",
+                        "rm fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-cascadia-code": [
+                        "ABK_FONT_NAME=CascadiaCode",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/CaskaydiaCoveNerdFont* ~/.fonts/",
+                        "rm fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-hack-nerd-font": [
+                        "ABK_FONT_NAME=Hack",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
+                        "rm fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font_installation_cleanup": [
+                        "fc-cache -fv"
+                    ]
+                },
+                "uninstall": {
+                    "font-agave-nerd-font": ["rm ~/.fonts/AgaveNerdFont*"],
+                    "font-comic-shanns-mono-nerd-font": ["rm ~/.fonts/ComicShannsMonoNerdFont*"],
+                    "font-droid-sans-mono-nerd-font": ["rm ~/.fonts/DroidSansMNerdFont*"],
+                    "font-cascadia-code": ["rm ~/.fonts/CaskaydiaCoveNerdFont*"],
+                    "font-hack-nerd-font": ["rm ~/.fonts/Hack*"],
+                    "font_installation_cleanup": ["fc-cache -fv"]
+                }
+            }
+        }
+    }
+}
