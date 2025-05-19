@@ -86,7 +86,8 @@ __updatePackageManager() {
     local LCL_EXIT_CODE=0
 
     # update brew / apt repository and packages
-    local LCL_UPDATE_PACKAGES=$(echo $LCL_INSTRUCTIONS | jq -r ".update_packages[]")
+    local LCL_UPDATE_PACKAGES
+    LCL_UPDATE_PACKAGES=$(echo "$LCL_INSTRUCTIONS" | jq -r ".update_packages[]")
     if [ "$LCL_UPDATE_PACKAGES" != "" ]; then
         PrintTrace $TRACE_INFO "${ORG}[Updating packages]${NC}"
         while IFS= read -r LCL_UPDATE_PACKAGE; do
@@ -103,7 +104,8 @@ __updatePackageManager() {
 
 
 __installItem() {
-    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_INSTALLATION_FILE_NAME=$1
     local LCL_INSTALL_TYPE=$2
     local LCL_ITEM=$3
@@ -147,6 +149,7 @@ __installItem() {
 
 __installItemList() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_FILE_NAME=$1
     local LCL_INSTALLED_TYPE=$2
     local LCL_INSTRUCTIONS=$3
@@ -211,7 +214,7 @@ install_abkEnv_main() {
     local MAIN_TOOLS_JSON
 
     [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
-    export TRACE_LEVEL=$TRACE_DEBUG
+    export TRACE_LEVEL=$TRACE_INFO
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
 
     PrintTrace $TRACE_INFO "   [BIN_DIR           = $BIN_DIR]"
@@ -242,7 +245,7 @@ install_abkEnv_main() {
         # check if file is a JSON file
         [[ "$MAIN_TOOLS_JSON_FILE" != *.json ]] && PrintTrace $TRACE_ERROR "${ORG}WARNING: Skipping non-JSON file: $MAIN_TOOLS_JSON_FILE${NC}" && continue
 
-        PrintTrace $TRACE_INFO "${GRN}Processing $MAIN_TOOLS_JSON_FILE${NC}"
+        PrintTrace $TRACE_INFO "\n${BLU}Processing $MAIN_TOOLS_JSON_FILE${NC}"
         # get install json instructions
         __getJsonInstallInstructions MAIN_TOOLS_JSON "$MAIN_TOOLS_JSON_FILE" || { PrintTrace $TRACE_ERROR "${RED}ERROR: Could not get correct install instructions from file: ${MAIN_TOOLS_JSON_FILE}${NC}"; continue;}
         PrintTrace $TRACE_DEBUG "MAIN_TOOLS_JSON = $MAIN_TOOLS_JSON"

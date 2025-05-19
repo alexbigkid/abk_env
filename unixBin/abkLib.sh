@@ -68,7 +68,7 @@ export ABK_ENV_NAME="ABK_ENV"
 # functions
 #---------------------------
 AbkLib_AddEnvironmentSettings() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_ENV_NAME=$1
     local LCL_FILE_TO_ADD_CONTENT_TO=$2
     shift
@@ -93,12 +93,12 @@ TEXT_TO_ADD
         PrintTrace $TRACE_CRITICAL "    ${RED}\tInvalid parameters passed in${NC}"
     fi
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]}($LCL_RESULT)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}($LCL_RESULT)"
     return $LCL_RESULT
 }
 
 AbkLib_RemoveEnvironmentSettings() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_ENV_NAME=$1
     local LCL_FILE_TO_REMOVE_CONTENT_FROM=$2
     local LCL_RESULT=$FALSE
@@ -116,20 +116,20 @@ AbkLib_RemoveEnvironmentSettings() {
         echo "   [File: $LCL_FILE_TO_REMOVE_CONTENT_FROM does not exist.]"
     fi
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]}($LCL_RESULT)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}($LCL_RESULT)"
     return $LCL_RESULT
 }
 
 AbkLib_IsParameterHelp() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local NUMBER_OF_PARAMETERS=$1
     local PARAMETER=$2
     # shellcheck disable=SC2086
     if [ $NUMBER_OF_PARAMETERS -eq 1 ] && [ "$PARAMETER" == "--help" ]; then
-        PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} (TRUE)"
+        PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (TRUE)"
         return $TRUE
     else
-        PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} (FALSE)"
+        PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (FALSE)"
         return $FALSE
     fi
 }
@@ -152,7 +152,7 @@ AbkLib_GetPathFromLink() {
 }
 
 AbkLib_IsStringInArray() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_STRING_TO_SEARCH_FOR=$1
     shift
     local LCL_ARRAY_TO_SEARCH_IN=("$@")
@@ -165,12 +165,12 @@ AbkLib_IsStringInArray() {
         fi
     done
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]}($LCL_MATCH_FOUND)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}($LCL_MATCH_FOUND)"
     return $LCL_MATCH_FOUND
 }
 
 AbkLib_IsBrewInstalled() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RESULT=$TRUE
     # homebrew installed?
     if [[ $(command -v brew) == "" ]]; then
@@ -178,13 +178,13 @@ AbkLib_IsBrewInstalled() {
         echo "WARNING: Homebrew is not installed, please install with:"
         echo "/usr/bin/ruby -e \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\""
     fi
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]}($LCL_RESULT)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]}($LCL_RESULT)"
     return $LCL_RESULT
 }
 
 
 AbkLib_CheckNumberOfParameters() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_EXPECTED_NUMBER_OF_PARAMS=$1
     shift
     local LCL_PARAMETERS_PASSED_IN=("$@")
@@ -195,16 +195,16 @@ AbkLib_CheckNumberOfParameters() {
         PrintTrace $TRACE_INFO "\texpected number:\t$LCL_EXPECTED_NUMBER_OF_PARAMS"
         PrintTrace $TRACE_INFO "\tpassed in number:\t${#LCL_PARAMETERS_PASSED_IN[@]}"
         PrintTrace $TRACE_INFO "\tparameters passed in:\t${LCL_PARAMETERS_PASSED_IN[*]}"
-        PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} (FALSE)"
+        PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (FALSE)"
         return $FALSE
     else
-        PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} (TRUE)"
+        PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (TRUE)"
         return $TRUE
     fi
 }
 
 AbkLib_GetIdLike_linux() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_LINUX_ID_LIKE
@@ -217,12 +217,12 @@ AbkLib_GetIdLike_linux() {
     [ "$LCL_LINUX_ID_LIKE" == "" ] && LCL_EXIT_CODE=1
 
     eval "$LCL_RETURN_VAR"=\$LCL_LINUX_ID_LIKE
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_LINUX_ID_LIKE)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_LINUX_ID_LIKE)"
     return $LCL_EXIT_CODE
 }
 
 AbkLib_GetId_linux() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_LINUX_ID
@@ -232,12 +232,12 @@ AbkLib_GetId_linux() {
     PrintTrace $TRACE_DEBUG "    LCL_LINUX_ID = $LCL_LINUX_ID"
 
     eval "$LCL_RETURN_VAR"=\$LCL_LINUX_ID
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_LINUX_ID)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_LINUX_ID)"
     return $LCL_EXIT_CODE
 }
 
 AbkLib_GetId_macOS() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_MACOS_ID="macOS"
@@ -246,24 +246,24 @@ AbkLib_GetId_macOS() {
     PrintTrace $TRACE_DEBUG "    LCL_MACOS_ID = $LCL_MACOS_ID"
 
     eval "$LCL_RETURN_VAR"=\$LCL_MACOS_ID
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_MACOS_ID)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_MACOS_ID)"
     return $LCL_EXIT_CODE
 }
 
 AbkLib_GetId_unix() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_UNIX_ID=
     AbkLib_GetId_"$ABK_UNIX_TYPE" LCL_UNIX_ID || LCL_EXIT_CODE=$?
 
     eval "$LCL_RETURN_VAR"=\$LCL_UNIX_ID
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_UNIX_ID)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_UNIX_ID)"
     return $LCL_EXIT_CODE
 }
 
 AbkLib_GetVersionId_linux() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_LINUX_VERSION_ID
@@ -273,12 +273,12 @@ AbkLib_GetVersionId_linux() {
     [ "$LCL_LINUX_VERSION_ID" == "" ] && LCL_EXIT_CODE=1
 
     eval "$LCL_RETURN_VAR"=\$LCL_LINUX_VERSION_ID
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_LINUX_VERSION_ID)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_LINUX_VERSION_ID)"
     return $LCL_EXIT_CODE
 }
 
 AbkLib_GetVersionId_macOS() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_MACOS_VERSION_ID
@@ -287,24 +287,24 @@ AbkLib_GetVersionId_macOS() {
     [ "$LCL_MACOS_VERSION_ID" == "" ] && LCL_EXIT_CODE=1
 
     eval "$LCL_RETURN_VAR"=\$LCL_MACOS_VERSION_ID
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_MACOS_VERSION_ID)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_MACOS_VERSION_ID)"
     return $LCL_EXIT_CODE
 }
 
 AbkLib_GetVersionId_unix() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     local LCL_UNIX_VERSION_ID=
     AbkLib_GetVersionId_"$ABK_UNIX_TYPE" LCL_UNIX_VERSION_ID || LCL_EXIT_CODE=$?
 
     eval "$LCL_RETURN_VAR"=\$LCL_UNIX_VERSION_ID
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_UNIX_VERSION_ID)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_UNIX_VERSION_ID)"
     return $LCL_EXIT_CODE
 }
 
 AbkLib_CheckPreRequisites_macOS() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_EXIT_CODE=0
     local IS_BREW_INSTALLED=$FALSE
 
@@ -317,16 +317,18 @@ AbkLib_CheckPreRequisites_macOS() {
         LCL_EXIT_CODE=1
     else
         # check jq is installed, we need it to read json tool installation instructions file
-        [ "$(command -v jq)" != "" ] && { eval "brew install jq" || LCL_EXIT_CODE=1; }
+        if ! command -v jq >/dev/null 2>&1; then
+            brew install jq || LCL_EXIT_CODE=$?
+        fi
     fi
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
 }
 
 
 AbkLib_CheckPreRequisites_linux() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_EXIT_CODE=0
 
     AbkLib_GetIdLike_linux LINUX_ID_LIKE || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} AbkLib_GetIdLike_linux failed"
@@ -334,15 +336,17 @@ AbkLib_CheckPreRequisites_linux() {
     AbkLib_IsStringInArray "$LINUX_ID_LIKE" "${ABK_SUPPORTED_LINUX_ID_LIKE[@]}" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} $LINUX_ID_LIKE is not supported.\nSupported Linux ID likes are: ${ABK_SUPPORTED_LINUX_ID_LIKE[*]}"
 
     # check jq is installed, we need it to read json tool installation instructions file
-    [ "$(command -v jq)" != "" ] && { eval "sudo apt install -y jq" || LCL_EXIT_CODE=1; }
+    if ! command -v jq >/dev/null 2>&1; then
+        sudo apt install -y jq || LCL_EXIT_CODE=$?
+    fi
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
 }
 
 
 AbkLib_CheckPreRequisites() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_EXIT_CODE=0
 
     # is $SHELL supported
@@ -355,43 +359,14 @@ AbkLib_CheckPreRequisites() {
 
     AbkLib_CheckPreRequisites_"$ABK_UNIX_TYPE" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} PreRequisites for ${ABK_UNIX_TYPE} are not met"
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
 }
 
 
-# AbkLib_WriteUninstallSteps() {
-#     PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
-#     local LCL_JSON_FILE_NAME_BACKUP=$1
-#     local LCL_INSTALLED_TYPE=$2
-#     local LCL_INSTALLED_TOOL=$3
-#     local LCL_UNINSTALLED_STEPS=$4
-#     local LCL_EXIT_CODE=0
-
-#     PrintTrace $TRACE_DEBUG "    LCL_JSON_FILE_NAME_BACKUP = $LCL_JSON_FILE_NAME_BACKUP"
-#     PrintTrace $TRACE_DEBUG "    LCL_INSTALLED_TYPE        = $LCL_INSTALLED_TYPE"
-#     PrintTrace $TRACE_DEBUG "    LCL_INSTALLED_TOOL        = $LCL_INSTALLED_TOOL"
-#     PrintTrace $TRACE_DEBUG "    LCL_INSTALLED_STEP        = $LCL_INSTALLED_STEP"
-
-#     local LCL_UNINSTALLATION
-#     LCL_UNINSTALLATION=$(jq -r --arg tool "$LCL_INSTALLED_TOOL" '.[$tool]' <<< "$LCL_UNINSTALLED_STEPS")
-#     PrintTrace $TRACE_DEBUG "    LCL_UNINSTALLATION = $LCL_UNINSTALLATION"
-#     if [ "$LCL_UNINSTALLATION" == "" ]; then
-#         # If it doesn't exist, add the line to the JSON file
-#         jq --arg type "$LCL_INSTALLED_TYPE" --arg app "$LCL_INSTALLED_TOOL" --arg step "$LCL_UNINSTALLATION" \
-#             '.[$type][$app] += [$step]' "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP" > "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP.tmp" \
-#             && mv "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP.tmp" "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP" && PrintTrace $TRACE_DEBUG "    Line added successfully."
-#     else
-#         PrintTrace $TRACE_DEBUG "    Line already exists. Skipped adding."
-#     fi
-
-#     PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
-#     return $LCL_EXIT_CODE
-# }
-
-
 AbkLib_WriteUninstallSteps() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_FILE_NAME_BACKUP=$1
     local LCL_INSTALLED_TYPE=$2
     local LCL_INSTALLED_TOOL=$3
@@ -422,61 +397,13 @@ AbkLib_WriteUninstallSteps() {
     && mv "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP.tmp" "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP" \
     && PrintTrace $TRACE_DEBUG "    Uninstall steps written successfully."
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
-    return $LCL_EXIT_CODE
-}
-
-
-AbkLib_MarkInstalledStep() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
-    local LCL_JSON_FILE_NAME_BACKUP=$1
-    local LCL_INSTALLED_TYPE=$2
-    local LCL_INSTALLED_TOOL=$3
-    local LCL_INSTALLED_STEP=$4
-    local LCL_EXIT_CODE=0
-
-    local LCL_INSTALLATION_LINE
-    LCL_INSTALLATION_LINE=$(jq --arg type "$LCL_INSTALLED_TYPE" --arg app "$LCL_INSTALLED_TOOL" '.[$type][$app]' "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP" | grep "$LCL_INSTALLED_STEP")
-    PrintTrace $TRACE_DEBUG "    LCL_INSTALLATION_LINE =$LCL_INSTALLATION_LINE"
-    if [ "$LCL_INSTALLATION_LINE" == "" ]; then
-        # If it doesn't exist, add the line to the JSON file
-        jq --arg type "$LCL_INSTALLED_TYPE" --arg app "$LCL_INSTALLED_TOOL" --arg step "$LCL_INSTALLED_STEP" \
-            '.[$type][$app] += [$step]' "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP" > "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP.tmp" \
-            && mv "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP.tmp" "$INSTALLED_DIR/$LCL_JSON_FILE_NAME_BACKUP" && PrintTrace $TRACE_DEBUG "    Line added successfully."
-    else
-        PrintTrace $TRACE_DEBUG "    Line already exists. Skipped adding."
-    fi
-
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
-    return $LCL_EXIT_CODE
-}
-
-
-AbkLib_InstallTool() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
-    local LCL_TOOL=$1
-    local LCL_INSTALL_INSTRACTIONS=$2
-    local LCL_EXIT_CODE=0
-
-    # shellcheck disable=SC2086
-    if [ "$(command -v $LCL_TOOL)" = "" ]; then
-        PrintTrace $TRACE_INFO "    ${YLW}[$LCL_TOOL installation ...]${NC}"
-
-        while IFS= read -r INSTALL_STEP; do
-            PrintTrace $TRACE_INFO "    installation step: ${YLW}$INSTALL_STEP${NC}"
-            eval "$INSTALL_STEP" && AbkLib_MarkInstalledStep "$INSTALLED_TOOLS" "$LCL_TOOL" "$INSTALL_STEP"
-        done <<< "$LCL_INSTALL_INSTRACTIONS"
-    else
-        PrintTrace $TRACE_INFO "    ${GRN}$LCL_TOOL already installed${NC}"
-    fi
-
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
 }
 
 
 AbkLib_CheckInstallationCompatibility() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} (hidden)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
     local LCL_INSTRUCTIONS=$1
     local LCL_EXIT_CODE=0
     local CHECK_UNIX_ID=
@@ -494,7 +421,7 @@ AbkLib_CheckInstallationCompatibility() {
     # shellcheck disable=SC2319
     [ "$LCL_MATCH_SUPPORTED_VERSION" == "" ] && PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} UnixId: $CHECK_UNIX_ID with version: $CHECK_UNIX_VERSION_ID is not supported.\nSupported Unix types are: $(echo "$LCL_INSTRUCTIONS" | jq -r '.supported_versions')"
 
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
 }
 

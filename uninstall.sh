@@ -75,7 +75,8 @@ __markInstalledToolAsUninstalled() {
 
 
 __uninstallItem() {
-    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_APP=$1
     local LCL_UNINSTALL_INSTRACTIONS=$2
     local LCL_EXIT_CODE=0
@@ -93,15 +94,12 @@ __uninstallItem() {
 
 __uninstallItemList() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_FILE_NAME=$1
     local LCL_INSTALLED_TYPE=$2
     local LCL_INSTRUCTIONS=$3
     local LCL_EXIT_CODE=0
     local LCL_INSTALLED_ITEM_LIST="null"
-
-    PrintTrace $TRACE_INFO "LCL_JSON_FILE_NAME = $LCL_JSON_FILE_NAME"
-    PrintTrace $TRACE_INFO "LCL_INSTALLED_TYPE = $LCL_INSTALLED_TYPE"
-    PrintTrace $TRACE_INFO "LCL_INSTRUCTIONS = $LCL_INSTRUCTIONS"
 
     # check if installed.json file exists
     if [ -e "$INSTALLED_DIR/$LCL_JSON_FILE_NAME" ]; then
@@ -152,40 +150,6 @@ __deleteBinDirLink() {
 }
 
 
-__uninstallRequiredTools() {
-    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
-    local LCL_JSON_INSTALLATION_FILE_NAME=$1
-    local LCL_INSTRUCTIONS=$2
-    local LCL_INSTALLED_TYPE=$INSTALLED_TOOLS
-    local LCL_EXIT_CODE=0
-    local LCL_INSTALLED_ITEM_LIST=
-
-    # check if installed.json file exists
-    if [ -e "$INSTALLED_DIR/$LCL_JSON_INSTALLATION_FILE_NAME" ]; then
-        LCL_INSTALLED_ITEM_LIST=$(jq -r ".$LCL_INSTALLED_TYPE // {} | keys_unsorted[]" "$INSTALLED_DIR/$LCL_JSON_INSTALLATION_FILE_NAME")
-        PrintTrace $TRACE_DEBUG "${ORG}Installed type: $LCL_INSTALLED_TYPE: ${LCL_INSTALLED_ITEM_LIST[@]}${NC}"
-    fi
-
-    if [ "$LCL_INSTALLED_ITEM_LIST" != "null" ] && [ "$LCL_INSTALLED_ITEM_LIST" != "" ]; then
-        PrintTrace $TRACE_INFO "${ORG}Uninstalling jq: ${LCL_INSTALLED_ITEM_LIST[@]}${NC}"
-        local LCL_UNINSTALL_ITEMS=$(echo "$LCL_INSTRUCTIONS" | jq -r ".tools.uninstall")
-
-        while IFS= read -r LCL_INSTALLED_ITEM; do
-            UNINSTALL_STEPS=$(echo "$LCL_UNINSTALL_ITEMS" | jq -r ".\"$LCL_INSTALLED_ITEM\"[]")
-            PrintTrace $TRACE_INFO "uninstall step list: ${YLW}$UNINSTALL_STEPS${NC}"
-            __uninstallItem "$LCL_INSTALLED_ITEM" "$UNINSTALL_STEPS" \
-                && __markInstalledToolAsUninstalled "$LCL_JSON_INSTALLATION_FILE_NAME" "$LCL_INSTALLED_TYPE" "$LCL_INSTALLED_ITEM" \
-                || PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_INSTALLED_ITEM uninstall failed${NC}"
-        done <<< "$LCL_INSTALLED_ITEM_LIST"
-    else
-        PrintTrace $TRACE_DEBUG "No installed $LCL_INSTALLED_TYPE found."
-    fi
-
-    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
-    return $LCL_EXIT_CODE
-}
-
-
 #---------------------------
 # main
 #---------------------------
@@ -200,7 +164,8 @@ uninstall_abkEnv_main() {
 
 
     [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
-    export TRACE_LEVEL=$TRACE_DEBUG
+    # export TRACE_LEVEL=$TRACE_DEBUG
+    export TRACE_LEVEL=$TRACE_INFO
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
 
     PrintTrace $TRACE_INFO "   [BIN_DIR           = $BIN_DIR]"
@@ -232,13 +197,10 @@ uninstall_abkEnv_main() {
         [[ "$INSTALLED_DIR/$MAIN_TOOLS_JSON_FILE" != *.json ]] && PrintTrace $TRACE_ERROR "${ORG}WARNING: Skipping non-JSON file: $INSTALLED_DIR/$MAIN_TOOLS_JSON_FILE${NC}" && continue
         [ ! -f "$INSTALLED_DIR/$MAIN_TOOLS_JSON_FILE" ] && PrintTrace $TRACE_ERROR "${ORG}WARNING: JSON file $MAIN_TOOLS_JSON_FILE was not used to install${NC}" && continue
 
-        PrintTrace $TRACE_INFO "${GRN}Processing $INSTALLED_DIR/$MAIN_TOOLS_JSON_FILE${NC}"
+        PrintTrace $TRACE_INFO "\n${BLU}Processing $INSTALLED_DIR/$MAIN_TOOLS_JSON_FILE${NC}"
         # get uninstall json instructions
         __getJsonUninstallInstructions MAIN_TOOLS_JSON "$INSTALLED_DIR/$MAIN_TOOLS_JSON_FILE" || { PrintTrace $TRACE_ERROR "${RED}ERROR: Could not get correct uninstall instructions from file: $INSTALLED_DIR/$MAIN_TOOLS_JSON_FILE${NC}"; continue; }
         PrintTrace $TRACE_DEBUG "MAIN_TOOLS_JSON = $MAIN_TOOLS_JSON"
-
-        # check unix (MacOS/Linux version supported)
-        # AbkLib_CheckInstallationCompatibility "$MAIN_TOOLS_JSON" || { PrintTrace $TRACE_ERROR "${RED}ERROR: The installation is not supported.${NC}"; continue; }
 
         __uninstallItemList "$MAIN_TOOLS_JSON_FILE" "$INSTALLED_FONTS" "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __uninstallItemList $INSTALLED_FONTS failed"
         __uninstallItemList "$MAIN_TOOLS_JSON_FILE" "$INSTALLED_APPS" "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __uninstallItemList $INSTALLED_APPS failed"
@@ -272,9 +234,6 @@ uninstall_abkEnv_main() {
         PrintTrace $TRACE_INFO "${ORG}INFO: All JSON files are empty. Removing config ...${NC}"
         __removeAbkEnvToConfig "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __removeAbkEnvToConfig $HOME/$ABK_USER_CONFIG_FILE_SHELL failed"
         __deleteBinDirLink || PrintTrace $TRACE_ERROR "${RED}ERROR:${NC} __deleteBinDirLink failed with $?"
-        # for MAIN_TOOLS_JSON_FILE in "${MAIN_JSON_FILES[@]}"; do
-        #     __uninstallRequiredTools "$MAIN_TOOLS_JSON_FILE" "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __uninstallRequiredTools failed"
-        # done
         exec ${SHELL##*/}
     fi
 
