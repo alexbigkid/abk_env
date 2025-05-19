@@ -80,8 +80,11 @@ For you convenience I prepared few installation packages listed below:
 | [tools_min.json](https://github.com/alexbigkid/abk_env/blob/main/tools_min.json)       | minimal installation - but installs brave-browser and flycut on MacOS |
 | [tools_node.json](https://github.com/alexbigkid/abk_env/blob/main/tools_node.json)     | node tools installation - for node development                        |
 | [tools_python.json](https://github.com/alexbigkid/abk_env/blob/main/tools_python.json) | python tools installation - for python development                    |
-| [tools_test.json](https://github.com/alexbigkid/abk_env/blob/main/tools_test.json)     | test installation - small set of tools for testing purpose            |
 | [tools_work.json](https://github.com/alexbigkid/abk_env/blob/main/tools_work.json)     | work specific tools installation                                      |
+| [test_001.json](https://github.com/alexbigkid/abk_env/blob/main/test_001.json)         | test 001 installation - small set of tools for testing purpose        |
+| [test_002.json](https://github.com/alexbigkid/abk_env/blob/main/test_002.json)         | test 002 installation - small set of tools for testing purpose        |
+| [test_003.json](https://github.com/alexbigkid/abk_env/blob/main/test_003.json)         | test 003 installation - small set of tools for testing purpose        |
+| [test_004.json](https://github.com/alexbigkid/abk_env/blob/main/test_004.json)         | test 004 installation - small set of tools for testing purpose        |
 
 
 ### Example of tools installed
