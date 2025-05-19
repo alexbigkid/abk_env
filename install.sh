@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #---------------------------
 # functions
 #---------------------------
@@ -16,8 +15,38 @@ PrintUsageAndExitWithCode() {
 }
 
 
+__getJsonInstallInstructions() {
+    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    local LCL_RETURN_VAR=$1
+    local LCL_JSON_FILE=$2
+    local LCL_EXIT_CODE=0
+    local LCL_JSON_KEY=".$ABK_UNIX_TYPE"
+    local LCL_JSON
+    LCL_JSON=$(cat "$LCL_JSON_FILE")
+    # PrintTrace $TRACE_DEBUG "LCL_JSON = $LCL_JSON"
+
+    PrintTrace $TRACE_DEBUG "    LCL_RETURN_VAR = $LCL_RETURN_VAR"
+    PrintTrace $TRACE_DEBUG "    LCL_JSON_FILE  = $LCL_JSON_FILE"
+    PrintTrace $TRACE_DEBUG "    LCL_JSON_KEY   = $LCL_JSON_KEY"
+    PrintTrace $TRACE_DEBUG "    LCL_JSON       = $LCL_JSON"
+
+    if [ "$ABK_UNIX_TYPE" == "linux" ]; then
+        AbkLib_GetIdLike_linux LINUX_ID_LIKE || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} AbkLib_GetIdLike_linux failed"
+        LCL_JSON_KEY="${LCL_JSON_KEY}.${LINUX_ID_LIKE}"
+    fi
+
+    local LCL_OS_INSTRUCTIONS
+    LCL_OS_INSTRUCTIONS=$(echo "$LCL_JSON" | jq -r "$LCL_JSON_KEY")
+    PrintTrace $TRACE_DEBUG "    LCL_OS_INSTRUCTIONS = $LCL_OS_INSTRUCTIONS"
+
+    eval "$LCL_RETURN_VAR"=\$LCL_OS_INSTRUCTIONS
+    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    return $LCL_EXIT_CODE
+}
+
+
 __addAbkEnvToConfig() {
-    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_USER_CONFIG_FILE_SHELL=$1
     local LCL_CONTENT_TO_ADD_ARRAY=(
         "if [ -f $ABK_ENV_FILE ]; then"
@@ -38,12 +67,13 @@ __addAbkEnvToConfig() {
 
 
 __createInstalledFile() {
-    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_INSTALL_JSON_FILE=$1
     local LCL_EXIT_CODE=0
 
     # ensure there is a directory to store the package information
-    mkdir -p $INSTALLED_DIR || $LCL_EXIT_CODE=$?
-    [ ! -f "$INSTALLED_DIR/$INSTALLED_FILE" ] && echo {} > $INSTALLED_DIR/$INSTALLED_FILE
+    mkdir -p $INSTALLED_DIR || LCL_EXIT_CODE=$?
+    [ ! -f "$INSTALLED_DIR/$LCL_INSTALL_JSON_FILE" ] && echo {} > $INSTALLED_DIR/$LCL_INSTALL_JSON_FILE
 
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_RETURN_VAL)"
     return $LCL_RETURN_VAL
@@ -51,12 +81,12 @@ __createInstalledFile() {
 
 
 __updatePackageManager() {
-    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} (hidden)"
-    local LCL_INSTRACTIONS=$1
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
+    local LCL_INSTRUCTIONS=$1
     local LCL_EXIT_CODE=0
 
     # update brew / apt repository and packages
-    local LCL_UPDATE_PACKAGES=$(echo $LCL_INSTRACTIONS | jq -r ".update_packages[]")
+    local LCL_UPDATE_PACKAGES=$(echo $LCL_INSTRUCTIONS | jq -r ".update_packages[]")
     if [ "$LCL_UPDATE_PACKAGES" != "" ]; then
         PrintTrace $TRACE_INFO "${ORG}[Updating packages]${NC}"
         while IFS= read -r LCL_UPDATE_PACKAGE; do
@@ -73,18 +103,20 @@ __updatePackageManager() {
 
 
 __installItem() {
-    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
-    local LCL_ITEM=$1
-    local LCL_INSTALL_INSTRACTIONS=$2
-    local LCL_INSTALL_TYPE=$3
-    local LCL_CHECK_INSTRACTIONS=$4
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
+    local LCL_JSON_INSTALLATION_FILE_NAME=$1
+    local LCL_INSTALL_TYPE=$2
+    local LCL_ITEM=$3
+    local LCL_CHECK_INSTRUCTIONS=$4
+    local LCL_INSTALL_INSTRUCTIONS=$5
+    local LCL_UNINSTALL_INSTRUCTIONS=$6
     local LCL_IS_APP_INSTALLED=1
     local LCL_EXIT_CODE=0
 
     PrintTrace $TRACE_DEBUG "LCL_ITEM                    = $LCL_ITEM"
-    PrintTrace $TRACE_DEBUG "LCL_INSTALL_INSTRACTIONS    = $LCL_INSTALL_INSTRACTIONS"
+    PrintTrace $TRACE_DEBUG "LCL_INSTALL_INSTRUCTIONS    = $LCL_INSTALL_INSTRUCTIONS"
     PrintTrace $TRACE_DEBUG "LCL_INSTALL_TYPE            = $LCL_INSTALL_TYPE"
-    PrintTrace $TRACE_DEBUG "LCL_CHECK_INSTRACTIONS      = $LCL_CHECK_INSTRACTIONS"
+    PrintTrace $TRACE_DEBUG "LCL_CHECK_INSTRUCTIONS      = $LCL_CHECK_INSTRUCTIONS"
 
     while IFS= read -r LCL_CHECK_STEP; do
         PrintTrace $TRACE_DEBUG "LCL_CHECK_STEP = $LCL_CHECK_STEP"
@@ -94,15 +126,16 @@ __installItem() {
             LCL_IS_APP_INSTALLED=0
         fi
         PrintTrace $TRACE_DEBUG "LCL_IS_APP_INSTALLED = $LCL_IS_APP_INSTALLED"
-    done <<< "$LCL_CHECK_INSTRACTIONS"
+    done <<< "$LCL_CHECK_INSTRUCTIONS"
 
     if [ $LCL_IS_APP_INSTALLED -eq 1 ]; then
         PrintTrace $TRACE_INFO "${YLW}[$LCL_ITEM installing ...]${NC}"
-        local TOOL_INSTALLED=$TRUE
-
         while IFS= read -r INSTALL_STEP; do
-            eval "$INSTALL_STEP" && AbkLib_MarkInstalledStep "$LCL_INSTALL_TYPE" "$LCL_ITEM" "$INSTALL_STEP"
-        done <<< "$LCL_INSTALL_INSTRACTIONS"
+            eval "$INSTALL_STEP" || LCL_EXIT_CODE=$?
+        done <<< "$LCL_INSTALL_INSTRUCTIONS"
+
+        PrintTrace $TRACE_INFO "${YLW}[$LCL_ITEM marking uninstalling steps ...]${NC}"
+        AbkLib_WriteUninstallSteps "$LCL_JSON_INSTALLATION_FILE_NAME" "$LCL_INSTALL_TYPE" "$LCL_ITEM" "$LCL_UNINSTALL_INSTRUCTIONS"
     else
         PrintTrace $TRACE_INFO "${GRN}$LCL_ITEM already installed${NC}"
     fi
@@ -113,25 +146,34 @@ __installItem() {
 
 
 __installItemList() {
-    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} (hidden)"
-    local LCL_INSTALLED_TYPE=$1
-    local LCL_INSTRACTIONS=$2
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} (hidden)"
+    local LCL_JSON_FILE_NAME=$1
+    local LCL_INSTALLED_TYPE=$2
+    local LCL_INSTRUCTIONS=$3
     local LCL_EXIT_CODE=0
     local LCL_ITEM="${LCL_INSTALLED_TYPE//installed_/}"
 
    # install items
-    local LCL_CHECK_ITEMS=$(echo $LCL_INSTRACTIONS | jq -r ".$LCL_ITEM.check")
-    local LCL_INSTALL_ITEMS=$(echo $LCL_INSTRACTIONS | jq -r ".$LCL_ITEM.install")
+    local LCL_CHECK_ITEMS
+    LCL_CHECK_ITEMS=$(echo $LCL_INSTRUCTIONS | jq -r ".$LCL_ITEM.check")
+    PrintTrace $TRACE_DEBUG "LCL_CHECK_ITEMS = $LCL_CHECK_ITEMS"
+    local LCL_INSTALL_ITEMS
+    LCL_INSTALL_ITEMS=$(echo $LCL_INSTRUCTIONS | jq -r ".$LCL_ITEM.install")
+    PrintTrace $TRACE_DEBUG "LCL_INSTALL_ITEMS = $LCL_INSTALL_ITEMS"
+    local LCL_UNINSTALL_ITEMS
+    LCL_UNINSTALL_ITEMS=$(echo $LCL_INSTRUCTIONS | jq -r ".$LCL_ITEM.uninstall")
+    PrintTrace $TRACE_DEBUG "LCL_UNINSTALL_ITEMS = $LCL_UNINSTALL_ITEMS"
+
     if [ "$LCL_INSTALL_ITEMS" != "" ]; then
         INSTALL_ITEM_LIST=($(echo "$LCL_INSTALL_ITEMS" | jq -r 'keys_unsorted[]'))
-        PrintTrace $TRACE_INFO "${ORG}[Installing $LCL_ITEM: ${INSTALL_ITEM_LIST[@]}]${NC}"
+        PrintTrace $TRACE_INFO "${ORG}[Installing $LCL_ITEM: ${INSTALL_ITEM_LIST[*]}]${NC}"
         for INSTALL_ITEM in "${INSTALL_ITEM_LIST[@]}"; do
             PrintTrace $TRACE_DEBUG "${ORG}$INSTALL_ITEM${NC}"
             INSTALL_STEPS=$(echo $LCL_INSTALL_ITEMS | jq -r ".\"$INSTALL_ITEM\"[]")
             PrintTrace $TRACE_DEBUG "${ORG}INSTALL_STEPS = $INSTALL_STEPS${NC}"
             CHECK_STEP=$(echo $LCL_CHECK_ITEMS | jq -r ".\"$INSTALL_ITEM\"[]")
             PrintTrace $TRACE_DEBUG "${ORG}CHECK_STEP = $CHECK_STEP${NC}"
-            __installItem "$INSTALL_ITEM" "$INSTALL_STEPS" "$LCL_INSTALLED_TYPE" "$CHECK_STEP" || PrintTrace $TRACE_ERROR "${RED}ERROR: $INSTALL_ITEM installation failed${NC}"
+            __installItem "$LCL_JSON_FILE_NAME" "$LCL_INSTALLED_TYPE" "$INSTALL_ITEM" "$CHECK_STEP" "$INSTALL_STEPS" "$LCL_UNINSTALL_ITEMS" || PrintTrace $TRACE_ERROR "${RED}ERROR: $INSTALL_ITEM installation failed${NC}"
         done
     fi
 
@@ -141,7 +183,7 @@ __installItemList() {
 
 
 __createBinDirLink() {
-    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]}"
     local LCL_CURRENT_DIR=$PWD
     local LCL_EXIT_CODE=0
 
@@ -161,11 +203,16 @@ __createBinDirLink() {
 #---------------------------
 install_abkEnv_main() {
     local MAIN_ABK_LIB_FILE="./unixBin/abkLib.sh"
-    local MAIN_TOOLS_JSON_FILE="./tools.json"
-    local MAIN_ABK_INSTALL_OH_MY="__install_oh_my"
-    [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR:${NC} $MAIN_ABK_LIB_FILE could not be found."
-    [ -f $MAIN_TOOLS_JSON_FILE ] || PrintUsageAndExitWithCode 1 "${RED}ERROR:${NC} $MAIN_TOOLS_JSON_FILE file could not be found."
-    PrintTrace $TRACE_FUNCTION "-> ${FUNCNAME[0]} ($@)"
+    local MAIN_DEFAULT_JSON_FILE="./tools_min.json"
+    local MAIN_JSON_INSTALLED_COUNT=0
+    local MAIN_EXIT_CODE=0
+    local MAIN_JSON_FILES
+    local MAIN_TOOLS_JSON_FILE
+    local MAIN_TOOLS_JSON
+
+    [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
+    export TRACE_LEVEL=$TRACE_DEBUG
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
 
     PrintTrace $TRACE_INFO "   [BIN_DIR           = $BIN_DIR]"
     PrintTrace $TRACE_INFO "   [HOME_BIN_DIR      = $HOME_BIN_DIR]"
@@ -177,44 +224,67 @@ install_abkEnv_main() {
 
     # is parameter --help?
     [ "$#" -eq 1 ] && [ "$1" == "--help" ] && PrintUsageAndExitWithCode $ERROR_CODE_SUCCESS
-    # Is number of parameters ok
-    [ "$#" -ne 0 ] && PrintUsageAndExitWithCode $ERROR_CODE_GENERAL_ERROR "${RED}ERROR: invalid number of parameters${NC}"
 
     AbkLib_CheckPreRequisites || PrintUsageAndExitWithCode $ERROR_CODE_GENERAL_ERROR "${RED}ERROR: cannot proceed Pre-Requisites are not met${NC}"
 
-    # get install json instructions
-    local MAIN_TOOLS_JSON=
-    AbkLib_GetJsonInstructions MAIN_TOOLS_JSON "$MAIN_TOOLS_JSON_FILE" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} Could not get correct install instructions from file: ${MAIN_TOOLS_JSON_FILE[*]}"
-    PrintTrace $TRACE_DEBUG "MAIN_TOOLS_JSON = $MAIN_TOOLS_JSON"
+    # Is number of parameters ok
+    if [ "$#" -eq 0 ]; then
+        PrintTrace $TRACE_INFO "No parameters provided, using default $MAIN_DEFAULT_JSON_FILE"
+        MAIN_JSON_FILES=("$MAIN_DEFAULT_JSON_FILE")
+    else
+        MAIN_JSON_FILES=("$@")
+    fi
 
-    # check unix (MacOS/Linux version supported)
-    AbkLib_CheckInstallationCompability "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} The installation is not supported."
+    for MAIN_TOOLS_JSON_FILE in "${MAIN_JSON_FILES[@]}"; do
 
-    __updatePackageManager "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __updatePackageManager failed"
+        # check if file exists
+        [ ! -f "$MAIN_TOOLS_JSON_FILE" ] && PrintTrace $TRACE_ERROR "${ORG}WARNING: File could NOT be found: $MAIN_TOOLS_JSON_FILE${NC}" && continue
+        # check if file is a JSON file
+        [[ "$MAIN_TOOLS_JSON_FILE" != *.json ]] && PrintTrace $TRACE_ERROR "${ORG}WARNING: Skipping non-JSON file: $MAIN_TOOLS_JSON_FILE${NC}" && continue
 
-    # print description
-    local LCL_DESCRIPTION=$(echo $MAIN_TOOLS_JSON | jq -r ".description")
-    PrintTrace $TRACE_INFO "${ORG}[$LCL_DESCRIPTION]${NC}"
+        PrintTrace $TRACE_INFO "${GRN}Processing $MAIN_TOOLS_JSON_FILE${NC}"
+        # get install json instructions
+        __getJsonInstallInstructions MAIN_TOOLS_JSON "$MAIN_TOOLS_JSON_FILE" || { PrintTrace $TRACE_ERROR "${RED}ERROR: Could not get correct install instructions from file: ${MAIN_TOOLS_JSON_FILE}${NC}"; continue;}
+        PrintTrace $TRACE_DEBUG "MAIN_TOOLS_JSON = $MAIN_TOOLS_JSON"
 
-    __createInstalledFile || PrintUsageAndExitWithCode $? "${RED}ERROR: __createInstalledFile failed${NC}"
-    __installItemList "$INSTALLED_TOOLS" "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __installItemList $INSTALLED_TOOLS failed"
-    __installItemList "$INSTALLED_APPS" "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __installItemList $INSTALLED_APPS failed"
-    __installItemList "$INSTALLED_FONTS" "$MAIN_TOOLS_JSON" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __installItemList $INSTALLED_FONTS failed"
+        # check unix (MacOS/Linux version supported)
+        AbkLib_CheckInstallationCompatibility "$MAIN_TOOLS_JSON" || { PrintTrace $TRACE_ERROR "${RED}ERROR: The installation is not supported.${NC}"; continue; }
+        __updatePackageManager "$MAIN_TOOLS_JSON" || { PrintTrace $TRACE_ERROR "${RED}ERROR: __updatePackageManager failed${NC}"; continue; }
 
-    __createBinDirLink || PrintTrace $TRACE_ERROR "${RED}ERROR:${NC} __createBinDirLink failed with $?"
-    __addAbkEnvToConfig "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __addAbkEnvToConfig $HOME/$ABK_USER_CONFIG_FILE_SHELL failed"
+        # print description
+        local LCL_DESCRIPTION
+        LCL_DESCRIPTION=$(echo $MAIN_TOOLS_JSON | jq -r ".description")
+        # shellcheck disable=SC2086
+        PrintTrace $TRACE_INFO "${ORG}[$LCL_DESCRIPTION]${NC}"
 
-    AbkLib_SourceEnvironment "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} AbkLib_SourceEnvironment $HOME/$ABK_USER_CONFIG_FILE_SHELL failed"
+        __createInstalledFile "$MAIN_TOOLS_JSON_FILE" || { PrintTrace $TRACE_ERROR "${RED}ERROR: __createInstalledFile failed${NC}"; continue; }
+        __installItemList "$MAIN_TOOLS_JSON_FILE" "$INSTALLED_TOOLS" "$MAIN_TOOLS_JSON" || { PrintTrace $TRACE_ERROR "${RED}ERROR: __installItemList $INSTALLED_TOOLS failed${NC}"; continue; }
+        __installItemList "$MAIN_TOOLS_JSON_FILE" "$INSTALLED_APPS" "$MAIN_TOOLS_JSON" || { PrintTrace $TRACE_ERROR "${RED}ERROR: __installItemList $INSTALLED_APPS failed${NC}"; continue; }
+        __installItemList "$MAIN_TOOLS_JSON_FILE" "$INSTALLED_FONTS" "$MAIN_TOOLS_JSON" || { PrintTrace $TRACE_ERROR "${RED}ERROR: __installItemList $INSTALLED_FONTS failed${NC}"; continue; }
 
-    exec ${SHELL##*/}
+        ((MAIN_JSON_INSTALLED_COUNT++))
+    done
 
-    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (0)"
-    return 0
+    PrintTrace "$TRACE_DEBUG" "MAIN_JSON_INSTALLED_COUNT = $MAIN_JSON_INSTALLED_COUNT"
+    if [ $MAIN_JSON_INSTALLED_COUNT -eq 0 ]; then
+        # shellcheck disable=SC2086
+        PrintTrace $TRACE_ERROR "${RED}ERROR: No JSON files were processed${NC}"
+        MAIN_EXIT_CODE=1
+    else
+        __createBinDirLink || PrintTrace $TRACE_ERROR "${RED}ERROR: __createBinDirLink failed with $?${NC}"
+        __addAbkEnvToConfig "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $? "${RED}ERROR: __addAbkEnvToConfig $HOME/$ABK_USER_CONFIG_FILE_SHELL failed${NC}"
+        exec ${SHELL##*/}
+    fi
+
+    # shellcheck disable=SC2086
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($MAIN_EXIT_CODE)"
+    return $MAIN_EXIT_CODE
 }
 
 echo ""
-echo "-> $0 ($@)"
+echo "-> $0 ($*)"
 
+# shellcheck disable=SC2068
 install_abkEnv_main $@
 LCL_EXIT_CODE=$?
 

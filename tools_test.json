@@ -1,0 +1,96 @@
+{
+    "macOS": {
+        "description": "Installing ABK tool set for MacOS",
+        "supported_versions": {
+            "macOS": ["11", "12", "13", "14", "15"]
+        },
+        "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
+        "tools": {
+            "check": {
+                "aws": ["command -v aws"],
+                "direnv": ["command -v direnv"],
+                "oh-my-posh": ["brew list | grep oh-my-posh"]
+            },
+            "install": {
+                "aws": [
+                    "brew install awscli",
+                    "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
+                ],
+                "direnv": [
+                    "brew install direnv",
+                    "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                ],
+                "oh-my-posh": [
+                    "brew install oh-my-posh",
+                    "oh-my-posh init $ABK_SHELL",
+                    "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                ]
+            },
+            "uninstall": {
+                "aws": [
+                    "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
+                    "brew uninstall awscli"
+                ],
+                "direnv": [
+                    "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+                    "brew uninstall direnv"
+                ],
+                "oh-my-posh": [
+                    "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                    "brew uninstall oh-my-posh"
+                ]
+            }
+        },
+        "apps": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        },
+        "fonts": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        }
+    },
+    "linux": {
+        "debian": {
+            "description": "Installing ABK tool set for Linux / Debian based distro",
+            "supported_versions": {
+                "debian": ["9", "10", "11", "12"],
+                "raspbian": ["9", "10", "11", "12"],
+                "ubuntu": ["20.04", "20.10", "22.04", "22.10", "24.04"]
+            },
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "tools": {
+                "check": {
+                },
+                "install": {
+                },
+                "uninstall": {
+                }
+            },
+            "apps": {
+                "check": {
+                },
+                "install":{
+                },
+                "uninstall": {
+                }
+            },
+            "fonts": {
+                "check": {
+                },
+                "install": {
+                },
+                "uninstall": {
+                }
+            }
+        }
+    }
+}

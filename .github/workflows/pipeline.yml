@@ -39,8 +39,8 @@ jobs:
             echo content of directory unixPackages
             ls -la unixPackages
             echo
-            echo content of installed.json
-            cat unixPackages/installed.json
+            echo content of installed json
+            find ./unixPackages -maxdepth 1 -type f -exec cat {} +
             echo
             echo content of .${{ matrix.shell }}rc
             cat ~/.${{ matrix.shell }}rc
@@ -82,8 +82,8 @@ jobs:
             echo content of directory unixPackages
             ls -la unixPackages
             echo
-            echo content of installed.json
-            cat unixPackages/installed.json
+            echo content of installed json
+            find ./unixPackages -maxdepth 1 -type f -exec cat {} +
             echo
             echo content of .${{ matrix.shell }}rc
             cat ~/.${{ matrix.shell }}rc

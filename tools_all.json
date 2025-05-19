@@ -193,10 +193,10 @@
                     "ls \"/Applications/Raspberry Pi Imager.app\"",
                     "ls \"~/Applications/Raspberry Pi Imager.app\""
                 ],
-                "slack": [
-                    "brew list --cask | grep ^slack$",
-                    "ls \"/Applications/Slack.app\"",
-                    "ls \"~/Applications/Slack.app\""
+                "spotify": [
+                    "brew list --cask | grep ^spotify$",
+                    "ls \"/Applications/Spotify.app\"",
+                    "ls \"~/Applications/Spotify.app\""
                 ],
                 "visual-studio-code": [
                     "brew list --cask | grep ^visual-studio-code$",
@@ -210,18 +210,14 @@
                 ]
             },
             "install": {
-                "balenaetcher": ["brew install --cask balenaetcher"],
+                "adobe-dng-converter": ["brew install --cask adobe-dng-converter"],
                 "brave-browser": ["brew install --cask brave-browser"],
                 "docker": ["brew install --cask docker"],
                 "flycut": ["brew install --cask flycut"],
-                "microsoft-teams": [
-                    "brew install --cask microsoft-teams",
-                    "brew uninstall --cask microsoft-auto-update"
-                ],
                 "mqttx": ["brew install --cask mqttx"],
                 "onedrive": ["brew install --cask onedrive"],
                 "raspberry-pi-imager": ["brew install --cask raspberry-pi-imager"],
-                "slack": ["brew install --cask slack"],
+                "spotify": ["brew install --cask spotify"],
                 "visual-studio-code": [
                     "brew install --cask visual-studio-code",
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
@@ -238,15 +234,14 @@
                 "vlc": ["brew install --cask vlc"]
             },
             "uninstall": {
-                "balenaetcher": ["brew uninstall --cask balenaetcher"],
+                "adobe-dng-converter": ["brew uninstall --cask adobe-dng-converter"],
                 "brave-browser": ["brew uninstall --cask brave-browser"],
                 "docker": ["brew uninstall --cask docker"],
                 "flycut": ["brew uninstall --cask flycut"],
-                "microsoft-teams": ["brew uninstall --cask microsoft-teams"],
                 "mqttx": ["brew uninstall --cask mqttx"],
                 "onedrive": ["brew uninstall --cask onedrive"],
                 "raspberry-pi-imager": ["brew uninstall --cask raspberry-pi-imager"],
-                "slack": ["brew uninstall --cask slack"],
+                "spotify": ["brew uninstall --cask spotify"],
                 "visual-studio-code": ["brew uninstall --cask visual-studio-code"],
                 "vlc": ["brew uninstall --cask vlc"]
             }

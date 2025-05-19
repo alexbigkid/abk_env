@@ -1,0 +1,173 @@
+{
+    "macOS": {
+        "description": "Installing ABK tool set for MacOS",
+        "supported_versions": {
+            "macOS": ["11", "12", "13", "14", "15"]
+        },
+        "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
+        "tools": {
+            "check": {
+                "jq": ["command -v jq"],
+                "oh-my-posh": ["brew list | grep oh-my-posh"],
+                "wget": ["command -v wget"],
+                "yq": ["command -v yq"],
+                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+            },
+            "install": {
+                "jq": ["brew install jq"],
+                "oh-my-posh": [
+                    "brew install oh-my-posh",
+                    "oh-my-posh init $ABK_SHELL",
+                    "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                ],
+                "wget": ["brew install wget"],
+                "yq": ["brew install yq"],
+                "zsh-autocomplete": [
+                    "brew install zsh-autocomplete",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ],
+                "zsh-autosuggestions": [
+                    "brew install zsh-autosuggestions",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ],
+                "zsh-syntax-highlighting": [
+                    "brew install zsh-syntax-highlighting",
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                ]
+            },
+            "uninstall": {
+                "jq": ["brew uninstall jq"],
+                "oh-my-posh": [
+                    "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                    "brew uninstall oh-my-posh"
+                ],
+                "wget": ["brew uninstall wget"],
+                "yq": ["brew uninstall yq"],
+                "zsh-autocomplete": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autocomplete"
+                ],
+                "zsh-autosuggestions": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autosuggestions"
+                ],
+                "zsh-syntax-highlighting": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-syntax-highlighting"
+                ]
+            }
+        },
+        "apps": {
+            "check": {
+                "brave-browser": [
+                    "brew list --cask | grep ^brave-browser$",
+                    "ls \"/Applications/Brave Browser.app\"",
+                    "ls \"~/Applications/Brave Browser.app\""
+                ],
+                "flycut": [
+                    "brew list --cask | grep ^flycut$",
+                    "ls \"/Applications/Flycut.app\"",
+                    "ls \"~/Applications/Flycut.app\""
+                ]
+            },
+            "install": {
+                "brave-browser": ["brew install --cask brave-browser"],
+                "flycut": ["brew install --cask flycut"]
+            },
+            "uninstall": {
+                "brave-browser": ["brew uninstall --cask brave-browser"],
+                "flycut": ["brew uninstall --cask flycut"]
+            }
+        },
+        "fonts": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        }
+    },
+    "linux": {
+        "debian": {
+            "description": "Installing ABK tool set for Linux / Debian based distro",
+            "supported_versions": {
+                "debian": ["9", "10", "11", "12"],
+                "raspbian": ["9", "10", "11", "12"],
+                "ubuntu": ["20.04", "20.10", "22.04", "22.10", "24.04"]
+            },
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "tools": {
+                "check": {
+                    "ffmpeg": ["command -v ffmpeg"],
+                    "jq": ["command -v jq"],
+                    "mplayer": ["command -v mplayer"],
+                    "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
+                    "wget": ["command -v wget"],
+                    "yq": ["command -v yq"],
+                    "xclip": ["command -v xclip"],
+                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                },
+                "install": {
+                    "ffmpeg": ["sudo apt install -y ffmpeg"],
+                    "jq": ["sudo apt install -y jq"],
+                    "mplayer": ["sudo apt install -y mplayer"],
+                    "oh-my-posh": [
+                        "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
+                        "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                    ],
+                    "wget": ["sudo apt install -y wget"],
+                    "yq": ["sudo snap install yq"],
+                    "xclip": ["sudo apt install -y xclip"],
+                    "zsh-autosuggestions": [
+                        "sudo apt install -y zsh-autosuggestions",
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "sudo apt install -y zsh-syntax-highlighting",
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    ]
+                },
+                "uninstall": {
+                    "ffmpeg": ["sudo apt remove -y ffmpeg"],
+                    "jq": ["sudo apt remove -y jq"],
+                    "mplayer": ["sudo apt remove -y mplayer"],
+                    "oh-my-posh": [
+                        "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                        "rm ./unixBin/oh-my-posh"
+                    ],
+                    "wget": ["sudo apt remove -y wget"],
+                    "yq": ["sudo snap remove yq"],
+                    "xclip": ["sudo apt remove -y xclip"],
+                    "zsh-autosuggestions": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-autosuggestions"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-syntax-highlighting"
+                    ]
+                }
+            },
+            "apps": {
+                "check": {
+                },
+                "install":{
+                },
+                "uninstall": {
+                }
+            },
+            "fonts": {
+                "check": {
+                },
+                "install": {
+                },
+                "uninstall": {
+                }
+            }
+        }
+    }
+}
