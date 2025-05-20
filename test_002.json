@@ -11,9 +11,9 @@
                 "exiftool": ["command -v exiftool"],
                 "typescript": ["command -v tsc"],
                 "uv": ["command -v uv"],
-                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
-                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
-                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+                "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
                 "direnv": [
@@ -110,8 +110,8 @@
                     "ffmpeg": ["command -v ffmpeg"],
                     "tree": ["command -v tree"],
                     "uv": ["command -v uv"],
-                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
-                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                    "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
                     "direnv": [

@@ -12,9 +12,9 @@
                 "parallel": ["command -v parallel"],
                 "pyenv": ["command -v pyenv"],
                 "ruff": ["command -v ruff"],
-                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
-                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
-                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+                "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
                 "direnv": [
@@ -110,8 +110,8 @@
                     "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
                     "ruff": ["command -v ruff"],
-                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
-                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                    "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
                     "direnv": [

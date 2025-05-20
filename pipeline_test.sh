@@ -56,24 +56,16 @@ ValidatePackageInstall() {
         return 1
     fi
 
-    PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-    PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validation for content of directory ./unixBin/env${NC}"
-    ls -la ./unixBin/env/
-    PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-
-
-    # PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_INSTALLED_FILE ${NC}"
-    # cat "$LCL_FULL_PATH_INSTALLED_FILE"
-    # PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_VALIDATION_FILE ${NC}"
-    # cat "$LCL_FULL_PATH_VALIDATION_FILE"
-
     # compare the contents of the installed file and the validation file
     if cmp -s "$LCL_FULL_PATH_INSTALLED_FILE" "$LCL_FULL_PATH_VALIDATION_FILE"; then
         PrintTrace $TRACE_INFO "${GRN}[OK] Validation for: $LCL_INSTALLATION_FILE${NC}"
     else
         PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-        diff "$LCL_FULL_PATH_INSTALLED_FILE" "$LCL_FULL_PATH_VALIDATION_FILE"
         PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_FULL_PATH_INSTALLED_FILE and $LCL_FULL_PATH_VALIDATION_FILE are different${NC}"
+        PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_INSTALLED_FILE ${NC}"
+        cat "$LCL_FULL_PATH_INSTALLED_FILE"
+        PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_VALIDATION_FILE ${NC}"
+        cat "$LCL_FULL_PATH_VALIDATION_FILE"
         PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
         return 1
     fi
