@@ -36,12 +36,18 @@ ValidatePackageInstall() {
     fi
 
     # get the unix version
-    AbkLib_GetId_unix LCL_UNIX_DISTRO || { PrintTrace $TRACE_ERROR "${RED}ERROR: AbkLib_GetId_unix failed${NC}"; return 1; }
-    PrintTrace $TRACE_INFO "LCL_UNIX_DISTRO = $LCL_UNIX_DISTRO"
-    if [ "$ABK_UNIX_TYPE" == "macOS" ]; then
+    if [ "$ABK_UNIX_TYPE" == "linux" ]; then
+        AbkLib_GetIdLike_linux LCL_UNIX_DISTRO
+        if [ "$LCL_UNIX_DISTRO" == "" ]; then
+            AbkLib_GetId_unix LCL_UNIX_DISTRO || { PrintTrace $TRACE_ERROR "${RED}ERROR: AbkLib_GetId_unix failed${NC}"; return 1; }
+        fi
+        PrintTrace $TRACE_INFO "LCL_UNIX_DISTRO = $LCL_UNIX_DISTRO"
+        LCL_FULL_PATH_VALIDATION_FILE="tests/$ABK_UNIX_TYPE/$LCL_UNIX_DISTRO/$LCL_INSTALLATION_FILE"
+    elif [ "$ABK_UNIX_TYPE" == "macOS" ]; then
         LCL_FULL_PATH_VALIDATION_FILE="tests/macOS/$LCL_INSTALLATION_FILE"
     else
-        LCL_FULL_PATH_VALIDATION_FILE="tests/$ABK_UNIX_TYPE/$LCL_UNIX_DISTRO/$LCL_INSTALLATION_FILE"
+        PrintTrace $TRACE_ERROR "${RED}ERROR: ABK_UNIX_TYPE = $ABK_UNIX_TYPE is not supported${NC}"
+        return 1
     fi
 
     # check validation file exist
@@ -50,16 +56,19 @@ ValidatePackageInstall() {
         return 1
     fi
 
-    PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-    PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_INSTALLED_FILE ${NC}"
-    cat "$LCL_FULL_PATH_INSTALLED_FILE"
-    PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_VALIDATION_FILE ${NC}"
-    cat "$LCL_FULL_PATH_VALIDATION_FILE"
-    PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
+    # PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_INSTALLED_FILE ${NC}"
+    # cat "$LCL_FULL_PATH_INSTALLED_FILE"
+    # PrintTrace $TRACE_INFO "${RED}Content of $LCL_FULL_PATH_VALIDATION_FILE ${NC}"
+    # cat "$LCL_FULL_PATH_VALIDATION_FILE"
 
     # compare the contents of the installed file and the validation file
-    if ! diff -q "$LCL_FULL_PATH_INSTALLED_FILE" "$LCL_FULL_PATH_VALIDATION_FILE"; then
+    if cmp -s "$LCL_FULL_PATH_INSTALLED_FILE" "$LCL_FULL_PATH_VALIDATION_FILE"; then
+        PrintTrace $TRACE_INFO "${GRN}[OK] Validation for: $LCL_INSTALLATION_FILE${NC}"
+    else
+        PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
+        diff "$LCL_FULL_PATH_INSTALLED_FILE" "$LCL_FULL_PATH_VALIDATION_FILE"
         PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_FULL_PATH_INSTALLED_FILE and $LCL_FULL_PATH_VALIDATION_FILE are different${NC}"
+        PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
         return 1
     fi
 
@@ -140,9 +149,7 @@ ValidateLinksCreated() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]}"
     local LCL_LINKS_DIR="./unixBin/env"
     local LCL_LINKS_FILES=(
-        "LINK_aws.env"
         "LINK_direnv.env"
-        "LINK_node.env"
         "LINK_oh-my-posh.env"
         "LINK_pyenv.env"
         "LINK_uv.env"
@@ -185,9 +192,11 @@ ValidateLinksDeleted() {
     local LCL_LINKS_FILES=(
         "LINK_aws.env"
         "LINK_direnv.env"
-        "LINK_node.env"
+        "LINK_nodenv.env"
         "LINK_oh-my-posh.env"
         "LINK_pyenv.env"
+        "LINK_rbenv.env"
+        "LINK_tfenv.env"
         "LINK_uv.env"
         "LINK_zsh_plugins.env"
     )
