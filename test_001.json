@@ -11,6 +11,7 @@
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "pyenv": ["command -v pyenv"],
                 "ruff": ["command -v ruff"],
+                "uv": ["command -v uv"],
                 "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
                 "zsh-autosuggestions": ["brew list | grep zsh-autosuggestions"],
                 "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
@@ -31,6 +32,10 @@
                     "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                 ],
                 "ruff": ["brew install ruff"],
+                "uv": [
+                    "brew install uv",
+                    "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
+                ],
                 "zsh-autocomplete": [
                     "brew install zsh-autocomplete",
                     "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
@@ -60,6 +65,10 @@
                     "rm -Rf ~/.pyenv"
                 ],
                 "ruff": ["brew uninstall ruff"],
+                "uv": [
+                    "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                    "brew uninstall uv"
+                ],
                 "zsh-autocomplete": [
                     "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
                     "brew uninstall zsh-autocomplete"
@@ -105,7 +114,7 @@
                     "direnv": ["command -v direnv"],
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
                     "pyenv": ["command -v pyenv"],
-                    "ruff": ["command -v ruff"],
+                    "uv": ["command -v uv"],
                     "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
                     "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
@@ -123,7 +132,12 @@
                         "curl -fsSL https://pyenv.run | bash",
                         "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                     ],
-                    "ruff": ["pip install ruff"],
+                    "uv": [
+                        "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "source $HOME/.local/bin/env",
+                        "uv tool install ruff",
+                        "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
+                    ],
                     "zsh-autosuggestions": [
                         "sudo apt install -y zsh-autosuggestions",
                         "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
@@ -147,7 +161,13 @@
                         "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
                         "rm -Rf ~/.pyenv"
                     ],
-                    "ruff": ["pip uninstall ruff"],
+                    "uv": [
+                        "uv tool uninstall ruff",
+                        "uv cache clean",
+                        "rm -r \"$(uv python dir)\"",
+                        "rm -r \"$(uv tool dir)\"",
+                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                    ],
                     "zsh-autosuggestions": [
                         "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
                         "sudo apt remove -y zsh-autosuggestions"
