@@ -9,6 +9,7 @@
             "check": {
                 "direnv": ["command -v direnv"],
                 "exiftool": ["command -v exiftool"],
+                "nodenv": ["command -v nodenv"],
                 "typescript": ["command -v tsc"],
                 "uv": ["command -v uv"],
                 "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
@@ -21,6 +22,10 @@
                     "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                 ],
                 "exiftool": ["brew install exiftool"],
+                "nodenv": [
+                    "brew install nodenv",
+                    "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
+                ],
                 "typescript": ["brew install typescript"],
                 "uv": [
                     "brew install uv",
@@ -45,6 +50,11 @@
                     "brew uninstall direnv"
                 ],
                 "exiftool": ["brew uninstall exiftool"],
+                "nodenv": [
+                    "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
+                    "brew uninstall nodenv",
+                    "rm -Rf ~/.nodenv"
+                ],
                 "typescript": ["brew uninstall typescript"],
                 "uv": [
                     "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
@@ -106,20 +116,23 @@
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "check": {
-                    "direnv": ["command -v direnv"],
                     "ffmpeg": ["command -v ffmpeg"],
-                    "tree": ["command -v tree"],
+                    "nodenv": ["command -v nodenv"],
                     "uv": ["command -v uv"],
                     "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
                     "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
-                    "direnv": [
-                        "sudo apt install -y direnv",
-                        "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
-                    ],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
-                    "tree": ["sudo apt install -y tree"],
+                    "nodenv": [
+                        "git clone https://github.com/nodenv/nodenv.git ~/.nodenv",
+                        "sudo ln -vs ~/.nodenv/bin/nodenv /usr/local/bin/nodenv",
+                        "(cd ~/.nodenv src/configure && make -C src || true)",
+                        "mkdir -p $(nodenv root)/plugins",
+                        "git clone https://github.com/nodenv/node-build.git $(nodenv root)/plugins/node-build",
+                        "git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases",
+                        "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
+                    ],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
                         "source $HOME/.local/bin/env",
@@ -136,12 +149,12 @@
                     ]
                 },
                 "uninstall": {
-                    "direnv": [
-                        "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
-                        "sudo apt remove -y direnv"
-                    ],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
-                    "tree": ["sudo apt remove -y tree"],
+                    "nodenv": [
+                        "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
+                        "sudo find /usr/local/bin -type l -name 'nodenv' -delete",
+                        "rm -Rf ~/.nodenv"
+                    ],
                     "uv": [
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
                         "uv tool uninstall ruff",

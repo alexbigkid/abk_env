@@ -3,6 +3,11 @@
     "exiftool": [
       "brew uninstall exiftool"
     ],
+    "nodenv": [
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
+      "brew uninstall nodenv",
+      "rm -Rf ~/.nodenv"
+    ],
     "typescript": [
       "brew uninstall typescript"
     ]

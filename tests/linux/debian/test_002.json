@@ -1,18 +1,17 @@
 {
   "installed_tools": {
-    "exiftool": [
-      "brew uninstall exiftool"
+    "ffmpeg": [
+      "sudo apt remove -y ffmpeg"
     ],
-    "typescript": [
-      "brew uninstall typescript"
+    "nodenv": [
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
+      "sudo find /usr/local/bin -type l -name 'nodenv' -delete",
+      "rm -Rf ~/.nodenv"
     ]
   },
   "installed_apps": {
-    "brave-browser": [
-      "brew uninstall --cask brave-browser"
-    ],
-    "flycut": [
-      "brew uninstall --cask flycut"
+    "visual-studio-code": [
+      "sudo snap remove code"
     ]
   }
 }
