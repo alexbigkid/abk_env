@@ -28,15 +28,15 @@
                 ],
                 "zsh-autocomplete": [
                     "brew install zsh-autocomplete",
-                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env)"
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                 ],
                 "zsh-autosuggestions": [
                     "brew install zsh-autosuggestions",
-                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env)"
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                 ],
                 "zsh-syntax-highlighting": [
                     "brew install zsh-syntax-highlighting",
-                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env)"
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                 ]
             },
             "uninstall": {
@@ -126,11 +126,11 @@
                     ],
                     "zsh-autosuggestions": [
                         "sudo apt install -y zsh-autosuggestions",
-                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env)"
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                     ],
                     "zsh-syntax-highlighting": [
                         "sudo apt install -y zsh-syntax-highlighting",
-                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env)"
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                     ]
                 },
                 "uninstall": {
