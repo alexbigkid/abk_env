@@ -18,25 +18,25 @@
             "install": {
                 "direnv": [
                     "brew install direnv",
-                    "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                    "ln -s ./unixBin/env/XXX_direnv.env ./unixBin/env/LINK_direnv.env"
                 ],
                 "exiftool": ["brew install exiftool"],
                 "typescript": ["brew install typescript"],
                 "uv": [
                     "brew install uv",
-                    "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                    "ln -s ./unixBin/env/XXX_uv.env ./unixBin/env/LINK_uv.env"
                 ],
                 "zsh-autocomplete": [
                     "brew install zsh-autocomplete",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                 ],
                 "zsh-autosuggestions": [
                     "brew install zsh-autosuggestions",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                 ],
                 "zsh-syntax-highlighting": [
                     "brew install zsh-syntax-highlighting",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                 ]
             },
             "uninstall": {
@@ -116,21 +116,21 @@
                 "install": {
                     "direnv": [
                         "sudo apt install -y direnv",
-                        "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                        "ln -s ./unixBin/env/XXX_direnv.env ./unixBin/env/LINK_direnv.env"
                     ],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
                     "tree": ["sudo apt install -y tree"],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
-                        "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                        "ln -s ./unixBin/env/XXX_uv.env ./unixBin/env/LINK_uv.env"
                     ],
                     "zsh-autosuggestions": [
                         "sudo apt install -y zsh-autosuggestions",
-                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                     ],
                     "zsh-syntax-highlighting": [
                         "sudo apt install -y zsh-syntax-highlighting",
-                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                     ]
                 },
                 "uninstall": {

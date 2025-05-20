@@ -19,31 +19,31 @@
             "install": {
                 "direnv": [
                     "brew install direnv",
-                    "echo $PWD && ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                    "echo $PWD && ln -s ./unixBin/env/XXX_direnv.env ./unixBin/env/LINK_direnv.env"
                 ],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
-                    "echo $PWD && ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                    "echo $PWD && ln -s ./unixBin/env/XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
                 ],
                 "parallel": ["brew install parallel"],
                 "pyenv": [
                     "brew install pyenv",
                     "brew install pyenv-virtualenv",
-                    "echo $PWD && ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                    "echo $PWD && ln -s ./unixBin/env/XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
                 ],
                 "ruff": ["brew install ruff"],
                 "zsh-autocomplete": [
                     "brew install zsh-autocomplete",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                 ],
                 "zsh-autosuggestions": [
                     "brew install zsh-autosuggestions",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                 ],
                 "zsh-syntax-highlighting": [
                     "brew install zsh-syntax-highlighting",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                 ]
             },
             "uninstall": {
@@ -116,11 +116,11 @@
                 "install": {
                     "direnv": [
                         "sudo apt install -y direnv",
-                        "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                        "ln -s ./unixBin/env/XXX_direnv.env ./unixBin/env/LINK_direnv.env"
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
-                        "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                        "ln -s ./unixBin/env/XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
                     ],
                     "parallel": ["sudo apt install -y parallel"],
                     "pyenv": [
@@ -130,16 +130,16 @@
                         "(cd ~/.pyenv && src/configure && make -C src || true)",
                         "mkdir -p ~/.pyenv/plugins",
                         "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
-                        "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                        "ln -s ./unixBin/env/XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
                     ],
                     "ruff": ["pip install ruff"],
                     "zsh-autosuggestions": [
                         "sudo apt install -y zsh-autosuggestions",
-                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                     ],
                     "zsh-syntax-highlighting": [
                         "sudo apt install -y zsh-syntax-highlighting",
-                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && echo $PWD && ln -s ./unixBin/env/XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
                     ]
                 },
                 "uninstall": {
