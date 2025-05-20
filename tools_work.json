@@ -306,7 +306,6 @@
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
-                    "ruff": ["command -v ruff"],
                     "serverless": ["command -v serverless"],
                     "shellcheck": ["command -v shellcheck"],
                     "tfenv": ["command -v tfenv"],
@@ -361,7 +360,6 @@
                         "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
                         "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                     ],
-                    "ruff": ["pip install ruff"],
                     "serverless": ["sudo npm install -g serverless"],
                     "shellcheck": ["sudo apt install -y shellcheck"],
                     "tfenv": [
@@ -372,6 +370,8 @@
                     "tree": ["sudo apt install -y tree"],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "source $HOME/.local/bin/env",
+                        "uv tool install ruff",
                         "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
@@ -419,7 +419,6 @@
                         "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
                         "rm -Rf ~/.pyenv"
                     ],
-                    "ruff": ["pip uninstall ruff"],
                     "serverless": ["sudo npm uninstall -g serverless"],
                     "shellcheck": ["sudo apt remove -y shellcheck"],
                     "tfenv": [
@@ -430,6 +429,7 @@
                     "tree": ["sudo apt remove -y tree"],
                     "uv": [
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                        "uv tool uninstall ruff",
                         "uv cache clean",
                         "rm -r \"$(uv python dir)\"",
                         "rm -r \"$(uv tool dir)\"",

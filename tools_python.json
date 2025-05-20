@@ -104,7 +104,6 @@
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
-                    "ruff": ["command -v ruff"],
                     "uv": ["command -v uv"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"]
@@ -129,9 +128,10 @@
                         "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
                         "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                     ],
-                    "ruff": ["pip install ruff"],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "source $HOME/.local/bin/env",
+                        "uv tool install ruff",
                         "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
@@ -153,9 +153,9 @@
                         "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
                         "rm -Rf ~/.pyenv"
                     ],
-                    "ruff": ["pip uninstall ruff"],
                     "uv": [
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                        "uv tool uninstall ruff",
                         "uv cache clean",
                         "rm -r \"$(uv python dir)\"",
                         "rm -r \"$(uv tool dir)\"",
