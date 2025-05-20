@@ -8,7 +8,7 @@
         "tools": {
             "check": {
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
-                "parallel": ["command -v parallel"]
+                "shellcheck": ["command -v shellcheck"]
             },
             "install": {
                 "oh-my-posh": [
@@ -16,14 +16,14 @@
                     "oh-my-posh init $ABK_SHELL",
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
-                "parallel": ["brew install parallel"]
+                "shellcheck": ["brew install shellcheck"]
             },
             "uninstall": {
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                     "brew uninstall oh-my-posh"
                 ],
-                "parallel": ["brew uninstall parallel"]
+                "shellcheck": ["brew uninstall shellcheck"]
             }
         },
         "apps": {
@@ -81,21 +81,21 @@
             "tools": {
                 "check": {
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
-                    "parallel": ["command -v parallel"]
+                    "shellcheck": ["command -v shellcheck"]
                 },
                 "install": {
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
-                    "parallel": ["sudo apt install -y parallel"]
+                    "shellcheck": ["sudo apt install -y shellcheck"]
                 },
                 "uninstall": {
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                         "rm ./unixBin/oh-my-posh"
                     ],
-                    "parallel": ["sudo apt remove -y parallel"]
+                    "shellcheck": ["sudo apt remove -y shellcheck"]
                 }
             },
             "apps": {

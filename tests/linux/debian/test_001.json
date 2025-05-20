@@ -8,9 +8,6 @@
       "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
       "rm ./unixBin/oh-my-posh"
     ],
-    "parallel": [
-      "sudo apt remove -y parallel"
-    ],
     "pyenv": [
       "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
       "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
