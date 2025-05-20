@@ -182,7 +182,7 @@ To update your tools you could use the alias:
 * <code>apt_update</code> - (Linux) updates all tools managed by apt
 
 
-### Uninstall
+## Uninstall
 If at some point you'd like to uninstall installed packages, you can run <code>./uninstall.sh</code>. Here few examples:
 * <code>./uninstall.sh tools_node.json</code> - will uninstall all node packages. SInce it was recorded what tools have been installed only the packages which has been previously installed with <code>tools_node.json</code> will be removed.
 * <code>./uninstall.sh tools_min.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code>
