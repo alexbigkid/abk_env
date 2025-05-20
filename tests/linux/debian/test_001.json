@@ -13,9 +13,6 @@
       "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
       "rm -Rf ~/.pyenv"
     ],
-    "ruff": [
-      "pip uninstall ruff"
-    ],
     "uv": [
       "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
       "uv tool uninstall ruff",

@@ -5,10 +5,6 @@
     ],
     "typescript": [
       "brew uninstall typescript"
-    ],
-    "uv": [
-      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
-      "brew uninstall uv"
     ]
   },
   "installed_apps": {

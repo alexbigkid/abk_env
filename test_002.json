@@ -122,6 +122,8 @@
                     "tree": ["sudo apt install -y tree"],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "source $HOME/.local/bin/env",
+                        "uv tool install ruff",
                         "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "zsh-autosuggestions": [
@@ -142,6 +144,7 @@
                     "tree": ["sudo apt remove -y tree"],
                     "uv": [
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                        "uv tool uninstall ruff",
                         "uv cache clean",
                         "rm -r \"$(uv python dir)\"",
                         "rm -r \"$(uv tool dir)\"",
