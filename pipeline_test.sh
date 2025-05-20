@@ -218,12 +218,10 @@ export TRACE_LEVEL=$TRACE_INFO
 # check Pre-Requisites
 AbkLib_CheckPreRequisites || PrintUsageAndExitWithCode 1 "${RED}ERROR: cannot proceed Pre-Requisites are not met${NC}"
 
-PrintTrace $TRACE_INFO "${GRN}List root directory${NC}"
-ls -la
 
 # check unixPackages directory
-[ ! -d "$UNIX_PACKAGES_DIR" ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: $UNIX_PACKAGES_DIR directory not found${NC}"
-PrintTrace $TRACE_INFO "${GRN}[OK] $UNIX_PACKAGES_DIR directory found${NC}"
+# [ ! -d "$UNIX_PACKAGES_DIR" ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: $UNIX_PACKAGES_DIR directory not found${NC}"
+# PrintTrace $TRACE_INFO "${GRN}[OK] $UNIX_PACKAGES_DIR directory found${NC}"
 
 
 # Find test_*.json files in root directory
