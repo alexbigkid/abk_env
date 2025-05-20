@@ -1,9 +1,5 @@
 {
   "installed_tools": {
-    "aws": [
-      "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
-      "brew uninstall awscli"
-    ],
     "direnv": [
       "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
       "brew uninstall direnv"

@@ -7,15 +7,10 @@
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
             "check": {
-                "aws": ["command -v aws"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "parallel": ["command -v parallel"]
             },
             "install": {
-                "aws": [
-                    "brew install awscli",
-                    "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
-                ],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
@@ -24,10 +19,6 @@
                 "parallel": ["brew install parallel"]
             },
             "uninstall": {
-                "aws": [
-                    "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
-                    "brew uninstall awscli"
-                ],
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                     "brew uninstall oh-my-posh"
@@ -89,19 +80,10 @@
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "check": {
-                    "aws": ["command -v aws"],
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"]
                 },
                 "install": {
-                    "aws": [
-                        "curl \"https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip\" -o \"awscliv2.zip\"",
-                        "unzip awscliv2.zip",
-                        "sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli",
-                        "[ -d ./aws ] && rm -Rf aws",
-                        "[ -e ./awscliv2.zip ] && rm awscliv2.zip",
-                        "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
-                    ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
                         "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
@@ -109,12 +91,6 @@
                     "parallel": ["sudo apt install -y parallel"]
                 },
                 "uninstall": {
-                    "aws": [
-                        "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
-                        "sudo find /usr/local/bin -type l -name 'aws' -delete",
-                        "sudo find /usr/local/bin -type l -name 'aws_completer' -delete",
-                        "[ -d /usr/local/aws-cli ] && sudo rm -Rf /usr/local/aws-cli"
-                    ],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                         "rm ./unixBin/oh-my-posh"
