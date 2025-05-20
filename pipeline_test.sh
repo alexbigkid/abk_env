@@ -155,31 +155,33 @@ ValidateLinksCreated() {
         "LINK_zsh_plugins.env"
     )
 
-    # check the links were created
-    pushd "$LCL_LINKS_DIR" >/dev/null
-    for LCL_LINK_FILE in "${LCL_LINKS_FILES[@]}"; do
-        if [ -L "$LCL_LINK_FILE" ]; then
-            local LCL_TARGET
-            local LCL_XXX_TARGET
-            LCL_TARGET=$(readlink "$LCL_LINK_FILE")
-            LCL_XXX_TARGET="./XXX_${LCL_LINK_FILE#LINK_}"
+    (
+        cd "$LCL_LINKS_DIR" || {
+            PrintTrace $TRACE_ERROR "${RED}ERROR: Could not cd into $LCL_LINKS_DIR${NC}"
+            exit 1
+        }
 
-            if [ "$LCL_TARGET" == "$LCL_XXX_TARGET" ]; then
-                PrintTrace $TRACE_INFO "${GRN}[OK] $LCL_LINK_FILE points to $LCL_TARGET${NC}"
+        for LCL_LINK_FILE in "${LCL_LINKS_FILES[@]}"; do
+            if [ -L "$LCL_LINK_FILE" ]; then
+                local LCL_TARGET
+                local LCL_XXX_TARGET
+                LCL_TARGET=$(readlink "$LCL_LINK_FILE")
+                LCL_XXX_TARGET="./XXX_${LCL_LINK_FILE#LINK_}"
+
+                if [ "$LCL_TARGET" == "$LCL_XXX_TARGET" ]; then
+                    PrintTrace $TRACE_INFO "${GRN}[OK] $LCL_LINK_FILE points to $LCL_TARGET${NC}"
+                else
+                    PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_LINK_FILE points to $LCL_TARGET instead of $LCL_XXX_TARGET${NC}"
+                    exit 1
+                fi
             else
-                PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_LINK_FILE points to $LCL_TARGET instead of $LCL_XXX_TARGET${NC}"
-                popd >/dev/null
-                return 1
+                PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_LINK_FILE not found${NC}"
+                exit 1
             fi
-        else
-            PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_LINKS_DIR/$LCL_LINK_FILE not found${NC}"
-            popd >/dev/null
-            return 1
-        fi
-    done
-    popd >/dev/null
+        done
+    ) || return 1
 
-    PrintTrace $TRACE_INFO "${GRN}[OK] Validation for: $LCL_INSTALLATION_FILE${NC}"
+    PrintTrace $TRACE_INFO "${GRN}[OK] Validation ValidateLinksCreated for: $LCL_INSTALLATION_FILE${NC}"
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (0)"
     return 0
 }
@@ -201,17 +203,21 @@ ValidateLinksDeleted() {
     )
 
     # check the links were created
-    pushd "$LCL_LINKS_DIR" >/dev/null
-    for LCL_LINK_FILE in "${LCL_LINKS_FILES[@]}"; do
-        if [ -L "$LCL_LINK_FILE" ]; then
-            PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_LINKS_DIR/$LCL_LINK_FILE NOT deleted${NC}"
-            popd >/dev/null
-            return 1
-        fi
-    done
-    popd >/dev/null
+    (
+        cd "$LCL_LINKS_DIR" || {
+            PrintTrace $TRACE_ERROR "${RED}ERROR: Could not cd into $LCL_LINKS_DIR${NC}"
+            exit 1
+        }
 
-    PrintTrace $TRACE_INFO "${GRN}[OK] Validation for: $LCL_INSTALLATION_FILE${NC}"
+        for LCL_LINK_FILE in "${LCL_LINKS_FILES[@]}"; do
+            if [ -L "$LCL_LINK_FILE" ]; then
+                PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_LINK_FILE was NOT deleted${NC}"
+                exit 1
+            fi
+        done
+    ) || return 1
+
+    PrintTrace $TRACE_INFO "${GRN}[OK] Validation ValidateLinksDeleted for: $LCL_INSTALLATION_FILE${NC}"
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (0)"
     return 0
 }
