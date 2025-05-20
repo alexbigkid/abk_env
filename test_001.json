@@ -9,7 +9,6 @@
             "check": {
                 "direnv": ["command -v direnv"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
-                "parallel": ["command -v parallel"],
                 "pyenv": ["command -v pyenv"],
                 "ruff": ["command -v ruff"],
                 "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
@@ -26,7 +25,6 @@
                     "oh-my-posh init $ABK_SHELL",
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
-                "parallel": ["brew install parallel"],
                 "pyenv": [
                     "brew install pyenv",
                     "brew install pyenv-virtualenv",
@@ -55,7 +53,6 @@
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                     "brew uninstall oh-my-posh"
                 ],
-                "parallel": ["brew uninstall parallel"],
                 "pyenv": [
                     "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
                     "brew uninstall pyenv-virtualenv",
@@ -107,7 +104,6 @@
                 "check": {
                     "direnv": ["command -v direnv"],
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
-                    "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
                     "ruff": ["command -v ruff"],
                     "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
@@ -122,9 +118,8 @@
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
-                    "parallel": ["sudo apt install -y parallel"],
                     "pyenv": [
-                        "sudo DEBIAN_FRONTEND=noninteractive apt install -yq make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev",
+                        "sudo DEBIAN_FRONTEND=noninteractive apt install -yq -o Dpkg::Options::='--force-confnew' make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev",
                         "curl -fsSL https://pyenv.run | bash",
                         "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                     ],
@@ -147,7 +142,6 @@
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                         "rm ./unixBin/oh-my-posh"
                     ],
-                    "parallel": ["sudo apt remove -y parallel"],
                     "pyenv": [
                         "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
                         "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
