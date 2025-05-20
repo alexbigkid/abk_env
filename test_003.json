@@ -14,7 +14,7 @@
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
-                    "ln -s ./unixBin/env/XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                    "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "parallel": ["brew install parallel"]
             },
@@ -86,7 +86,7 @@
                 "install": {
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
-                        "ln -s ./unixBin/env/XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                        "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "parallel": ["sudo apt install -y parallel"]
                 },
