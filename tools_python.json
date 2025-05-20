@@ -21,25 +21,25 @@
             "install": {
                 "direnv": [
                     "brew install direnv",
-                    "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                    "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                 ],
                 "exiftool": ["brew install exiftool"],
                 "jq": ["brew install jq"],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
-                    "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                    "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "parallel": ["brew install parallel"],
                 "pyenv": [
                     "brew install pyenv",
                     "brew install pyenv-virtualenv",
-                    "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                    "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                 ],
                 "ruff": ["brew install ruff"],
                 "uv": [
                     "brew install uv",
-                    "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                    "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                 ],
                 "wget": ["brew install wget"],
                 "yq": ["brew install yq"]
@@ -112,12 +112,12 @@
                 "install": {
                     "direnv": [
                         "sudo apt install -y direnv",
-                        "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                        "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                     ],
                     "jq": ["sudo apt install -y jq"],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
-                        "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                        "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "parallel": ["sudo apt install -y parallel"],
                     "pyenv": [
@@ -127,12 +127,12 @@
                         "(cd ~/.pyenv && src/configure && make -C src || true)",
                         "mkdir -p ~/.pyenv/plugins",
                         "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
-                        "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                        "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                     ],
                     "ruff": ["pip install ruff"],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
-                        "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                        "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo snap install yq"]

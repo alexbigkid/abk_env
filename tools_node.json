@@ -18,12 +18,12 @@
                 "jq": ["brew install jq"],
                 "nodenv": [
                     "brew install nodenv",
-                    "ln -s ./XXX_nodenv.env ./unixBin/env/LINK_nodenv.env"
+                    "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
                 ],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
-                    "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                    "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "typescript": ["brew install typescript"],
                 "wget": ["brew install wget"],
@@ -88,11 +88,11 @@
                         "mkdir -p $(nodenv root)/plugins",
                         "git clone https://github.com/nodenv/node-build.git $(nodenv root)/plugins/node-build",
                         "git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases",
-                        "ln -s ./XXX_nodenv.env ./unixBin/env/LINK_nodenv.env"
+                        "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
-                        "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                        "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo snap install yq"]

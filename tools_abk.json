@@ -37,11 +37,11 @@
             "install": {
                 "aws": [
                     "brew install awscli",
-                    "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
+                    "(cd unixBin/env && ln -s XXX_aws.env LINK_aws.env)"
                 ],
                 "direnv": [
                     "brew install direnv",
-                    "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                    "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                 ],
                 "exiftool": ["brew install exiftool"],
                 "git": ["brew install git"],
@@ -52,18 +52,18 @@
                 "nmap": ["brew install nmap"],
                 "nodenv": [
                     "brew install nodenv",
-                    "ln -s ./XXX_nodenv.env ./unixBin/env/LINK_nodenv.env"
+                    "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
                 ],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
-                    "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                    "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "parallel": ["brew install parallel"],
                 "pyenv": [
                     "brew install pyenv",
                     "brew install pyenv-virtualenv",
-                    "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                    "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                 ],
                 "ruff": ["brew install ruff"],
                 "serverless": ["brew install serverless"],
@@ -73,21 +73,21 @@
                 "typescript": ["brew install typescript"],
                 "uv": [
                     "brew install uv",
-                    "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                    "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                 ],
                 "wget": ["brew install wget"],
                 "yq": ["brew install yq"],
                 "zsh-autocomplete": [
                     "brew install zsh-autocomplete",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                 ],
                 "zsh-autosuggestions": [
                     "brew install zsh-autosuggestions",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                 ],
                 "zsh-syntax-highlighting": [
                     "brew install zsh-syntax-highlighting",
-                    "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                 ]
             },
             "uninstall": {
@@ -291,11 +291,11 @@
                         "sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli",
                         "[ -d ./aws ] && rm -Rf aws",
                         "[ -e ./awscliv2.zip ] && rm awscliv2.zip",
-                        "ln -s ./XXX_aws.env ./unixBin/env/LINK_aws.env"
+                        "(cd unixBin/env && ln -s XXX_aws.env LINK_aws.env)"
                     ],
                     "direnv": [
                         "sudo apt install -y direnv",
-                        "ln -s ./XXX_direnv.env ./unixBin/env/LINK_direnv.env"
+                        "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                     ],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
                     "pass": ["sudo apt install -y pass"],
@@ -311,11 +311,11 @@
                         "mkdir -p $(nodenv root)/plugins",
                         "git clone https://github.com/nodenv/node-build.git $(nodenv root)/plugins/node-build",
                         "git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases",
-                        "ln -s ./XXX_nodenv.env ./unixBin/env/LINK_nodenv.env"
+                        "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
-                        "ln -s ./XXX_oh-my-posh.env ./unixBin/env/LINK_oh-my-posh.env"
+                        "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "parallel": ["sudo apt install -y parallel"],
                     "pyenv": [
@@ -325,7 +325,7 @@
                         "(cd ~/.pyenv && src/configure && make -C src || true)",
                         "mkdir -p ~/.pyenv/plugins",
                         "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
-                        "ln -s ./XXX_pyenv.env ./unixBin/env/LINK_pyenv.env"
+                        "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
                     ],
                     "ruff": ["pip install ruff"],
                     "serverless": ["sudo npm install -g serverless"],
@@ -333,23 +333,23 @@
                     "tfenv": [
                         "git clone https://github.com/tfutils/tfenv.git ~/.tfenv",
                         "sudo ln -vs ~/.tfenv/bin/tfenv /usr/local/bin/tfenv",
-                        "ln -s ./XXX_tfenv.env ./unixBin/env/LINK_tfenv.env"
+                        "(cd unixBin/env && ln -s XXX_tfenv.env LINK_tfenv.env)"
                     ],
                     "tree": ["sudo apt install -y tree"],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
-                        "ln -s ./XXX_uv.env ./unixBin/env/LINK_uv.env"
+                        "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo snap install yq"],
                     "xclip": ["sudo apt install -y xclip"],
                     "zsh-autosuggestions": [
                         "sudo apt install -y zsh-autosuggestions",
-                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                     ],
                     "zsh-syntax-highlighting": [
                         "sudo apt install -y zsh-syntax-highlighting",
-                        "[ ! -L ./unixBin/env/LINK_zsh_plugins.env ] && ln -s ./XXX_zsh_plugins.env ./unixBin/env/LINK_zsh_plugins.env"
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
                     ]
                 },
                 "uninstall": {
