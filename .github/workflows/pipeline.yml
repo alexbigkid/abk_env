@@ -28,26 +28,7 @@ jobs:
             fi
 
       - name: Run tool install/uninstall in ${{ matrix.shell }}
-        run: |
-          echo "Running on macOS ${{ matrix.version }} with ${{ matrix.shell }}"
-          ${{ matrix.shell }} -c "
-            echo SHELL = $SHELL
-            echo
-            echo
-            ./install.sh
-            echo
-            echo content of directory unixPackages
-            ls -la unixPackages
-            echo
-            echo content of installed json
-            find ./unixPackages -maxdepth 1 -type f -exec cat {} +
-            echo
-            echo content of .${{ matrix.shell }}rc
-            cat ~/.${{ matrix.shell }}rc
-            ./uninstall.sh
-            echo content of directory unixPackages
-            ls -la unixPackages
-            "
+        run: ${{ matrix.shell }} -c "./pipeline_test.sh"
 
   Ubuntu:
     name: Ubuntu ${{ matrix.version }} - ${{ matrix.shell }}
@@ -72,25 +53,8 @@ jobs:
             fi
 
       - name: Run tool install/uninstall in ${{ matrix.shell }}
-        run: |
-          echo "Running on Ubuntu ${{ matrix.version }} with ${{ matrix.shell }}"
-          ${{ matrix.shell }} -c "
-            echo SHELL = $SHELL
-            echo
-            ./install.sh
-            echo
-            echo content of directory unixPackages
-            ls -la unixPackages
-            echo
-            echo content of installed json
-            find ./unixPackages -maxdepth 1 -type f -exec cat {} +
-            echo
-            echo content of .${{ matrix.shell }}rc
-            cat ~/.${{ matrix.shell }}rc
-            ./uninstall.sh
-            echo content of directory unixPackages
-            ls -la unixPackages
-          "
+        run: ${{ matrix.shell }} -c "./pipeline_test.sh"
+
 
 #   Docker:
 #     name: Linux Docker - ${{ matrix.os }}:${{ matrix.version }}
