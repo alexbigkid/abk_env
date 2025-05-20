@@ -17,6 +17,10 @@
     "ruff": [
       "brew uninstall ruff"
     ],
+    "uv": [
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+      "brew uninstall uv"
+    ],
     "zsh-autocomplete": [
       "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
       "brew uninstall zsh-autocomplete"

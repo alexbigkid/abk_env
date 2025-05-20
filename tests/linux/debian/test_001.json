@@ -14,7 +14,15 @@
       "rm -Rf ~/.pyenv"
     ],
     "ruff": [
-       "pip uninstall ruff"
+      "pip uninstall ruff"
+    ],
+    "uv": [
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+      "uv tool uninstall ruff",
+      "uv cache clean",
+      "rm -r \"$(uv python dir)\"",
+      "rm -r \"$(uv tool dir)\"",
+      "rm ~/.local/bin/uv ~/.local/bin/uvx"
     ],
     "zsh-autosuggestions": [
       "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
