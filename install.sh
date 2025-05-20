@@ -133,7 +133,12 @@ __installItem() {
     if [ $LCL_IS_APP_INSTALLED -eq 1 ]; then
         PrintTrace $TRACE_INFO "${YLW}[$LCL_ITEM installing ...]${NC}"
         while IFS= read -r INSTALL_STEP; do
-            eval "$INSTALL_STEP" || LCL_EXIT_CODE=$?
+            eval "$INSTALL_STEP"
+            LCL_EXIT_CODE=$?
+            if [ $LCL_EXIT_CODE -ne 0 ]; then
+                PrintTrace $TRACE_ERROR "${RED}ERROR: $INSTALL_STEP failed with $LCL_EXIT_CODE${NC}"
+                break
+            fi
         done <<< "$LCL_INSTALL_INSTRUCTIONS"
 
         PrintTrace $TRACE_INFO "${YLW}[$LCL_ITEM marking uninstalling steps ...]${NC}"
