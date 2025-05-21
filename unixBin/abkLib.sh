@@ -110,7 +110,7 @@ AbkLib_RemoveEnvironmentSettings() {
             PrintTrace $TRACE_INFO "   [ABK environment found removing it...]"
             sed -i -e "/^$ABK_ENV_BEGIN $LCL_ENV_NAME$/,/^$ABK_ENV_END $LCL_ENV_NAME$/d" "$LCL_FILE_TO_REMOVE_CONTENT_FROM"
         else
-            PrintTrace $TRACE_INFO "   [ABK environment NOT found. Nothng to remove]"
+            PrintTrace $TRACE_INFO "   [ABK environment NOT found. Nothing to remove]"
         fi
     else
         echo "   [File: $LCL_FILE_TO_REMOVE_CONTENT_FROM does not exist.]"
