@@ -51,7 +51,7 @@ __removeAbkEnvToConfig() {
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_USER_CONFIG_FILE_SHELL=$1
 
-    AbkLib_RemoveEnvironmentSettings "$ABK_ENV_NAME" "$LCL_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $ERROR_CODE_NEEDED_FILE_DOES_NOT_EXIST "${RED}ERROR: $HOME/$LCL_USER_CONFIG_FILE_SHELL file does not exist${NC}"
+    AbkLib_RemoveEnvironmentSettings "$ABK_ENV_NAME" "$LCL_USER_CONFIG_FILE_SHELL" || PrintTrace $TRACE_ERROR "${RED}ERROR: $HOME/$LCL_USER_CONFIG_FILE_SHELL file does not exist${NC}"
 
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (0)"
     return 0
@@ -245,7 +245,7 @@ uninstall_abkEnv_main() {
 
     if $MAIN_ALL_JSON_FILES_EMPTY; then
         PrintTrace $TRACE_INFO "${ORG}INFO: All JSON files are empty. Removing config ...${NC}"
-        __removeAbkEnvToConfig "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __removeAbkEnvToConfig $HOME/$ABK_USER_CONFIG_FILE_SHELL failed"
+        __removeAbkEnvToConfig "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintTrace $TRACE_ERROR "${RED}ERROR:${NC} __removeAbkEnvToConfig $HOME/$ABK_USER_CONFIG_FILE_SHELL failed. Exited with: $?"
         __deleteBinDirLink || PrintTrace $TRACE_ERROR "${RED}ERROR:${NC} __deleteBinDirLink failed with $?"
         exec $ABK_SHELL
     fi
