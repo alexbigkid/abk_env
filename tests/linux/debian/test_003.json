@@ -1,12 +1,12 @@
 {
   "installed_tools": {
     "shellcheck": [
-      "brew uninstall shellcheck"
+      "sudo apt remove -y shellcheck"
     ]
   },
   "installed_apps": {
     "visual-studio-code": [
-      "brew uninstall --cask visual-studio-code"
+      "sudo snap remove code"
     ]
   }
 }
