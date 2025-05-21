@@ -7,6 +7,8 @@
         "cascadia",
         "caskaydia",
         "chsh",
+        "compdef",
+        "compinit",
         "direnv",
         "distro",
         "easiliy",
