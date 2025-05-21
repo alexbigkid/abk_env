@@ -1,6 +1,19 @@
 #!/bin/bash
 
 #---------------------------
+# variables
+#---------------------------
+# Robust shell detection
+if [ -n "$ZSH_VERSION" ]; then
+    export ABK_SHELL="zsh"
+elif [ -n "$BASH_VERSION" ]; then
+    export ABK_SHELL="bash"
+else
+    export ABK_SHELL="${SHELL##*/}"
+    echo -e "${RED}ERROR:${NC} $ABK_SHELL is not supported. Please consider using bash or zsh"
+fi
+
+#---------------------------
 # functions
 #---------------------------
 PrintUsageAndExitWithCode() {
@@ -234,7 +247,7 @@ uninstall_abkEnv_main() {
         PrintTrace $TRACE_INFO "${ORG}INFO: All JSON files are empty. Removing config ...${NC}"
         __removeAbkEnvToConfig "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $? "${RED}ERROR:${NC} __removeAbkEnvToConfig $HOME/$ABK_USER_CONFIG_FILE_SHELL failed"
         __deleteBinDirLink || PrintTrace $TRACE_ERROR "${RED}ERROR:${NC} __deleteBinDirLink failed with $?"
-        exec ${SHELL##*/}
+        exec $ABK_SHELL
     fi
 
     PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} (0)"

@@ -1,6 +1,19 @@
 #!/bin/bash
 
 #---------------------------
+# variables
+#---------------------------
+# Robust shell detection
+if [ -n "$ZSH_VERSION" ]; then
+    export ABK_SHELL="zsh"
+elif [ -n "$BASH_VERSION" ]; then
+    export ABK_SHELL="bash"
+else
+    export ABK_SHELL="${SHELL##*/}"
+    echo -e "${RED}ERROR:${NC} $ABK_SHELL is not supported. Please consider using bash or zsh"
+fi
+
+#---------------------------
 # functions
 #---------------------------
 PrintUsageAndExitWithCode() {
@@ -281,7 +294,7 @@ install_abkEnv_main() {
     else
         __createBinDirLink || PrintTrace $TRACE_ERROR "${RED}ERROR: __createBinDirLink failed with $?${NC}"
         __addAbkEnvToConfig "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || PrintUsageAndExitWithCode $? "${RED}ERROR: __addAbkEnvToConfig $HOME/$ABK_USER_CONFIG_FILE_SHELL failed${NC}"
-        exec ${SHELL##*/}
+        exec $ABK_SHELL
     fi
 
     # shellcheck disable=SC2086

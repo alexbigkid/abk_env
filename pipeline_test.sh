@@ -6,6 +6,15 @@ set -euo pipefail
 #---------------------------
 ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
+# Robust shell detection
+if [ -n "$ZSH_VERSION" ]; then
+    export TEST_SHELL="zsh"
+elif [ -n "$BASH_VERSION" ]; then
+    export TEST_SHELL="bash"
+else
+    export TEST_SHELL="${SHELL##*/}"
+    echo -e "${RED}ERROR:${NC} $ABK_SHELL is not supported. Please consider using bash or zsh"
+fi
 
 #---------------------------
 # functions
@@ -280,7 +289,6 @@ done
 
 
 # test content has been added to .zshrc/.bashrc
-TEST_SHELL=${SHELL##*/}
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
 PrintTrace $TRACE_DEBUG "${YLW}==> TEST_SHELL = $TEST_SHELL${NC}"
 PrintTrace $TRACE_DEBUG "${YLW}==> SHELL      = $SHELL${NC}"
@@ -309,7 +317,6 @@ done
 
 
 # test content has been removed from .zshrc/.bashrc
-TEST_SHELL=${SHELL##*/}
 TEST_SHELL_ENV="${HOME}/.${TEST_SHELL}rc"
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validate content removed: $TEST_SHELL_ENV${NC}"
