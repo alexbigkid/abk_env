@@ -281,6 +281,9 @@ done
 
 # test content has been added to .zshrc/.bashrc
 TEST_SHELL=${SHELL##*/}
+PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
+PrintTrace $TRACE_DEBUG "${YLW}==> TEST_SHELL = $TEST_SHELL${NC}"
+PrintTrace $TRACE_DEBUG "${YLW}==> SHELL      = $SHELL${NC}"
 TEST_SHELL_ENV="${HOME}/.${TEST_SHELL}rc"
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validate content added: $TEST_SHELL_ENV${NC}"
