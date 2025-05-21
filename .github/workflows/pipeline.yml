@@ -54,7 +54,7 @@ jobs:
             fi
 
       - name: Run tool install/uninstall in ${{ matrix.shell }}
-        run: ${{ matrix.shell }} -c "./pipeline_test.sh"
+        run: ${{ matrix.shell }} -ic "./pipeline_test.sh"
 
 
 #   Docker:
