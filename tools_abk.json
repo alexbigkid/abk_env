@@ -20,7 +20,6 @@
                 "nodenv": ["command -v nodenv"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "parallel": ["command -v parallel"],
-                "pyenv": ["command -v pyenv"],
                 "ruff": ["command -v ruff"],
                 "serverless": ["command -v serverless"],
                 "shellcheck": ["command -v shellcheck"],
@@ -60,11 +59,6 @@
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "parallel": ["brew install parallel"],
-                "pyenv": [
-                    "brew install pyenv",
-                    "brew install pyenv-virtualenv",
-                    "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
-                ],
                 "ruff": ["brew install ruff"],
                 "serverless": ["brew install serverless"],
                 "shellcheck": ["brew install shellcheck"],
@@ -117,12 +111,6 @@
                     "brew uninstall oh-my-posh"
                 ],
                 "parallel": ["brew uninstall parallel"],
-                "pyenv": [
-                    "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
-                    "brew uninstall pyenv-virtualenv",
-                    "brew uninstall pyenv",
-                    "rm -Rf ~/.pyenv"
-                ],
                 "ruff": ["brew uninstall ruff"],
                 "serverless": ["brew uninstall serverless"],
                 "shellcheck": ["brew uninstall shellcheck"],
@@ -271,7 +259,6 @@
                     "nodenv": ["command -v nodenv"],
                     "oh-my-posh": ["-e ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
-                    "pyenv": ["command -v pyenv"],
                     "serverless": ["command -v serverless"],
                     "shellcheck": ["command -v shellcheck"],
                     "tfenv": ["command -v tfenv"],
@@ -317,15 +304,6 @@
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "parallel": ["sudo apt install -y parallel"],
-                    "pyenv": [
-                        "sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git",
-                        "git clone https://github.com/pyenv/pyenv.git ~/.pyenv",
-                        "sudo ln -vs ~/.pyenv/bin/pyenv /usr/local/bin/pyenv",
-                        "(cd ~/.pyenv && src/configure && make -C src || true)",
-                        "mkdir -p ~/.pyenv/plugins",
-                        "git clone https://github.com/pyenv/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv",
-                        "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
-                    ],
                     "serverless": ["sudo npm install -g serverless"],
                     "shellcheck": ["sudo apt install -y shellcheck"],
                     "tfenv": [
@@ -380,11 +358,6 @@
                         "rm ./unixBin/oh-my-posh"
                     ],
                     "parallel": ["sudo apt remove -y parallel"],
-                    "pyenv": [
-                        "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
-                        "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
-                        "rm -Rf ~/.pyenv"
-                    ],
                     "serverless": ["sudo npm uninstall -g serverless"],
                     "shellcheck": ["sudo apt remove -y shellcheck"],
                     "tfenv": [
