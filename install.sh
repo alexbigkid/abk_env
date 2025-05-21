@@ -29,7 +29,7 @@ PrintUsageAndExitWithCode() {
 
 
 __getJsonInstallInstructions() {
-    PrintTrace $TRACE_FUNCTION "\n    -> ${FUNCNAME[0]} ($*)"
+    PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_JSON_FILE=$2
     local LCL_EXIT_CODE=0
