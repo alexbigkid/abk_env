@@ -276,18 +276,28 @@ for TEST_PACKAGE_FILE in "${TEST_PACKAGE_FILES[@]}"; do
     PrintTrace $TRACE_INFO "${YLW}--> [TEST] Processing $TEST_PACKAGE_FILE${NC}"
 
     ./install.sh "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: install.sh failed${NC}"
+    echo "ABK:001"
     ValidatePackageInstall "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation ValidatePackageInstall failed for: $TEST_PACKAGE_FILE${NC}"
+    echo "ABK:002"
 done
 
 
+echo "ABK:003"
 # test content has been added to .zshrc/.bashrc
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
+echo "ABK:004"
 PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL = $ABK_SHELL${NC}"
+echo "ABK:005"
 PrintTrace $TRACE_DEBUG "${YLW}==> SHELL      = $SHELL${NC}"
+echo "ABK:006"
 TEST_SHELL_ENV="${HOME}/.${ABK_SHELL}rc"
+echo "ABK:007"
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
+echo "ABK:008"
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validate content added: $TEST_SHELL_ENV${NC}"
+echo "ABK:009"
 ValidateShellEnvironmentAdded "$TEST_SHELL_ENV" || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation ValidateShellEnvironmentAdded failed for: $TEST_SHELL_ENV${NC}"
+echo "ABK:010"
 
 
 # test LINK files has been created
