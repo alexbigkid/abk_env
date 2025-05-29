@@ -41,22 +41,22 @@ export INSTALLED_FONTS="installed_fonts"
 # echo "dirname/readlink: $(dirname $(readlink -f $0))"
 
 #---------------------------
-# vars definition
-#---------------------------
-ABK_VARS="$ABK_LIB_FILE_DIR/env/000_vars.env"
-# echo "ABK_VARS = $ABK_VARS"
-# shellcheck source=../env/000_vars.env
-# shellcheck disable=SC1091
-[ -f "$ABK_VARS" ] && . "$ABK_VARS" || echo -e "${RED}ERROR:${NC} vars definition file ($ABK_VARS) could not be found"
-
-#---------------------------
 # color definitions
 #---------------------------
-LCL_ABK_COLORS="$ABK_LIB_FILE_DIR/env/001_colors.env"
-# shellcheck source=../env/001_colors.env
+LCL_ABK_COLORS="$ABK_LIB_FILE_DIR/env/000_colors.env"
+# shellcheck source=../env/000_colors.env
 # echo "LCL_ABK_COLORS = $LCL_ABK_COLORS"
 # shellcheck disable=SC1091
 [ -f "$LCL_ABK_COLORS" ] && . "$LCL_ABK_COLORS" || echo -e "${RED}ERROR:${NC} colors definition file ($LCL_ABK_COLORS) could not be found"
+
+#---------------------------
+# vars definition
+#---------------------------
+ABK_VARS="$ABK_LIB_FILE_DIR/env/001_vars.env"
+# echo "ABK_VARS = $ABK_VARS"
+# shellcheck source=../env/001_vars.env
+# shellcheck disable=SC1091
+[ -f "$ABK_VARS" ] && . "$ABK_VARS" || echo -e "${RED}ERROR:${NC} vars definition file ($ABK_VARS) could not be found"
 
 # -----------------------------------------------------------------------------
 # internal variables definitions
@@ -428,13 +428,13 @@ AbkLib_CheckInstallationCompatibility() {
 }
 
 
-PrintTrace() {
-    local LCL_TRACE_LEVEL=$1
-    shift
-    local LCL_PRINT_STRING=("$@")
-    if [ "$LCL_TRACE_LEVEL" -eq "$TRACE_FUNCTION" ]; then
-        [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${CYAN}${LCL_PRINT_STRING[*]}${NC}"
-    else
-        [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${LCL_PRINT_STRING[@]}"
-    fi
-}
+# PrintTrace() {
+#     local LCL_TRACE_LEVEL=$1
+#     shift
+#     local LCL_PRINT_STRING=("$@")
+#     if [ "$LCL_TRACE_LEVEL" -eq "$TRACE_FUNCTION" ]; then
+#         [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${CYN}${LCL_PRINT_STRING[*]}${NC}"
+#     else
+#         [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${LCL_PRINT_STRING[@]}"
+#     fi
+# }
