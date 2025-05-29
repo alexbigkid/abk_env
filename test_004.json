@@ -23,7 +23,6 @@
         },
         "fonts": {
             "check": {
-                "homebrew/cask-fonts": ["brew tap | grep ^homebrew/cask-fonts$"],
                 "font-agave-nerd-font": ["brew list --cask | grep ^font-agave-nerd-font$"],
                 "font-comic-shanns-mono-nerd-font": ["brew list --cask | grep ^font-comic-shanns-mono-nerd-font$"],
                 "font-droid-sans-mono-nerd-font": ["brew list --cask | grep ^font-droid-sans-mono-nerd-font$"],
@@ -33,7 +32,6 @@
                 "font-hack-nerd-font": ["brew list --cask | grep ^font-hack-nerd-font$"]
             },
             "install": {
-                "homebrew/cask-fonts": ["brew tap homebrew/cask-fonts"],
                 "font-agave-nerd-font": ["brew install --cask font-agave-nerd-font"],
                 "font-comic-shanns-mono-nerd-font": ["brew install --cask font-comic-shanns-mono-nerd-font"],
                 "font-droid-sans-mono-nerd-font": ["brew install --cask font-droid-sans-mono-nerd-font"],
@@ -50,7 +48,6 @@
                 "font-cascadia-code-pl": ["brew uninstall --cask font-cascadia-code-pl"],
                 "font-caskaydia-cove-nerd-font": ["brew uninstall --cask font-caskaydia-cove-nerd-font"],
                 "font-hack-nerd-font": ["brew uninstall --cask font-hack-nerd-font"],
-                "homebrew/cask-fonts": ["brew untap homebrew/cask-fonts"]
             }
         }
     },

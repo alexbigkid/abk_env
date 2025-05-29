@@ -1,8 +1,5 @@
 {
   "installed_fonts": {
-    "homebrew/cask-fonts": [
-      "brew untap homebrew/cask-fonts"
-    ],
     "font-agave-nerd-font": [
       "brew uninstall --cask font-agave-nerd-font"
     ],
