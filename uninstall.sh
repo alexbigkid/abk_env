@@ -3,6 +3,8 @@
 #---------------------------
 # variables
 #---------------------------
+ABK_SHELL="${SHELL##*/}"
+[ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh"
 
 
 #---------------------------
