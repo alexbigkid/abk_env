@@ -284,7 +284,7 @@ PrintTrace $TRACE_INFO "${YLW}==================================================
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Install validation${NC}"
 for TEST_PACKAGE_FILE in "${TEST_PACKAGE_FILES[@]}"; do
     PrintTrace $TRACE_INFO "${YLW}------------------------------------------------------------${NC}"
-    PrintTrace $TRACE_INFO "${YLW}--> [TEST] Processing $TEST_PACKAGE_FILE{NC}"
+    PrintTrace $TRACE_INFO "${YLW}--> [TEST] Processing $TEST_PACKAGE_FILE${NC}"
 
     ./install.sh "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: install.sh failed${NC}"
     ValidatePackageInstall "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation ValidatePackageInstall failed for: $TEST_PACKAGE_FILE${NC}"
@@ -312,7 +312,7 @@ PrintTrace $TRACE_INFO "${YLW}==================================================
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Uninstall validation${NC}"
 for TEST_PACKAGE_FILE in "${TEST_PACKAGE_FILES[@]}"; do
     PrintTrace $TRACE_INFO "${YLW}------------------------------------------------------------${NC}"
-    PrintTrace $TRACE_INFO "${YLW}--> [TEST] Processing $TEST_PACKAGE_FILE{NC}"
+    PrintTrace $TRACE_INFO "${YLW}--> [TEST] Processing $TEST_PACKAGE_FILE${NC}"
 
     ./uninstall.sh "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: install.sh failed${NC}"
     ValidatePackageUninstall "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation ValidatePackageUninstall failed for: $TEST_PACKAGE_FILE${NC}"
