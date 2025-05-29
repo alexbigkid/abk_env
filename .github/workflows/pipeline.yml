@@ -20,7 +20,6 @@ jobs:
       - name: zsh install/uninstall test
         shell: zsh {0}
         run: |
-          export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
@@ -28,7 +27,6 @@ jobs:
       - name: bash install/uninstall test
         shell: bash {0}
         run: |
-          export SHELL=$(which bash)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
@@ -57,7 +55,6 @@ jobs:
       - name: zsh install/uninstall test
         shell: zsh {0}
         run: |
-          export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
@@ -65,7 +62,6 @@ jobs:
       - name: bash install/uninstall test
         shell: bash {0}
         run: |
-          export SHELL=$(which bash)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
