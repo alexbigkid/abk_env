@@ -30,9 +30,9 @@ DEFAULT_SHELL=$(DetectUserDefaultShell)
 export DEFAULT_SHELL
 
 if [[ "$DEFAULT_SHELL" == */zsh ]]; then
-    export TEST_SHELL="zsh"
+    export ABK_SHELL="zsh"
 elif [[ "$DEFAULT_SHELL" == */bash ]]; then
-    export TEST_SHELL="bash"
+    export ABK_SHELL="bash"
 else
     echo "Unsupported default shell: $DEFAULT_SHELL"
     export ABK_SHELL="${SHELL##*/}"
