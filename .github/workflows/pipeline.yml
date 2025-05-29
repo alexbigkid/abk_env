@@ -18,7 +18,7 @@ jobs:
         run: cat /etc/shells
 
       - name: zsh install/uninstall test
-        shell: zsh
+        shell: zsh {0}
         run: |
           export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
@@ -26,7 +26,7 @@ jobs:
           ./pipeline_test.sh
 
       - name: bash install/uninstall test
-        shell: bash
+        shell: bash {0}
         run: |
           export SHELL=$(which bash)
           echo "SHELL = $SHELL"
@@ -46,7 +46,7 @@ jobs:
         run: cat /etc/shells
 
       - name: zsh install/uninstall test
-        shell: zsh
+        shell: zsh {0}
         run: |
           export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
@@ -54,7 +54,7 @@ jobs:
           ./pipeline_test.sh
 
       - name: bash install/uninstall test
-        shell: bash
+        shell: bash {0}
         run: |
           export SHELL=$(which bash)
           echo "SHELL = $SHELL"
