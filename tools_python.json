@@ -101,7 +101,7 @@
                 "check": {
                     "direnv": ["command -v direnv"],
                     "jq": ["command -v jq"],
-                    "oh-my-posh": ["command -v oh-my-posh"],
+                    "oh-my-posh": ["[ -e ./unixBin/oh-my-posh ]"],
                     "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
                     "uv": ["command -v uv"],
