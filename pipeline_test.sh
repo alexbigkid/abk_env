@@ -8,22 +8,15 @@ ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
 
 DetectUserDefaultShell() {
-    local user="$USER"
-
-    # macOS
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        if command -v dscl &>/dev/null; then
-            dscl . -read /Users/"$user" UserShell 2>/dev/null | awk '{print $2}' && return
-        fi
+    if command -v getent >/dev/null 2>&1; then
+        getent passwd "$USER" | cut -d: -f7
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        dscl . -read /Users/"$USER" UserShell | awk '{print $2}'
+    elif [ -f /etc/passwd ]; then
+        grep "^$USER:" /etc/passwd | cut -d: -f7
+    else
+        echo "Unknown"
     fi
-
-    # Linux: prefer getent if available
-    if command -v getent &>/dev/null; then
-        getent passwd "$user" | cut -d: -f7 && return
-    fi
-
-    # Fallback: parse /etc/passwd
-    grep "^$user:" /etc/passwd 2>/dev/null | cut -d: -f7
 }
 
 DEFAULT_SHELL=$(DetectUserDefaultShell)
