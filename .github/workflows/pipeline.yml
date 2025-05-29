@@ -17,18 +17,18 @@ jobs:
       - name: Ensure correct SHELL availability
         run: cat /etc/shells
 
-      - name: Run tool install/uninstall in bash
-        shell: bash
+      - name: zsh install/uninstall test
+        shell: zsh
         run: |
-          export SHELL=$(which bash)
+          export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
 
-      - name: Run tool install/uninstall in zsh
-        shell: zsh
+      - name: bash install/uninstall test
+        shell: bash
         run: |
-          export SHELL=$(which zsh)
+          export SHELL=$(which bash)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
@@ -45,18 +45,18 @@ jobs:
       - name: Ensure correct SHELL availability
         run: cat /etc/shells
 
-      - name: Run tool install/uninstall in bash
-        shell: bash
+      - name: zsh install/uninstall test
+        shell: zsh
         run: |
-          export SHELL=$(which bash)
+          export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
 
-      - name: Run tool install/uninstall in zsh
-        shell: zsh
+      - name: bash install/uninstall test
+        shell: bash
         run: |
-          export SHELL=$(which zsh)
+          export SHELL=$(which bash)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
