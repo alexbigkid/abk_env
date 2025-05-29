@@ -7,13 +7,13 @@ set -euo pipefail
 ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
 # Robust shell detection
-if [ -n "$ZSH_VERSION" ]; then
+if [ -n "${ZSH_VERSION-}" ]; then
     export TEST_SHELL="zsh"
-elif [ -n "$BASH_VERSION" ]; then
+elif [ -n "${BASH_VERSION-}" ]; then
     export TEST_SHELL="bash"
 else
     export TEST_SHELL="${SHELL##*/}"
-    echo -e "${RED}ERROR:${NC} $ABK_SHELL is not supported. Please consider using bash or zsh"
+    echo -e "${RED}ERROR:${NC} $TEST_SHELL is not supported. Please consider using bash or zsh"
 fi
 
 #---------------------------
