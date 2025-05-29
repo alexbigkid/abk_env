@@ -11,9 +11,9 @@
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "wget": ["command -v wget"],
                 "yq": ["command -v yq"],
-                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
-                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
-                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+                "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
                 "jq": ["brew install jq"],
@@ -108,8 +108,8 @@
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
-                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
-                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                    "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
                     "ffmpeg": ["sudo apt install -y ffmpeg"],

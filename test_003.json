@@ -44,11 +44,8 @@
                 "visual-studio-code": [
                     "brew install --cask visual-studio-code",
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
-                    "echo ABK_VSCODE_USER_CONFIG_DIR = \"$ABK_VSCODE_USER_CONFIG_DIR\"",
                     "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                    "echo ABK_VSCODE_USER_CONFIG_SETTING = \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                     "mkdir -p \"$ABK_VSCODE_USER_CONFIG_DIR\"",
-                    "ls -la \"$ABK_VSCODE_USER_CONFIG_DIR\"",
                     "[ ! -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$ABK_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                     "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                     "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
@@ -60,7 +57,12 @@
             },
             "uninstall": {
                 "brave-browser": ["brew uninstall --cask brave-browser"],
-                "visual-studio-code": ["brew uninstall --cask visual-studio-code"]
+                "visual-studio-code": [
+                    "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
+                    "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+                    "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "brew uninstall --cask visual-studio-code"
+                ]
             }
         },
         "fonts": {
@@ -121,7 +123,12 @@
                     ]
                 },
                 "uninstall": {
-                    "visual-studio-code": ["sudo snap remove code"]
+                    "visual-studio-code": [
+                        "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
+                        "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+                        "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "sudo snap remove code"
+                    ]
                 }
             },
             "fonts": {

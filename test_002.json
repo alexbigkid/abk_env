@@ -175,25 +175,10 @@
             },
             "apps": {
                 "check": {
-                    "visual-studio-code": ["command -v code"]
                 },
                 "install":{
-                    "visual-studio-code": [
-                        "sudo snap install --classic code",
-                        "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
-                        "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                        "mkdir -p $ABK_VSCODE_USER_CONFIG_DIR",
-                        "[ ! -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$ABK_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.shellIntegration.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.tabs.enabled\": true}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"terminal.integrated.tabs.title\": \"${cwd}\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-                        "jq '. + {\"files.autoSave\": \"afterDelay\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\""
-                    ]
                 },
                 "uninstall": {
-                    "visual-studio-code": ["sudo snap remove code"]
                 }
             },
             "fonts": {

@@ -30,9 +30,9 @@
                 "uv": ["command -v uv"],
                 "wget": ["command -v wget"],
                 "yq": ["command -v yq"],
-                "zsh-autocomplete": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autocomplete"],
-                "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-autosuggestions"],
-                "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && brew list | grep zsh-syntax-highlighting"]
+                "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
                 "aws": [
@@ -223,7 +223,7 @@
                     "brew install --cask visual-studio-code",
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
                     "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                    "mkdir -p $ABK_VSCODE_USER_CONFIG_DIR",
+                    "mkdir -p \"$ABK_VSCODE_USER_CONFIG_DIR\"",
                     "[ ! -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$ABK_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                     "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                     "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
@@ -244,7 +244,12 @@
                 "onedrive": ["brew uninstall --cask onedrive"],
                 "raspberry-pi-imager": ["brew uninstall --cask raspberry-pi-imager"],
                 "slack": ["brew uninstall --cask slack"],
-                "visual-studio-code": ["brew uninstall --cask visual-studio-code"],
+                "visual-studio-code": [
+                    "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
+                    "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+                    "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "brew uninstall --cask visual-studio-code"
+                ],
                 "vlc": ["brew uninstall --cask vlc"]
             }
         },
@@ -314,8 +319,8 @@
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
-                    "zsh-autosuggestions": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-autosuggestions"],
-                    "zsh-syntax-highlighting": ["[ \"$ABK_SHELL\" = \"zsh\" ] && apt list --installed | grep zsh-syntax-highlighting"]
+                    "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
                     "aws": [
@@ -457,7 +462,7 @@
                         "sudo snap install --classic code",
                         "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
                         "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                        "mkdir -p $ABK_VSCODE_USER_CONFIG_DIR",
+                        "mkdir -p \"$ABK_VSCODE_USER_CONFIG_DIR\"",
                         "[ ! -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && echo {} > \"$ABK_VSCODE_USER_CONFIG_SETTING\" && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                         "jq '. + {\"terminal.integrated.fontSize\": 14}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                         "jq '. + {\"terminal.integrated.fontFamily\": \"Hack Nerd Font\"}' \"$ABK_VSCODE_USER_CONFIG_SETTING\" > ./tmp_setting.json && mv ./tmp_setting.json \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
@@ -468,7 +473,12 @@
                     ]
                 },
                 "uninstall": {
-                    "visual-studio-code": ["sudo snap remove code"]
+                    "visual-studio-code": [
+                        "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
+                        "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+                        "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "sudo snap remove code"
+                    ]
                 }
             },
             "fonts": {
