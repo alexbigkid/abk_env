@@ -85,7 +85,7 @@
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "check": {
-                    "oh-my-posh": ["command -v oh-my-posh"],
+                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "shellcheck": ["command -v shellcheck"]
                 },
                 "install": {

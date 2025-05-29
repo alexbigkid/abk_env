@@ -112,7 +112,7 @@
             "tools": {
                 "check": {
                     "direnv": ["command -v direnv"],
-                    "oh-my-posh": ["command -v oh-my-posh"],
+                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "pyenv": ["command -v pyenv"],
                     "uv": ["command -v uv"],
                     "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
