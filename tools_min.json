@@ -104,7 +104,7 @@
                     "ffmpeg": ["command -v ffmpeg"],
                     "jq": ["command -v jq"],
                     "mplayer": ["command -v mplayer"],
-                    "oh-my-posh": ["[ -e ./unixBin/oh-my-posh ]"],
+                    "oh-my-posh": ["-f ./unixBin/oh-my-posh"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
