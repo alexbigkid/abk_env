@@ -5,16 +5,8 @@
 # variables
 # -----------------------------------------------------------------------------
 export ABK_SHELL="${SHELL##*/}"
-if [ "$ABK_SHELL" = "zsh" ]; then
-    export ABK_LIB_FILE_DIR=${0:a:h}
-elif [ "$ABK_SHELL" = "bash" ]; then
-    export ABK_LIB_FILE_DIR=$(dirname "${BASH_SOURCE[0]}")
-else
-    echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh"
-    exit 1
-fi
 echo "[☑️  ABK_SHELL = $ABK_SHELL]"
-# ABK_LIB_FILE_DIR=$(dirname "$BASH_SOURCE")
+ABK_LIB_FILE_DIR=$(dirname "$BASH_SOURCE")
 echo "ABK_LIB_FILE_DIR = $ABK_LIB_FILE_DIR"
 export ABK_ENV_FILE="${PWD}/${ABK_LIB_FILE_DIR}/env/abk.env"
 echo "ABK_ENV_FILE = $ABK_ENV_FILE"
