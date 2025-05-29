@@ -303,7 +303,7 @@
                     "mplayer": ["command -v mplayer"],
                     "nmap": ["command -v nmap"],
                     "nodenv": ["command -v nodenv"],
-                    "oh-my-posh": ["-f ./unixBin/oh-my-posh"],
+                    "oh-my-posh": ["command -v oh-my-posh"],
                     "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
                     "serverless": ["command -v serverless"],
