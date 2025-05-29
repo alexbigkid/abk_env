@@ -6,62 +6,57 @@ on:
 
 jobs:
   MacOS:
-    name: MacOS ${{ matrix.version }} - ${{ matrix.shell }}
+    name: MacOS ${{ matrix.version }}
     runs-on: macos-${{ matrix.version }}
     strategy:
       matrix:
         version: [14, 15]
-        shell: [bash, zsh]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ensure ${{ matrix.shell }} is installed
+      - name: Ensure correct SHELL availability
         run: cat /etc/shells
-      # run: |
-        #     SHELL_CMD="${{ matrix.shell }}"
-        #     echo "Checking if $SHELL_CMD is installed..."
-        #     if ! command -v "$SHELL_CMD" &> /dev/null; then
-        #         echo "$SHELL_CMD not found, attempting to install..."
-        #         sudo apt-get update
-        #         sudo apt-get install -y "$SHELL_CMD"
-        #     else
-        #         echo "$SHELL_CMD is already installed."
-        #     fi
 
-      - name: Run tool install/uninstall in ${{ matrix.shell }}
-        shell: ${{ matrix.shell }}
+      - name: Run tool install/uninstall in bash
+        shell: bash
         run: |
-          export SHELL=$(which ${{ matrix.shell }})
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          echo "USER_SHELL = $USER_SHELL"
+          ./pipeline_test.sh
+
+      - name: Run tool install/uninstall in zsh
+        shell: zsh
+        run: |
+          export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
 
   Ubuntu:
-    name: Ubuntu ${{ matrix.version }} - ${{ matrix.shell }}
+    name: Ubuntu ${{ matrix.version }}
     runs-on: ubuntu-${{ matrix.version }}
     strategy:
       matrix:
         version: [22.04, 24.04]
-        shell: [bash, zsh]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ensure ${{ matrix.shell }} is installed
-        run: |
-            SHELL_CMD="${{ matrix.shell }}"
-            echo "Checking if $SHELL_CMD is installed..."
-            if ! command -v "$SHELL_CMD" &> /dev/null; then
-                echo "$SHELL_CMD not found, attempting to install..."
-                sudo apt-get update
-                sudo apt-get install -y "$SHELL_CMD"
-            else
-                echo "$SHELL_CMD is already installed."
-            fi
+      - name: Ensure correct SHELL availability
+        run: cat /etc/shells
 
-      - name: Run tool install/uninstall in ${{ matrix.shell }}
-        shell: ${{ matrix.shell }}
+      - name: Run tool install/uninstall in bash
+        shell: bash
         run: |
-          export SHELL=$(which ${{ matrix.shell }})
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          echo "USER_SHELL = $USER_SHELL"
+          ./pipeline_test.sh
+
+      - name: Run tool install/uninstall in zsh
+        shell: zsh
+        run: |
+          export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
           echo "USER_SHELL = $USER_SHELL"
           ./pipeline_test.sh
