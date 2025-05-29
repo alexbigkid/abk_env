@@ -7,35 +7,6 @@ set -euo pipefail
 ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
 
-DetectUserDefaultShell() {
-    if command -v getent >/dev/null 2>&1; then
-        getent passwd "$USER" | cut -d: -f7
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        dscl . -read /Users/"$USER" UserShell | awk '{print $2}'
-    elif [ -f /etc/passwd ]; then
-        grep "^$USER:" /etc/passwd | cut -d: -f7
-    else
-        echo "Unknown"
-    fi
-}
-
-DEFAULT_SHELL=$(DetectUserDefaultShell)
-export DEFAULT_SHELL
-
-if [[ "$DEFAULT_SHELL" == */zsh ]]; then
-    export ABK_SHELL="zsh"
-elif [[ "$DEFAULT_SHELL" == */bash ]]; then
-    export ABK_SHELL="bash"
-else
-    echo "Unsupported default shell: $DEFAULT_SHELL"
-    export ABK_SHELL="${SHELL##*/}"
-    echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh"
-    exit 1
-fi
-echo "INFO: ABK_SHELL = $ABK_SHELL"
-echo "Script is running in: ${BASH_VERSION:-}${ZSH_VERSION:+zsh}"
-echo "User's default shell: ${SHELL}"
-
 
 #---------------------------
 # functions

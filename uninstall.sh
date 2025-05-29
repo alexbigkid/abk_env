@@ -173,6 +173,7 @@ uninstall_abkEnv_main() {
     export TRACE_LEVEL=$TRACE_INFO
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
 
+    PrintTrace $TRACE_INFO "   [ABK_SHELL         = $ABK_SHELL]"
     PrintTrace $TRACE_INFO "   [BIN_DIR           = $BIN_DIR]"
     PrintTrace $TRACE_INFO "   [HOME_BIN_DIR      = $HOME_BIN_DIR]"
     PrintTrace $TRACE_INFO "   [SH_BIN_DIR        = $SH_BIN_DIR]"
