@@ -5,7 +5,7 @@
 # variables
 # -----------------------------------------------------------------------------
 export ABK_SHELL="${SHELL##*/}"
-echo "[☑️  ABK_SHELL = $ABK_SHELL]"
+echo "ABK_SHELL = $ABK_SHELL"
 ABK_LIB_FILE_DIR=$(dirname "$BASH_SOURCE")
 echo "ABK_LIB_FILE_DIR = $ABK_LIB_FILE_DIR"
 export ABK_ENV_FILE="${PWD}/${ABK_LIB_FILE_DIR}/env/abk.env"
