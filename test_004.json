@@ -47,7 +47,7 @@
                 "font-cascadia-code": ["brew uninstall --cask font-cascadia-code"],
                 "font-cascadia-code-pl": ["brew uninstall --cask font-cascadia-code-pl"],
                 "font-caskaydia-cove-nerd-font": ["brew uninstall --cask font-caskaydia-cove-nerd-font"],
-                "font-hack-nerd-font": ["brew uninstall --cask font-hack-nerd-font"],
+                "font-hack-nerd-font": ["brew uninstall --cask font-hack-nerd-font"]
             }
         }
     },
