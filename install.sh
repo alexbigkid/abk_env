@@ -129,7 +129,7 @@ __installItem() {
 
     while IFS= read -r LCL_CHECK_STEP; do
         PrintTrace $TRACE_DEBUG "LCL_CHECK_STEP = $LCL_CHECK_STEP"
-        EVAL_CHECK_STEP=$(eval $LCL_CHECK_STEP 2>/dev/null)
+        EVAL_CHECK_STEP=$(eval "$LCL_CHECK_STEP" 2>/dev/null)
         PrintTrace $TRACE_DEBUG "EVAL_CHECK_STEP = $EVAL_CHECK_STEP"
         if [ "$EVAL_CHECK_STEP" != "" ]; then
             LCL_IS_APP_INSTALLED=0
