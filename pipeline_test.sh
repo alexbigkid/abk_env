@@ -16,7 +16,8 @@ else
     echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh"
 fi
 echo "INFO: ABK_SHELL = $ABK_SHELL"
-
+echo "Script is running in: ${BASH_VERSION:-}${ZSH_VERSION:+zsh}"
+echo "User's default shell: ${SHELL}"
 
 #---------------------------
 # functions

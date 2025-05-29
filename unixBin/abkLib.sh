@@ -13,7 +13,7 @@ else
     echo "ERROR: ${SHELL##*/} is not supported. Please consider using bash or zsh"
 fi
 echo "ABK_LIB_FILE_DIR = $ABK_LIB_FILE_DIR"
-export ABK_ENV_FILE="$PWD/$ABK_LIB_FILE_DIR/env/abk.env"
+export ABK_ENV_FILE="${PWD}${ABK_LIB_FILE_DIR}/env/abk.env"
 echo "ABK_ENV_FILE = $ABK_ENV_FILE"
 export TRUE=0
 export FALSE=1
