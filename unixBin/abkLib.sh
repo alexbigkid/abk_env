@@ -4,21 +4,21 @@
 # -----------------------------------------------------------------------------
 # variables
 # -----------------------------------------------------------------------------
-# ABK_LIB_FILE_DIR=$(dirname "$BASH_SOURCE")
-if [ -n "${ZSH_VERSION-}" ]; then
+export ABK_SHELL="${SHELL##*/}"
+if [ "$ABK_SHELL" = "zsh" ]; then
     export ABK_LIB_FILE_DIR=${0:a:h}
-    echo "1 ZSH_VERSION = $ZSH_VERSION"
-elif [ -n "${BASH_VERSION-}" ]; then
+elif [ "$ABK_SHELL" = "bash" ]; then
     export ABK_LIB_FILE_DIR=$(dirname "${BASH_SOURCE[0]}")
-    echo "1 BASH_VERSION = $BASH_VERSION"
 else
-    echo "ERROR: ${SHELL##*/} is not supported. Please consider using bash or zsh"
+    echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh"
+    exit 1
 fi
-echo "2 ZSH_VERSION = $ZSH_VERSION"
-echo "2 BASH_VERSION = $BASH_VERSION"
+echo "[☑️  ABK_SHELL = $ABK_SHELL]"
+# ABK_LIB_FILE_DIR=$(dirname "$BASH_SOURCE")
 echo "ABK_LIB_FILE_DIR = $ABK_LIB_FILE_DIR"
 export ABK_ENV_FILE="${PWD}/${ABK_LIB_FILE_DIR}/env/abk.env"
 echo "ABK_ENV_FILE = $ABK_ENV_FILE"
+
 export TRUE=0
 export FALSE=1
 
