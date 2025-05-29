@@ -6,18 +6,43 @@ set -euo pipefail
 #---------------------------
 ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
-# Robust shell detection
-if [ -n "${ZSH_VERSION-}" ]; then
-    export ABK_SHELL="zsh"
-elif [ -n "${BASH_VERSION-}" ]; then
-    export ABK_SHELL="bash"
+
+DetectUserDefaultShell() {
+    local user="$USER"
+
+    # macOS
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if command -v dscl &>/dev/null; then
+            dscl . -read /Users/"$user" UserShell 2>/dev/null | awk '{print $2}' && return
+        fi
+    fi
+
+    # Linux: prefer getent if available
+    if command -v getent &>/dev/null; then
+        getent passwd "$user" | cut -d: -f7 && return
+    fi
+
+    # Fallback: parse /etc/passwd
+    grep "^$user:" /etc/passwd 2>/dev/null | cut -d: -f7
+}
+
+DEFAULT_SHELL=$(DetectUserDefaultShell)
+export DEFAULT_SHELL
+
+if [[ "$DEFAULT_SHELL" == */zsh ]]; then
+    export TEST_SHELL="zsh"
+elif [[ "$DEFAULT_SHELL" == */bash ]]; then
+    export TEST_SHELL="bash"
 else
+    echo "Unsupported default shell: $DEFAULT_SHELL"
     export ABK_SHELL="${SHELL##*/}"
     echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh"
+    exit 1
 fi
 echo "INFO: ABK_SHELL = $ABK_SHELL"
 echo "Script is running in: ${BASH_VERSION:-}${ZSH_VERSION:+zsh}"
 echo "User's default shell: ${SHELL}"
+
 
 #---------------------------
 # functions

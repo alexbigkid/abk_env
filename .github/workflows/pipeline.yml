@@ -42,8 +42,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ensure correct SHELL availability
-        run: cat /etc/shells
+      - name: Ensure zsh is installed
+        run: |
+            SHELL_CMD="zsh"
+            echo "Checking if $SHELL_CMD is installed..."
+            if ! command -v "$SHELL_CMD" &> /dev/null; then
+                echo "$SHELL_CMD not found, attempting to install..."
+                sudo apt-get update
+                sudo apt-get install -y "$SHELL_CMD"
+            else
+                echo "$SHELL_CMD is already installed."
+            fi
 
       - name: zsh install/uninstall test
         shell: zsh {0}
