@@ -8,12 +8,12 @@ ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
 # Robust shell detection
 if [ -n "${ZSH_VERSION-}" ]; then
-    export TEST_SHELL="zsh"
+    export ABK_SHELL="zsh"
 elif [ -n "${BASH_VERSION-}" ]; then
-    export TEST_SHELL="bash"
+    export ABK_SHELL="bash"
 else
-    export TEST_SHELL="${SHELL##*/}"
-    echo -e "${RED}ERROR:${NC} $TEST_SHELL is not supported. Please consider using bash or zsh"
+    export ABK_SHELL="${SHELL##*/}"
+    echo -e "${RED}ERROR:${NC} $ABK_SHELL is not supported. Please consider using bash or zsh"
 fi
 
 #---------------------------
@@ -290,9 +290,9 @@ done
 
 # test content has been added to .zshrc/.bashrc
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-PrintTrace $TRACE_DEBUG "${YLW}==> TEST_SHELL = $TEST_SHELL${NC}"
+PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL = $ABK_SHELL${NC}"
 PrintTrace $TRACE_DEBUG "${YLW}==> SHELL      = $SHELL${NC}"
-TEST_SHELL_ENV="${HOME}/.${TEST_SHELL}rc"
+TEST_SHELL_ENV="${HOME}/.${ABK_SHELL}rc"
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validate content added: $TEST_SHELL_ENV${NC}"
 ValidateShellEnvironmentAdded "$TEST_SHELL_ENV" || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation ValidateShellEnvironmentAdded failed for: $TEST_SHELL_ENV${NC}"
@@ -317,7 +317,7 @@ done
 
 
 # test content has been removed from .zshrc/.bashrc
-TEST_SHELL_ENV="${HOME}/.${TEST_SHELL}rc"
+TEST_SHELL_ENV="${HOME}/.${ABK_SHELL}rc"
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validate content removed: $TEST_SHELL_ENV${NC}"
 ValidateShellEnvironmentRemoved "$TEST_SHELL_ENV" || PrintUsageAndExitWithCode 1 "${RED}ERROR: ValidateShellEnvironmentRemoved failed for: $TEST_SHELL_ENV${NC}"
