@@ -36,7 +36,7 @@ __getJsonUninstallInstructions() {
     PrintTrace $TRACE_DEBUG "    LCL_OS_INSTRUCTIONS = $LCL_OS_INSTRUCTIONS"
 
     eval "$LCL_RETURN_VAR"=\$LCL_OS_INSTRUCTIONS
-    PrintTrace $TRACE_FUNCTION "    <- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    PrintTrace $TRACE_FUNCTION "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
 }
 
