@@ -8,10 +8,5 @@
       "sudo find /usr/local/bin -type l -name 'nodenv' -delete",
       "rm -Rf ~/.nodenv"
     ]
-  },
-  "installed_apps": {
-    "visual-studio-code": [
-      "sudo snap remove code"
-    ]
   }
 }
