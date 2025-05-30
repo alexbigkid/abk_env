@@ -163,12 +163,12 @@
                         "rm -Rf ~/.pyenv"
                     ],
                     "uv": [
-                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
                         "uv tool uninstall ruff",
                         "uv cache clean",
-                        "rm -r \"$(uv python dir)\"",
-                        "rm -r \"$(uv tool dir)\"",
-                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                        "rm -rf \"$(uv python dir)\"",
+                        "rm -rf \"$(uv tool dir)\"",
+                        "rm -f ~/.local/bin/uv ~/.local/bin/uvx",
+                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete"
                     ],
                     "zsh-autosuggestions": [
                         "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
