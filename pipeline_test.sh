@@ -171,6 +171,9 @@ ValidateLinksCreated() {
         "LINK_zsh_plugins.env"
     )
 
+    PrintTrace "$TRACE_DEBUG" "ABK: content of $LCL_LINKS_DIR"
+    ls -la $LCL_LINKS_DIR
+
     (
         cd "$LCL_LINKS_DIR" || {
             PrintTrace "$TRACE_ERROR" "${RED}ERROR: Could not cd into $LCL_LINKS_DIR${NC}"
