@@ -8,7 +8,8 @@
         "tools": {
             "check": {
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
-                "shellcheck": ["command -v shellcheck"]
+                "ruff": ["command -v ruff"],
+                "uv": ["command -v uv"]
             },
             "install": {
                 "oh-my-posh": [
@@ -16,14 +17,22 @@
                     "oh-my-posh init $ABK_SHELL",
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
-                "shellcheck": ["brew install shellcheck"]
+                "ruff": ["brew install ruff"],
+                "uv": [
+                    "brew install uv",
+                    "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
+                ]
             },
             "uninstall": {
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                     "brew uninstall oh-my-posh"
                 ],
-                "shellcheck": ["brew uninstall shellcheck"]
+                "ruff": ["brew uninstall ruff"],
+                "uv": [
+                    "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                    "brew uninstall uv"
+                ]
             }
         },
         "apps": {
@@ -86,7 +95,7 @@
             "tools": {
                 "check": {
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
-                    "shellcheck": ["command -v shellcheck"]
+                    "uv": ["command -v uv"]
                 },
                 "install": {
                     "oh-my-posh": [
@@ -94,14 +103,26 @@
                         "./unixBin/oh-my-posh init $ABK_SHELL",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
-                    "shellcheck": ["sudo apt install -y shellcheck"]
+                    "uv": [
+                        "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "source $HOME/.local/bin/env",
+                        "uv tool install ruff",
+                        "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
+                    ]
                 },
                 "uninstall": {
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                         "rm ./unixBin/oh-my-posh"
                     ],
-                    "shellcheck": ["sudo apt remove -y shellcheck"]
+                    "uv": [
+                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                        "uv tool uninstall ruff",
+                        "uv cache clean",
+                        "rm -r \"$(uv python dir)\"",
+                        "rm -r \"$(uv tool dir)\"",
+                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                    ]
                 }
             },
             "apps": {
