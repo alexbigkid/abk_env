@@ -185,7 +185,7 @@ ValidateLinksCreated() {
                 local LCL_TARGET
                 local LCL_XXX_TARGET
                 LCL_TARGET=$(readlink "$LCL_LINK_FILE")
-                LCL_XXX_TARGET="./XXX_${LCL_LINK_FILE#LINK_}"
+                LCL_XXX_TARGET="XXX_${LCL_LINK_FILE#LINK_}"
 
                 if [ "$LCL_TARGET" == "$LCL_XXX_TARGET" ]; then
                     PrintTrace "$TRACE_INFO" "${GRN}[OK] $LCL_LINK_FILE points to $LCL_TARGET${NC}"
