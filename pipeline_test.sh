@@ -234,7 +234,7 @@ ValidateLinksDeleted() {
         done
     ) || return 1
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ValidateLinksDeleted for: $LCL_INSTALLATION_FILE${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ValidateLinksDeleted${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
