@@ -288,7 +288,7 @@ echo "ABK:003"
 # test content has been added to .zshrc/.bashrc
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
 echo "ABK:004"
-PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL = $ABK_SHELL${NC}"
+PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL = ${ABK_SHELL}${NC}"
 echo "ABK:005"
 PrintTrace $TRACE_DEBUG "${YLW}==> SHELL      = $SHELL${NC}"
 echo "ABK:006"
