@@ -75,7 +75,7 @@
                 "check": {
                     "jq": ["command -v jq"],
                     "nodenv": ["command -v nodenv"],
-                    "oh-my-posh": ["command -v oh-my-posh"],
+                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"]
                 },
