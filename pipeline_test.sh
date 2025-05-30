@@ -259,16 +259,21 @@ AbkLib_CheckPreRequisites || PrintUsageAndExitWithCode 1 "${RED}ERROR: cannot pr
 # check unixPackages directory
 # [ ! -d "$UNIX_PACKAGES_DIR" ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: $UNIX_PACKAGES_DIR directory not found${NC}"
 # PrintTrace $TRACE_INFO "${GRN}[OK] $UNIX_PACKAGES_DIR directory found${NC}"
-
+echo "ABK:0000"
 
 # Find test_*.json files in root directory
 shopt -s nullglob
+echo "ABK:0001"
 TEST_PACKAGE_FILES=(./test_*.json)
+echo "ABK:0002"
 shopt -u nullglob
+echo "ABK:0003"
 [ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no test_*.json files found${NC}"
+echo "ABK:0004"
 
 # setup correct SHELL
 PrintTrace $TRACE_DEBUG "SHELL      = $SHELL"
+echo "ABK:0005"
 ABK_SHELL="${SHELL##*/}"
 [ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && PrintTrace $TRACE_ERROR "${RED}ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh${NC}" && exit 1
 PrintTrace $TRACE_DEBUG "ABK_SHELL  = $ABK_SHELL"
