@@ -228,8 +228,8 @@ install_abkEnv_main() {
     local MAIN_TOOLS_JSON
 
     [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
-    export TRACE_LEVEL=$TRACE_DEBUG
-    # export TRACE_LEVEL=$TRACE_INFO
+    # export TRACE_LEVEL=$TRACE_DEBUG
+    export TRACE_LEVEL=$TRACE_INFO
     PrintTrace $TRACE_FUNCTION "\n-> ${FUNCNAME[0]} ($*)"
 
     PrintTrace $TRACE_INFO "   ABK_SHELL         = $ABK_SHELL"
