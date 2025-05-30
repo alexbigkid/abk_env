@@ -259,27 +259,18 @@ AbkLib_CheckPreRequisites || PrintUsageAndExitWithCode 1 "${RED}ERROR: cannot pr
 # check unixPackages directory
 # [ ! -d "$UNIX_PACKAGES_DIR" ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: $UNIX_PACKAGES_DIR directory not found${NC}"
 # PrintTrace $TRACE_INFO "${GRN}[OK] $UNIX_PACKAGES_DIR directory found${NC}"
-echo "ABK:0000"
+
+
+# setup correct SHELL
+ABK_SHELL="${SHELL##*/}"
+[ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && PrintTrace $TRACE_ERROR "${RED}ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh${NC}" && exit 1
+
 
 # Find test_*.json files in root directory
 shopt -s nullglob
-echo "ABK:0001"
 TEST_PACKAGE_FILES=(./test_*.json)
-echo "ABK:0002"
 shopt -u nullglob
-echo "ABK:0003"
 [ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no test_*.json files found${NC}"
-echo "ABK:0004"
-echo "SHELL = $SHELL"
-echo "ABK_SHELL = $ABK_SHELL"
-PrintTrace $TRACE_INFO "ABK::00045"
-# setup correct SHELL
-PrintTrace $TRACE_INFO "SHELL      = $SHELL"
-PrintTrace $TRACE_DEBUG "SHELL      = $SHELL"
-echo "ABK:0005"
-ABK_SHELL="${SHELL##*/}"
-[ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && PrintTrace $TRACE_ERROR "${RED}ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh${NC}" && exit 1
-PrintTrace $TRACE_DEBUG "ABK_SHELL  = $ABK_SHELL"
 
 # test install
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
@@ -289,29 +280,18 @@ for TEST_PACKAGE_FILE in "${TEST_PACKAGE_FILES[@]}"; do
     PrintTrace $TRACE_INFO "${YLW}--> [TEST] Processing $TEST_PACKAGE_FILE${NC}"
 
     ./install.sh "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: install.sh failed${NC}"
-    echo "ABK:001"
     ValidatePackageInstall "$TEST_PACKAGE_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation ValidatePackageInstall failed for: $TEST_PACKAGE_FILE${NC}"
-    echo "ABK:002"
 done
 
 
-echo "ABK:003"
 # test content has been added to .zshrc/.bashrc
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-echo "ABK:004"
-PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL = ABK${NC}"
-# PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL = ${ABK_SHELL}${NC}"
-echo "ABK:005"
-PrintTrace $TRACE_DEBUG "${YLW}==> SHELL      = $SHELL${NC}"
-echo "ABK:006"
+PrintTrace $TRACE_DEBUG "${YLW}==> SHELL        = $SHELL${NC}"
+PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL    = $ABK_SHELL${NC}"
 TEST_SHELL_ENV="${HOME}/.${ABK_SHELL}rc"
-echo "ABK:007"
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-echo "ABK:008"
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validate content added: $TEST_SHELL_ENV${NC}"
-echo "ABK:009"
 ValidateShellEnvironmentAdded "$TEST_SHELL_ENV" || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation ValidateShellEnvironmentAdded failed for: $TEST_SHELL_ENV${NC}"
-echo "ABK:010"
 
 
 # test LINK files has been created
