@@ -250,7 +250,6 @@ echo "-> $0 ($*)"
 [ -f "$ABK_LIB_FILE" ] && . "$ABK_LIB_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: $ABK_LIB_FILE could not be found.${NC}"
 export TRACE_LEVEL=$TRACE_INFO
 
-PrintTrace $TRACE_DEBUG "ABK_TEST"
 # Is number of parameters ok
 [ "$#" -ne 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: wrong number of parameters${NC}"
 
