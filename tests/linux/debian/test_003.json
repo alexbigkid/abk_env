@@ -1,9 +1,4 @@
 {
-  "installed_tools": {
-    "shellcheck": [
-      "sudo apt remove -y shellcheck"
-    ]
-  },
   "installed_apps": {
     "visual-studio-code": [
       "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
