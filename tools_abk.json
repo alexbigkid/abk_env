@@ -262,7 +262,7 @@
                     "mplayer": ["command -v mplayer"],
                     "nmap": ["command -v nmap"],
                     "nodenv": ["command -v nodenv"],
-                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
+                    "oh-my-posh": ["command -v oh-my-posh"],
                     "parallel": ["command -v parallel"],
                     "serverless": ["command -v serverless"],
                     "shellcheck": ["command -v shellcheck"],
@@ -306,6 +306,7 @@
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
+                        "oh-my-posh init $ABK_SHELL",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "parallel": ["sudo apt install -y parallel"],

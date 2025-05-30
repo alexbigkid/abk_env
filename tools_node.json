@@ -75,7 +75,7 @@
                 "check": {
                     "jq": ["command -v jq"],
                     "nodenv": ["command -v nodenv"],
-                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
+                    "oh-my-posh": ["command -v oh-my-posh"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"]
                 },
@@ -92,6 +92,7 @@
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
+                        "oh-my-posh init $ABK_SHELL",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],

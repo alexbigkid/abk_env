@@ -112,7 +112,7 @@
             "tools": {
                 "check": {
                     "direnv": ["command -v direnv"],
-                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
+                    "oh-my-posh": ["command -v oh-my-posh"],
                     "pyenv": ["command -v pyenv"],
                     "uv": ["command -v uv"],
                     "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
@@ -125,6 +125,7 @@
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
+                        "oh-my-posh init $ABK_SHELL",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "pyenv": [

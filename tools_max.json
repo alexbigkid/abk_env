@@ -115,6 +115,7 @@
                 ],
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                    "oh-my-posh init $ABK_SHELL",
                     "brew uninstall oh-my-posh"
                 ],
                 "parallel": ["brew uninstall parallel"],
@@ -303,7 +304,7 @@
                     "mplayer": ["command -v mplayer"],
                     "nmap": ["command -v nmap"],
                     "nodenv": ["command -v nodenv"],
-                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
+                    "oh-my-posh": ["command -v oh-my-posh"],
                     "parallel": ["command -v parallel"],
                     "pyenv": ["command -v pyenv"],
                     "serverless": ["command -v serverless"],
