@@ -93,7 +93,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-comic-shanns-mono-nerd-font": [
@@ -101,7 +101,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-droid-sans-mono-nerd-font": [
@@ -109,7 +109,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/DroidSansMNerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-cascadia-code": [
@@ -117,7 +117,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/CaskaydiaCoveNerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-hack-nerd-font": [
@@ -125,7 +125,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font_installation_cleanup": [
@@ -133,11 +133,11 @@
                     ]
                 },
                 "uninstall": {
-                    "font-agave-nerd-font": ["rm ~/.fonts/AgaveNerdFont*"],
-                    "font-comic-shanns-mono-nerd-font": ["rm ~/.fonts/ComicShannsMonoNerdFont*"],
-                    "font-droid-sans-mono-nerd-font": ["rm ~/.fonts/DroidSansMNerdFont*"],
-                    "font-cascadia-code": ["rm ~/.fonts/CaskaydiaCoveNerdFont*"],
-                    "font-hack-nerd-font": ["rm ~/.fonts/Hack*"],
+                    "font-agave-nerd-font": ["rm -f ~/.fonts/AgaveNerdFont*"],
+                    "font-comic-shanns-mono-nerd-font": ["rm -f ~/.fonts/ComicShannsMonoNerdFont*"],
+                    "font-droid-sans-mono-nerd-font": ["rm -f ~/.fonts/DroidSansMNerdFont*"],
+                    "font-cascadia-code": ["rm -f ~/.fonts/CaskaydiaCoveNerdFont*"],
+                    "font-hack-nerd-font": ["rm -f ~/.fonts/Hack*"],
                     "font_installation_cleanup": ["fc-cache -fv"]
                 }
             }

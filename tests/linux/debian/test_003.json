@@ -3,7 +3,7 @@
     "visual-studio-code": [
       "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
       "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-      "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+      "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
       "sudo snap remove code"
     ]
   }

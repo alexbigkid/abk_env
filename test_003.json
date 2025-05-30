@@ -69,7 +69,7 @@
                 "visual-studio-code": [
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
                     "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                    "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                     "brew uninstall --cask visual-studio-code"
                 ]
             }
@@ -113,15 +113,15 @@
                 "uninstall": {
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
-                        "rm ./unixBin/oh-my-posh"
+                        "rm -f ./unixBin/oh-my-posh"
                     ],
                     "uv": [
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
                         "uv tool uninstall ruff",
                         "uv cache clean",
-                        "rm -r \"$(uv python dir)\"",
-                        "rm -r \"$(uv tool dir)\"",
-                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                        "rm -rf \"$(uv python dir)\"",
+                        "rm -rf \"$(uv tool dir)\"",
+                        "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
                     ]
                 }
             },
@@ -148,7 +148,7 @@
                     "visual-studio-code": [
                         "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
                         "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                        "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                         "sudo snap remove code"
                     ]
                 }

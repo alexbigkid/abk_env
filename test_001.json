@@ -155,7 +155,7 @@
                     ],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
-                        "rm ./unixBin/oh-my-posh"
+                        "rm -f ./unixBin/oh-my-posh"
                     ],
                     "pyenv": [
                         "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",

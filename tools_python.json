@@ -142,7 +142,7 @@
                     "jq": ["sudo apt remove -y jq"],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
-                        "rm ./unixBin/oh-my-posh"
+                        "rm -f ./unixBin/oh-my-posh"
                     ],
                     "parallel": ["sudo apt remove -y parallel"],
                     "pyenv": [
@@ -154,9 +154,9 @@
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
                         "uv tool uninstall ruff",
                         "uv cache clean",
-                        "rm -r \"$(uv python dir)\"",
-                        "rm -r \"$(uv tool dir)\"",
-                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                        "rm -rf \"$(uv python dir)\"",
+                        "rm -rf \"$(uv tool dir)\"",
+                        "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
                     ],
                     "wget": ["sudo apt remove -y wget"],
                     "yq": ["sudo snap remove yq"]

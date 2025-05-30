@@ -202,7 +202,7 @@
                 "visual-studio-code": [
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
                     "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                    "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                    "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                     "brew uninstall --cask visual-studio-code"
                 ]
             }
@@ -281,7 +281,7 @@
                         "unzip awscliv2.zip",
                         "sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli",
                         "[ -d ./aws ] && rm -Rf aws",
-                        "[ -e ./awscliv2.zip ] && rm awscliv2.zip",
+                        "[ -e ./awscliv2.zip ] && rm -f awscliv2.zip",
                         "(cd unixBin/env && ln -s XXX_aws.env LINK_aws.env)"
                     ],
                     "direnv": [
@@ -361,7 +361,7 @@
                     ],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
-                        "rm ./unixBin/oh-my-posh"
+                        "rm -f ./unixBin/oh-my-posh"
                     ],
                     "parallel": ["sudo apt remove -y parallel"],
                     "serverless": ["sudo npm uninstall -g serverless"],
@@ -376,9 +376,9 @@
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
                         "uv tool uninstall ruff",
                         "uv cache clean",
-                        "rm -r \"$(uv python dir)\"",
-                        "rm -r \"$(uv tool dir)\"",
-                        "rm ~/.local/bin/uv ~/.local/bin/uvx"
+                        "rm -rf \"$(uv python dir)\"",
+                        "rm -rf \"$(uv tool dir)\"",
+                        "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
                     ],
                     "wget": ["sudo apt remove -y wget"],
                     "yq": ["sudo snap remove yq"],
@@ -416,7 +416,7 @@
                     "visual-studio-code": [
                         "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
                         "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-                        "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+                        "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
                         "sudo snap remove code"
                     ]
                 }
@@ -438,7 +438,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-comic-shanns-mono-nerd-font": [
@@ -446,7 +446,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-droid-sans-mono-nerd-font": [
@@ -454,7 +454,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/DroidSansMNerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-cascadia-code": [
@@ -462,7 +462,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/CaskaydiaCoveNerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font-hack-nerd-font": [
@@ -470,7 +470,7 @@
                         "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
                         "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
                         "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
-                        "rm fonts.tar.xz",
+                        "rm -f fonts.tar.xz",
                         "rm -Rf ./fonts"
                     ],
                     "font_installation_cleanup": [
@@ -478,11 +478,11 @@
                     ]
                 },
                 "uninstall": {
-                    "font-agave-nerd-font": ["rm ~/.fonts/AgaveNerdFont*"],
-                    "font-comic-shanns-mono-nerd-font": ["rm ~/.fonts/ComicShannsMonoNerdFont*"],
-                    "font-droid-sans-mono-nerd-font": ["rm ~/.fonts/DroidSansMNerdFont*"],
-                    "font-cascadia-code": ["rm ~/.fonts/CaskaydiaCoveNerdFont*"],
-                    "font-hack-nerd-font": ["rm ~/.fonts/Hack*"],
+                    "font-agave-nerd-font": ["rm -f ~/.fonts/AgaveNerdFont*"],
+                    "font-comic-shanns-mono-nerd-font": ["rm -f ~/.fonts/ComicShannsMonoNerdFont*"],
+                    "font-droid-sans-mono-nerd-font": ["rm -f ~/.fonts/DroidSansMNerdFont*"],
+                    "font-cascadia-code": ["rm -f ~/.fonts/CaskaydiaCoveNerdFont*"],
+                    "font-hack-nerd-font": ["rm -f ~/.fonts/Hack*"],
                     "font_installation_cleanup": ["fc-cache -fv"]
                 }
             }
