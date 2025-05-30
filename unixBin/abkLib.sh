@@ -348,7 +348,7 @@ AbkLib_CheckPreRequisites_linux() {
 
 
 AbkLib_CheckPreRequisites() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_EXIT_CODE=0
 
     # is $SHELL supported
