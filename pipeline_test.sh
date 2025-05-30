@@ -231,6 +231,7 @@ ValidateLinksDeleted() {
                 PrintTrace "$TRACE_ERROR" "${RED}ERROR: $LCL_LINK_FILE was NOT deleted${NC}"
                 exit 1
             fi
+            PrintTrace "$TRACE_INFO" "${GRN}[OK] $LCL_LINK_FILE deleted${NC}"
         done
     ) || return 1
 
