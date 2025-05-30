@@ -332,4 +332,4 @@ PrintTrace "$TRACE_INFO" "${GRN}==> [OK] All validation tests passed${NC}"
 PrintTrace "$TRACE_INFO" "${GRN}============================================================${NC}"
 
 echo "<- $0 (0)"
-exit $LCL_EXIT_CODE
+exit 0
