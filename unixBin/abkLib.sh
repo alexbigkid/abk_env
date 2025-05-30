@@ -428,13 +428,13 @@ AbkLib_CheckInstallationCompatibility() {
 }
 
 
-PrintTrace() {
-    local LCL_TRACE_LEVEL=$1
-    shift
-    local LCL_PRINT_STRING=("$@")
-    if [ "$LCL_TRACE_LEVEL" -eq "$TRACE_FUNCTION" ]; then
-        [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${CYN}${LCL_PRINT_STRING[*]}${NC}"
-    else
-        [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${LCL_PRINT_STRING[@]}"
-    fi
-}
+# PrintTrace() {
+#     local LCL_TRACE_LEVEL=$1
+#     shift
+#     local LCL_PRINT_STRING=("$@")
+#     if [ "$LCL_TRACE_LEVEL" -eq "$TRACE_FUNCTION" ]; then
+#         [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${CYN}${LCL_PRINT_STRING[*]}${NC}"
+#     else
+#         [ "$TRACE_LEVEL" -ge "$LCL_TRACE_LEVEL" ] && echo -e "${LCL_PRINT_STRING[@]}"
+#     fi
+# }

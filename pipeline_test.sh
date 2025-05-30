@@ -274,6 +274,7 @@ echo "SHELL = $SHELL"
 echo "ABK_SHELL = $ABK_SHELL"
 PrintTrace $TRACE_INFO "ABK::00045"
 # setup correct SHELL
+PrintTrace $TRACE_INFO "SHELL      = $SHELL"
 PrintTrace $TRACE_DEBUG "SHELL      = $SHELL"
 echo "ABK:0005"
 ABK_SHELL="${SHELL##*/}"
