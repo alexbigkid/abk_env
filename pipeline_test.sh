@@ -6,7 +6,7 @@ set -euo pipefail
 #---------------------------
 ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
-ABK_SHELL="${SHELL##*/}"
+export ABK_SHELL="${SHELL##*/}"
 [ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh" && exit 1
 
 
