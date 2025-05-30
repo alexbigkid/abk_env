@@ -48,7 +48,6 @@ ABK_COLORS="$ABK_LIB_FILE_DIR/env/000_colors.env"
 # echo "ABK_COLORS = $ABK_COLORS"
 # shellcheck disable=SC1091
 [ -f "$ABK_COLORS" ] && . "$ABK_COLORS" || echo -e "${RED}ERROR:${NC} colors definition file ($ABK_COLORS) could not be found"
-echo -e "${RED}ABK_COLORS defined${NC}"
 
 #---------------------------
 # vars definition
@@ -58,7 +57,6 @@ ABK_VARS="$ABK_LIB_FILE_DIR/env/001_vars.env"
 # shellcheck source=../env/001_vars.env
 # shellcheck disable=SC1091
 [ -f "$ABK_VARS" ] && . "$ABK_VARS" || echo -e "${RED}ERROR:${NC} vars definition file ($ABK_VARS) could not be found"
-echo -e "${RED}TRACE_DEBUG $TRACE_DEBUG${NC}"
 
 # -----------------------------------------------------------------------------
 # internal variables definitions
