@@ -127,8 +127,8 @@ __installItem() {
     PrintTrace $TRACE_DEBUG "LCL_INSTALL_TYPE            = $LCL_INSTALL_TYPE"
     PrintTrace $TRACE_DEBUG "LCL_CHECK_INSTRUCTIONS      = $LCL_CHECK_INSTRUCTIONS"
 
-    PrintTrace $TRACE_DEBUG "PATH = $PATH"
-    PrintTrace $TRACE_DEBUG "PWD  = $PWD"
+    # PrintTrace $TRACE_DEBUG "PATH = $PATH"
+    # PrintTrace $TRACE_DEBUG "PWD  = $PWD"
     while IFS= read -r LCL_CHECK_STEP; do
         PrintTrace $TRACE_DEBUG "LCL_CHECK_STEP = $LCL_CHECK_STEP"
         EVAL_CHECK_STEP=$(eval "$LCL_CHECK_STEP" 2>/dev/null)
