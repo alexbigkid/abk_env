@@ -165,14 +165,12 @@ ValidateLinksCreated() {
     local LCL_LINKS_DIR="./unixBin/env"
     local LCL_LINKS_FILES=(
         "LINK_direnv.env"
+        "LINK_nodenv.env"
         "LINK_oh-my-posh.env"
         "LINK_pyenv.env"
         "LINK_uv.env"
         "LINK_zsh_plugins.env"
     )
-
-    PrintTrace "$TRACE_DEBUG" "ABK: content of $LCL_LINKS_DIR"
-    ls -la $LCL_LINKS_DIR
 
     (
         cd "$LCL_LINKS_DIR" || {
@@ -200,7 +198,7 @@ ValidateLinksCreated() {
         done
     ) || return 1
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ValidateLinksCreated for: $LCL_INSTALLATION_FILE${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ValidateLinksCreated${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
