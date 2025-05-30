@@ -245,6 +245,8 @@ ValidateLinksDeleted() {
 echo ""
 echo "-> $0 ($*)"
 
+PrintTrace $TRACE_DEBUG "ABK_TEST"
+
 # shellcheck source=./unixBin/abkLib.sh
 [ -f "$ABK_LIB_FILE" ] && . "$ABK_LIB_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: $ABK_LIB_FILE could not be found.${NC}"
 export TRACE_LEVEL=$TRACE_INFO
