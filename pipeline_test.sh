@@ -270,7 +270,9 @@ shopt -u nullglob
 echo "ABK:0003"
 [ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no test_*.json files found${NC}"
 echo "ABK:0004"
-
+echo "SHELL = $SHELL"
+echo "ABK_SHELL = $ABK_SHELL"
+PrintTrace $TRACE_INFO "ABK::00045"
 # setup correct SHELL
 PrintTrace $TRACE_DEBUG "SHELL      = $SHELL"
 echo "ABK:0005"
