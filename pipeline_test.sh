@@ -24,7 +24,7 @@ PrintUsageAndExitWithCode() {
 
 
 ValidatePackageInstall() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_INSTALLATION_FILE=$1
     local LCL_FULL_PATH_INSTALLED_FILE="$UNIX_PACKAGES_DIR/$LCL_INSTALLATION_FILE"
     local LCL_FULL_PATH_VALIDATION_FILE
@@ -77,7 +77,7 @@ ValidatePackageInstall() {
 
 
 ValidatePackageUninstall() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_INSTALLATION_FILE=$1
     local LCL_FULL_PATH_INSTALLED_FILE="$UNIX_PACKAGES_DIR/$LCL_INSTALLATION_FILE"
     local LCL_FULL_PATH_VALIDATION_FILE
@@ -96,7 +96,7 @@ ValidatePackageUninstall() {
 
 
 ValidateShellEnvironmentAdded() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_TEST_SHELL_ENV="$1"
 
     # check the shell environment file was created
@@ -128,7 +128,7 @@ EOF
 
 
 ValidateShellEnvironmentRemoved() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_TEST_SHELL_ENV="$1"
 
     # check the shell environment file was created
@@ -161,7 +161,7 @@ EOF
 
 
 ValidateLinksCreated() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]}"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_LINKS_DIR="./unixBin/env"
     local LCL_LINKS_FILES=(
         "LINK_direnv.env"
@@ -204,7 +204,7 @@ ValidateLinksCreated() {
 
 
 ValidateLinksDeleted() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]}"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_LINKS_DIR="./unixBin/env"
     local LCL_LINKS_FILES=(
         "LINK_aws.env"

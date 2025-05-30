@@ -23,7 +23,7 @@ PrintUsageAndExitWithCode() {
 
 
 __getJsonUninstallInstructions() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_JSON_FILE=$2
     local LCL_EXIT_CODE=0
@@ -42,7 +42,7 @@ __getJsonUninstallInstructions() {
 
 
 __removeAbkEnvToConfig() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_USER_CONFIG_FILE_SHELL=$1
 
     AbkLib_RemoveEnvironmentSettings "$ABK_ENV_NAME" "$LCL_USER_CONFIG_FILE_SHELL" || PrintTrace "$TRACE_ERROR" "${RED}ERROR: $HOME/$LCL_USER_CONFIG_FILE_SHELL file does not exist${NC}"
@@ -53,7 +53,7 @@ __removeAbkEnvToConfig() {
 
 
 __markInstalledToolAsUninstalled() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_INSTALLATION_FILE_NAME=$1
     local LCL_INSTALLED_TYPE=$2
     local LCL_INSTALLED_ITEM=$3
@@ -82,8 +82,8 @@ __markInstalledToolAsUninstalled() {
 
 
 __uninstallItem() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} (hidden)"
-    # PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_APP=$1
     local LCL_UNINSTALL_INSTRACTIONS=$2
     local LCL_EXIT_CODE=0
@@ -100,8 +100,8 @@ __uninstallItem() {
 
 
 __uninstallItemList() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} (hidden)"
-    # PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_FILE_NAME=$1
     local LCL_INSTALLED_TYPE=$2
     local LCL_INSTRUCTIONS=$3
@@ -142,7 +142,7 @@ __uninstallItemList() {
 
 
 __deleteBinDirLink() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]}"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_CURRENT_DIR=$PWD
     local LCL_EXIT_CODE=0
 
@@ -173,7 +173,7 @@ uninstall_abkEnv_main() {
     [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
     # export TRACE_LEVEL=$TRACE_DEBUG
     export TRACE_LEVEL=$TRACE_INFO
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
 
     PrintTrace "$TRACE_INFO" "   ABK_SHELL         = $ABK_SHELL"
     PrintTrace "$TRACE_INFO" "   BIN_DIR           = $BIN_DIR"

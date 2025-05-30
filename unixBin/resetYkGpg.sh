@@ -29,7 +29,7 @@ PrintUsageAndExitWithCode ()
 
 
 checkYubiKeyPresence () {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]}"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_EXIT_CODE=0
     PrintTrace "$TRACE_INFO" "🔍 Checking for YubiKey..."
     if ! gpg --card-status &>/dev/null; then
@@ -42,7 +42,7 @@ checkYubiKeyPresence () {
 
 
 printYubiKeyInfo () {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]}"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_EXIT_CODE=0
     PrintTrace "$TRACE_INFO" "🔍 gpg --card-status"
     gpg --card-status
@@ -52,7 +52,7 @@ printYubiKeyInfo () {
 
 
 extractGpgAuthKey() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_KEY_FP="$2"
     local LCL_EXIT_CODE=0
@@ -68,7 +68,7 @@ extractGpgAuthKey() {
 
 
 removeGpgAuthKeyFromSshControl() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_AUTH_KEYGRIP="$1"
     local LCL_SSHCONTROL_FILE="$GNUPG_DIR/sshcontrol"
     local LCL_EXIT_CODE=0
@@ -89,7 +89,7 @@ removeGpgAuthKeyFromSshControl() {
 
 
 getGpgFingerprint() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
 
@@ -110,7 +110,7 @@ getGpgFingerprint() {
 
 
 deleteSshPubKeyFile() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
     local LCL_SSH_DIR="$HOME/.ssh"
@@ -141,7 +141,7 @@ deleteSshPubKeyFile() {
 
 
 resetSshGpgConfig() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
     local LCL_GPG_AGENT_CONF_FILE="$GNUPG_DIR/gpg-agent.conf"
@@ -184,7 +184,7 @@ resetSshGpgConfig() {
 
 
 resetGitGpgSigningConfig() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
 
@@ -214,7 +214,7 @@ resetGitGpgSigningConfig() {
 
 
 setGpgKeyTrustToUnknown() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
 
@@ -251,7 +251,7 @@ EOF
 
 
 removePublicKeyFromKeyRing() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
 

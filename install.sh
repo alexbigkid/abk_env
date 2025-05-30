@@ -23,7 +23,7 @@ PrintUsageAndExitWithCode() {
 
 
 __getJsonInstallInstructions() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_RETURN_VAR=$1
     local LCL_JSON_FILE=$2
     local LCL_EXIT_CODE=0
@@ -53,7 +53,7 @@ __getJsonInstallInstructions() {
 
 
 __addAbkEnvToConfig() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_USER_CONFIG_FILE_SHELL=$1
     local LCL_CONTENT_TO_ADD_ARRAY=(
         "if [ -f $ABK_ENV_FILE ]; then"
@@ -74,7 +74,7 @@ __addAbkEnvToConfig() {
 
 
 __createInstalledFile() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_INSTALL_JSON_FILE=$1
     local LCL_EXIT_CODE=0
 
@@ -88,7 +88,7 @@ __createInstalledFile() {
 
 
 __updatePackageManager() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} (hidden)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} (hidden)"
     local LCL_INSTRUCTIONS=$1
     local LCL_EXIT_CODE=0
 
@@ -111,8 +111,8 @@ __updatePackageManager() {
 
 
 __installItem() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} (hidden)"
-    # PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_INSTALLATION_FILE_NAME=$1
     local LCL_INSTALL_TYPE=$2
     local LCL_ITEM=$3
@@ -162,8 +162,8 @@ __installItem() {
 
 
 __installItemList() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} (hidden)"
-    # PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} (hidden)"
+    # PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_JSON_FILE_NAME=$1
     local LCL_INSTALLED_TYPE=$2
     local LCL_INSTRUCTIONS=$3
@@ -200,7 +200,7 @@ __installItemList() {
 
 
 __createBinDirLink() {
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]}"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_CURRENT_DIR=$PWD
     local LCL_EXIT_CODE=0
 
@@ -230,7 +230,7 @@ install_abkEnv_main() {
     [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
     # export TRACE_LEVEL=$TRACE_DEBUG
     export TRACE_LEVEL=$TRACE_INFO
-    PrintTrace "$TRACE_FUNCTION" "\n-> ${FUNCNAME[0]} ($*)"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
 
     PrintTrace "$TRACE_INFO" "   ABK_SHELL         = $ABK_SHELL"
     PrintTrace "$TRACE_INFO" "   BIN_DIR           = $BIN_DIR"
