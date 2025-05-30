@@ -1,10 +1,22 @@
 {
-  "installed_apps": {
-    "visual-studio-code": [
-      "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
-      "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
-      "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-      "sudo snap remove code"
+  "installed_fonts": {
+    "font-agave-nerd-font": [
+      "rm ~/.fonts/AgaveNerdFont*"
+    ],
+    "font-comic-shanns-mono-nerd-font": [
+      "rm ~/.fonts/ComicShannsMonoNerdFont*"
+    ],
+    "font-droid-sans-mono-nerd-font": [
+      "rm ~/.fonts/DroidSansMNerdFont*"
+    ],
+    "font-cascadia-code": [
+      "rm ~/.fonts/CaskaydiaCoveNerdFont*"
+    ],
+    "font-hack-nerd-font": [
+      "rm ~/.fonts/Hack*"
+    ],
+    "font_installation_cleanup": [
+      "fc-cache -fv"
     ]
   }
 }
