@@ -6,8 +6,6 @@ set -euo pipefail
 #---------------------------
 ABK_LIB_FILE="./unixBin/abkLib.sh"
 UNIX_PACKAGES_DIR="./unixPackages"
-export ABK_SHELL="${SHELL##*/}"
-[ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && echo "ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh" && exit 1
 
 
 #---------------------------
@@ -269,6 +267,11 @@ TEST_PACKAGE_FILES=(./test_*.json)
 shopt -u nullglob
 [ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no test_*.json files found${NC}"
 
+# setup correct SHELL
+ABK_SHELL="${SHELL##*/}"
+[ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && PrintTrace $TRACE_ERROR "${RED}ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh${NC}" && exit 1
+PrintTrace $TRACE_DEBUG "SHELL      = $SHELL"
+PrintTrace $TRACE_DEBUG "ABK_SHELL  = $ABK_SHELL"
 
 # test install
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
