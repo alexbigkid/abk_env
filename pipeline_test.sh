@@ -286,8 +286,8 @@ done
 
 # test content has been added to .zshrc/.bashrc
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
-PrintTrace $TRACE_INFO "${YLW}==> SHELL        = $SHELL${NC}"
-PrintTrace $TRACE_INFO "${YLW}==> ABK_SHELL    = $ABK_SHELL${NC}"
+PrintTrace $TRACE_DEBUG "${YLW}==> SHELL        = $SHELL${NC}"
+PrintTrace $TRACE_DEBUG "${YLW}==> ABK_SHELL    = $ABK_SHELL${NC}"
 TEST_SHELL_ENV="${HOME}/.${ABK_SHELL}rc"
 PrintTrace $TRACE_INFO "${YLW}============================================================${NC}"
 PrintTrace $TRACE_INFO "${YLW}==> [TEST] Validate content added: $TEST_SHELL_ENV${NC}"
