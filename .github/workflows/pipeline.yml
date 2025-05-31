@@ -17,21 +17,33 @@ jobs:
       - name: Ensure correct SHELL availability
         run: cat /etc/shells
 
-      - name: zsh install/uninstall test
+      - name: zsh install test
         shell: zsh {0}
         run: |
           export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
-          echo "USER_SHELL = $USER_SHELL"
-          ./pipeline_test.sh
+          ./test_install.sh
 
-      - name: bash install/uninstall test
+      - name: zsh uninstall test
+        shell: zsh {0}
+        run: |
+          export SHELL=$(which zsh)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh
+
+      - name: bash install test
         shell: bash {0}
         run: |
           export SHELL=$(which bash)
           echo "SHELL = $SHELL"
-          echo "USER_SHELL = $USER_SHELL"
-          ./pipeline_test.sh
+          ./test_install.sh
+
+      - name: bash uninstall test
+        shell: bash {0}
+        run: |
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh
 
   Ubuntu:
     name: Ubuntu ${{ matrix.version }}
@@ -50,25 +62,40 @@ jobs:
                 echo "$SHELL_CMD not found, attempting to install..."
                 sudo apt-get update
                 sudo apt-get install -y "$SHELL_CMD"
+                echo "$SHELL_CMD just installed."
             else
                 echo "$SHELL_CMD is already installed."
             fi
+            echo "------------------------------------"
+            cat /etc/shells
 
-      - name: zsh install/uninstall test
+      - name: zsh install test
         shell: zsh {0}
         run: |
           export SHELL=$(which zsh)
           echo "SHELL = $SHELL"
-          echo "USER_SHELL = $USER_SHELL"
-          ./pipeline_test.sh
+          ./test_install.sh
 
-      - name: bash install/uninstall test
+      - name: zsh uninstall test
+        shell: zsh {0}
+        run: |
+          export SHELL=$(which zsh)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh
+
+      - name: bash install test
         shell: bash {0}
         run: |
           export SHELL=$(which bash)
           echo "SHELL = $SHELL"
-          echo "USER_SHELL = $USER_SHELL"
-          ./pipeline_test.sh
+          ./test_install.sh
+
+      - name: bash uninstall test
+        shell: bash {0}
+        run: |
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh
 
 
 #   Docker:
