@@ -242,9 +242,9 @@
         "debian": {
             "description": "Installing ABK tool set for Linux / Debian based distro",
             "supported_versions": {
-                "debian": ["9", "10", "11", "12"],
-                "raspbian": ["9", "10", "11", "12"],
-                "ubuntu": ["20.04", "20.10", "22.04", "22.10", "24.04"]
+                "debian": ["11", "12"],
+                "raspbian": ["11", "12"],
+                "ubuntu": ["22.04", "24.04"]
             },
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
