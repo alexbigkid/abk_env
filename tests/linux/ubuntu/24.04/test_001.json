@@ -1,0 +1,33 @@
+{
+  "installed_tools": {
+    "direnv": [
+      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+      "sudo apt remove -y direnv"
+    ],
+    "oh-my-posh": [
+      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+      "rm -f ./unixBin/oh-my-posh"
+    ],
+    "pyenv": [
+      "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
+      "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
+      "rm -Rf ~/.pyenv"
+    ],
+    "uv": [
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+      "uv tool uninstall ruff || true",
+      "uv cache clean",
+      "rm -rf \"$(uv python dir)\"",
+      "rm -rf \"$(uv tool dir)\"",
+      "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
+    ],
+    "zsh-autosuggestions": [
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "sudo apt remove -y zsh-autosuggestions"
+    ],
+    "zsh-syntax-highlighting": [
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "sudo apt remove -y zsh-syntax-highlighting"
+    ]
+  }
+}

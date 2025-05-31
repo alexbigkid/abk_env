@@ -1,0 +1,81 @@
+{
+  "installed_tools": {
+    "direnv": [
+      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+      "sudo apt remove -y direnv"
+    ],
+    "ffmpeg": [
+      "sudo apt remove -y ffmpeg"
+    ],
+    "mplayer": [
+      "sudo apt remove -y mplayer"
+    ],
+    "nmap": [
+      "sudo apt remove -y nmap"
+    ],
+    "nodenv": [
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
+      "sudo find /usr/local/bin -type l -name 'nodenv' -delete",
+      "rm -Rf ~/.nodenv"
+    ],
+    "oh-my-posh": [
+      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+      "rm -f ./unixBin/oh-my-posh"
+    ],
+    "serverless": [
+      "sudo npm uninstall -g serverless"
+    ],
+    "tfenv": [
+      "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete",
+      "sudo find /usr/local/bin -type l -name 'tfenv' -delete",
+      "rm -Rf ~/.tfenv"
+    ],
+    "uv": [
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+      "uv tool uninstall ruff || true",
+      "uv cache clean",
+      "rm -rf \"$(uv python dir)\"",
+      "rm -rf \"$(uv tool dir)\"",
+      "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
+    ],
+    "xclip": [
+      "sudo apt remove -y xclip"
+    ],
+    "zsh-autosuggestions": [
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "sudo apt remove -y zsh-autosuggestions"
+    ],
+    "zsh-syntax-highlighting": [
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "sudo apt remove -y zsh-syntax-highlighting"
+    ]
+  },
+  "installed_apps": {
+    "visual-studio-code": [
+      "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
+      "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+      "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+      "sudo snap remove code"
+    ]
+  },
+  "installed_fonts": {
+    "font-agave-nerd-font": [
+      "rm -f ~/.fonts/AgaveNerdFont*"
+    ],
+    "font-comic-shanns-mono-nerd-font": [
+      "rm -f ~/.fonts/ComicShannsMonoNerdFont*"
+    ],
+    "font-droid-sans-mono-nerd-font": [
+      "rm -f ~/.fonts/DroidSansMNerdFont*"
+    ],
+    "font-cascadia-code": [
+      "rm -f ~/.fonts/CaskaydiaCoveNerdFont*"
+    ],
+    "font-hack-nerd-font": [
+      "rm -f ~/.fonts/Hack*"
+    ],
+    "font_installation_cleanup": [
+      "fc-cache -fv"
+    ]
+  }
+}

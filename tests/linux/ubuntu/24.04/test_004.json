@@ -1,0 +1,22 @@
+{
+  "installed_fonts": {
+    "font-agave-nerd-font": [
+      "rm -f ~/.fonts/AgaveNerdFont*"
+    ],
+    "font-comic-shanns-mono-nerd-font": [
+      "rm -f ~/.fonts/ComicShannsMonoNerdFont*"
+    ],
+    "font-droid-sans-mono-nerd-font": [
+      "rm -f ~/.fonts/DroidSansMNerdFont*"
+    ],
+    "font-cascadia-code": [
+      "rm -f ~/.fonts/CaskaydiaCoveNerdFont*"
+    ],
+    "font-hack-nerd-font": [
+      "rm -f ~/.fonts/Hack*"
+    ],
+    "font_installation_cleanup": [
+      "fc-cache -fv"
+    ]
+  }
+}

@@ -29,6 +29,7 @@ ValidatePackageInstall() {
     local LCL_FULL_PATH_INSTALLED_FILE="$UNIX_PACKAGES_DIR/$LCL_INSTALLATION_FILE"
     local LCL_FULL_PATH_VALIDATION_FILE
     local LCL_UNIX_DISTRO
+    local LCL_DISTRO_VERSION
 
     # check the installed tools file was created
     if [ ! -f "$LCL_FULL_PATH_INSTALLED_FILE" ]; then
@@ -38,14 +39,15 @@ ValidatePackageInstall() {
 
     # get the unix version
     if [ "$ABK_UNIX_TYPE" == "linux" ]; then
-        AbkLib_GetIdLike_linux LCL_UNIX_DISTRO
-        if [ "$LCL_UNIX_DISTRO" == "" ]; then
-            AbkLib_GetId_unix LCL_UNIX_DISTRO || { PrintTrace "$TRACE_ERROR" "${RED}ERROR: AbkLib_GetId_unix failed${NC}"; return 1; }
-        fi
-        PrintTrace "$TRACE_INFO" "LCL_UNIX_DISTRO = $LCL_UNIX_DISTRO"
-        LCL_FULL_PATH_VALIDATION_FILE="tests/$ABK_UNIX_TYPE/$LCL_UNIX_DISTRO/$LCL_INSTALLATION_FILE"
+        AbkLib_GetId_unix LCL_UNIX_DISTRO || { PrintTrace "$TRACE_ERROR" "${RED}ERROR: AbkLib_GetId_unix failed${NC}"; return 1; }
+        AbkLib_GetVersionId_linux LCL_DISTRO_VERSION || { PrintTrace "$TRACE_ERROR" "${RED}ERROR: AbkLib_GetVersionId_linux failed${NC}"; return 1; }
+        PrintTrace "$TRACE_INFO" "LCL_UNIX_DISTRO       = $LCL_UNIX_DISTRO"
+        PrintTrace "$TRACE_INFO" "LCL_DISTRO_VERSION    = $LCL_DISTRO_VERSION"
+        LCL_FULL_PATH_VALIDATION_FILE="tests/$ABK_UNIX_TYPE/$LCL_UNIX_DISTRO/$LCL_DISTRO_VERSION/$LCL_INSTALLATION_FILE"
     elif [ "$ABK_UNIX_TYPE" == "macOS" ]; then
-        LCL_FULL_PATH_VALIDATION_FILE="tests/macOS/$LCL_INSTALLATION_FILE"
+        AbkLib_GetVersionId_macOS LCL_DISTRO_VERSION || { PrintTrace "$TRACE_ERROR" "${RED}ERROR: AbkLib_GetVersionId_macOS failed${NC}"; return 1; }
+        PrintTrace "$TRACE_INFO" "LCL_DISTRO_VERSION    = $LCL_DISTRO_VERSION"
+        LCL_FULL_PATH_VALIDATION_FILE="tests/macOS/$LCL_DISTRO_VERSION/$LCL_INSTALLATION_FILE"
     else
         PrintTrace "$TRACE_ERROR" "${RED}ERROR: ABK_UNIX_TYPE = $ABK_UNIX_TYPE is not supported${NC}"
         return 1
