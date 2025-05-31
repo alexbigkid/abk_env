@@ -155,10 +155,10 @@
         },
         "apps": {
             "check": {
-                "adobe-dng-converter": [
-                    "brew list --cask | grep ^adobe-dng-converter$",
-                    "ls \"/Applications/Adobe DNG Converter.app\"",
-                    "ls \"~/Applications/Adobe DNG Converter.app\""
+                "balenaetcher": [
+                    "brew list --cask | grep ^balenaetcher$",
+                    "ls \"/Applications/balenaEtcher.app\"",
+                    "ls \"~/Applications/balenaEtcher.app\""
                 ],
                 "brave-browser": [
                     "brew list --cask | grep ^brave-browser$",
