@@ -488,7 +488,7 @@
                     "font-droid-sans-mono-nerd-font": ["ls ~/.fonts/DroidSansMNerdFont*"],
                     "font-cascadia-code": ["ls ~/.fonts/CaskaydiaCoveNerdFont*"],
                     "font-hack-nerd-font": ["ls ~/.fonts/Hack*"],
-                    "font_installation_cleanup": ["ls ~/.fonts/"]
+                    "font_installation_cleanup": [""]
                 },
                 "install": {
                     "font_installation_start": ["mkdir -p ~/.fonts"],
