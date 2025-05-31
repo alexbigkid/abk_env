@@ -1,0 +1,24 @@
+{
+  "installed_tools": {
+    "pyenv": [
+      "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
+      "brew uninstall pyenv-virtualenv",
+      "brew uninstall pyenv",
+      "rm -Rf ~/.pyenv"
+    ]
+  },
+  "installed_apps": {
+    "mqttx": [
+      "brew uninstall --cask mqttx"
+    ],
+    "raspberry-pi-imager": [
+      "brew uninstall --cask raspberry-pi-imager"
+    ],
+    "spotify": [
+      "brew uninstall --cask spotify"
+    ],
+    "vlc": [
+      "brew uninstall --cask vlc"
+    ]
+  }
+}
