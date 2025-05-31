@@ -182,9 +182,11 @@ ABK_SHELL="${SHELL##*/}"
 
 # Find test_*.json files in root directory
 shopt -s nullglob
-TEST_PACKAGE_FILES=(./test_*.json)
+# TEST_PACKAGE_FILES=(./test_*.json)
+FILE_PREFIX="${1:-test_}"
+TEST_PACKAGE_FILES=(./"${FILE_PREFIX}"*.json)
 shopt -u nullglob
-[ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no test_*.json files found${NC}"
+[ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no file with prefix found: ${FILE_PREFIX}${NC}"
 
 
 # test install

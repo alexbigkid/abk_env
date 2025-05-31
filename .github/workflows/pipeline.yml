@@ -45,6 +45,34 @@ jobs:
           echo "SHELL = $SHELL"
           ./test_uninstall.sh
 
+      - name: zsh install tools
+        shell: zsh {0}
+        run: |
+          export SHELL=$(which zsh)
+          echo "SHELL = $SHELL"
+          ./test_install.sh "tools_"
+
+      - name: zsh uninstall tools
+        shell: zsh {0}
+        run: |
+          export SHELL=$(which zsh)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh "tools_"
+
+      - name: bash install tools
+        shell: bash {0}
+        run: |
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          ./test_install.sh "tools_"
+
+      - name: bash uninstall tools
+        shell: bash {0}
+        run: |
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh "tools_"
+
   Ubuntu:
     name: Ubuntu ${{ matrix.version }}
     runs-on: ubuntu-${{ matrix.version }}
@@ -96,6 +124,34 @@ jobs:
           export SHELL=$(which bash)
           echo "SHELL = $SHELL"
           ./test_uninstall.sh
+
+      - name: zsh install tools
+        shell: zsh {0}
+        run: |
+          export SHELL=$(which zsh)
+          echo "SHELL = $SHELL"
+          ./test_install.sh "tools_"
+
+      - name: zsh uninstall tools
+        shell: zsh {0}
+        run: |
+          export SHELL=$(which zsh)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh "tools_"
+
+      - name: bash install tools
+        shell: bash {0}
+        run: |
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          ./test_install.sh "tools_"
+
+      - name: bash uninstall tools
+        shell: bash {0}
+        run: |
+          export SHELL=$(which bash)
+          echo "SHELL = $SHELL"
+          ./test_uninstall.sh "tools_"
 
 
 #   Docker:
