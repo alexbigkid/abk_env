@@ -139,13 +139,20 @@ Those font are useful for coding and for oh-my-posh
 
 
 ## oh-my-posh configuration
+* open terminal app
+* click on Terminal / Settings (on MacOS: Press <code>&#x2318; + ,</code>)
+* click in the bottom left corner on a circle with 3 dots and import
+* Navigate to repo directory and then to: <code>unixBin/env/terminal/profiles</code>
+* Select <code>Solarized Dark.terminal</code>
+* Select the Profile just added and the click on <code>Default</code> in the bottom left corner
+
 There is a pre-configured theme located in folder <code>./unixBin/env/omp/themes</code>. There are many other predefined themes. You can activate them in the file: <code>./unixBin/env/XXX_oh-my-posh.env</code> Default is configured for ABK customized prompt: <code>./unixBin/env/omp/themes/powerlevel10k_abk.omp.json</code>, which looks like this:
 ![powerlevel10k_abk](./unixBin/env/omp/themes/powerlevel10k_abk.png "pl10k_abk")
 
 If you like to create your own theme please follow: [oh-my-posh documentation](https://ohmyposh.dev/docs).
 
 * Note 1: if you don't see correct symbols in the prompt, please use font which is capable to display glyphs (symbols) in your terminal app settings. A good font example: Hack Nerd Font
-* Note 2: The default oh-my-posh theme is based on dark background terminal app profile. If you like to use my profile please import it from <code>./unixBin/env/terminal/profiles/Solarized Dark.terminal</code>
+* Note 2: The default oh-my-posh theme is based on dark background terminal app profile. It might not look great if you use theme with bright background.
 
 
 ## Aliases
@@ -178,6 +185,6 @@ To update your tools you could use the alias:
 
 ## Uninstall
 If at some point you'd like to uninstall installed packages, you can run <code>./uninstall.sh</code>. Here few examples:
-* <code>./uninstall.sh tools_node.json</code> - will uninstall all node packages. SInce it was recorded what tools have been installed only the packages which has been previously installed with <code>tools_node.json</code> will be removed.
+* <code>./uninstall.sh tools_node.json</code> - will uninstall all node packages. Since it was recorded what tools have been installed only the packages which has been previously installed with <code>tools_node.json</code> will be uninstalled.
 * <code>./uninstall.sh tools_min.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code>
 * <code>./uninstall.sh tools_min.json tools_node.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code> and <code>tools_node.json</code>
