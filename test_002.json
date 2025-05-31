@@ -135,8 +135,7 @@
                     ],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
-                        "source $HOME/.local/bin/env",
-                        "uv tool install ruff",
+                        "(cd \"$HOME/.local/bin\" && ./uv tool install ruff) || true",
                         "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "zsh-autosuggestions": [
@@ -157,7 +156,7 @@
                     ],
                     "uv": [
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
-                        "uv tool uninstall ruff",
+                        "uv tool uninstall ruff || true",
                         "uv cache clean",
                         "rm -rf \"$(uv python dir)\"",
                         "rm -rf \"$(uv tool dir)\"",
