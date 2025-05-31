@@ -119,17 +119,11 @@ For you convenience I prepared few installation packages listed below:
 
 | tool                                                               | description                                                             |
 | :----------------------------------------------------------------- | :---------------------------------------------------------------------- |
-| [balenaetcher](https://github.com/balena-io/etcher)                | Etcher is a powerful OS image flasher built with web technologies       |
 | [brave-browser](https://github.com/brave/brave-browser)            | Secure, fast Web browser based on Chromium just like Chrome             |
 | [docker](https://github.com/docker)                                | Docker helps developers to abstract virtual environments                |
 | [flycut](https://github.com/TermiT/Flycut)                         | Flycut is a clean and simple clipboard manager for developers           |
-| [microsoft-teams](https://www.microsoft.com/en-us/microsoft-teams) | Company's online meeting app                                            |
-| [mqttx](https://mqttx.app/)                                        | MQTTX makes developing and testing MQTT applications faster and easier. |
 | [onedrive](https://www.microsoft.com/en-us/microsoft-365/onedrive) | Company's online storage.                                               |
-| [raspberry-pi-imager](https://github.com/raspberrypi/rpi-imager)   | Raspberry Pi Imaging Utility                                            |
-| [slack](https://slack.com/)                                        | Company's quick message communication app                               |
 | [visual-studio-code](https://github.com/microsoft/vscode)          | The best code editor ever :)                                            |
-| [vlc](https://github.com/videolan/vlc)                             | VLC is a libre and open source media player and multimedia engine       |
 
 
 ### Fonts installed
