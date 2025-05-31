@@ -111,7 +111,7 @@ ValidateDirectoryEmpty() {
         return 1
     fi
 
-    if [ !-z "$(ls -A "$LCL_CHECK_DIR")" ]; then
+    if [ ! -z "$(ls -A "$LCL_CHECK_DIR")" ]; then
         PrintTrace "$TRACE_ERROR" "${RED}ERROR: Directory $LCL_CHECK_DIR is not empty.${NC}"
         return 1
     fi
