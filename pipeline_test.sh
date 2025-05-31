@@ -105,7 +105,6 @@ ValidateShellEnvironmentAdded() {
         return 1
     fi
 
-    cat $LCL_TEST_SHELL_ENV
 
     local LCL_EXPECTED_CONTENT
     LCL_EXPECTED_CONTENT=$(cat <<'EOF'
@@ -118,6 +117,7 @@ EOF
 )
     if ! grep -Fq "$LCL_EXPECTED_CONTENT" "$LCL_TEST_SHELL_ENV"; then
         PrintTrace "$TRACE_ERROR" "${RED}[ERROR] ABK config is NOT found in $LCL_TEST_SHELL_ENV${NC}"
+        cat "$LCL_TEST_SHELL_ENV"
         return 1
     fi
 
@@ -127,6 +127,36 @@ EOF
 }
 
 
+# ValidateShellEnvironmentRemoved() {
+#     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
+#     local LCL_TEST_SHELL_ENV="$1"
+
+#     # check the shell environment file was created
+#     if [ ! -f "$LCL_TEST_SHELL_ENV" ]; then
+#         PrintTrace "$TRACE_ERROR" "${RED}ERROR: $LCL_TEST_SHELL_ENV not found${NC}"
+#         return 1
+#     fi
+
+
+#     local LCL_EXPECTED_CONTENT
+#     LCL_EXPECTED_CONTENT=$(cat <<'EOF'
+# # BEGIN >>>>>> DO_NOT_REMOVE >>>>>> ABK_ENV
+# if [ -f "$HOME/abk_env/./unixBin/env/abk.env" ]; then
+#     . "$HOME/abk_env/./unixBin/env/abk.env"
+# fi
+# # END <<<<<< DO_NOT_REMOVE <<<<<< ABK_ENV
+# EOF
+# )
+#     if grep -Fq "$LCL_EXPECTED_CONTENT" "$LCL_TEST_SHELL_ENV"; then
+#         PrintTrace "$TRACE_ERROR" "${RED}[ERROR] ABK config is FOUND in $LCL_TEST_SHELL_ENV${NC}"
+#         cat "$LCL_TEST_SHELL_ENV"
+#         return 1
+#     fi
+
+#     PrintTrace "$TRACE_INFO" "${GRN}[OK] ValidateShellEnvironmentRemoved for: $LCL_TEST_SHELL_ENV${NC}"
+#     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
+#     return 0
+# }
 ValidateShellEnvironmentRemoved() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_TEST_SHELL_ENV="$1"
@@ -137,22 +167,12 @@ ValidateShellEnvironmentRemoved() {
         return 1
     fi
 
-    cat $LCL_TEST_SHELL_ENV
 
-    local LCL_EXPECTED_CONTENT
-    LCL_EXPECTED_CONTENT=$(cat <<'EOF'
-# BEGIN >>>>>> DO_NOT_REMOVE >>>>>> ABK_ENV
-if [ -f "$HOME/abk_env/./unixBin/env/abk.env" ]; then
-    . "$HOME/abk_env/./unixBin/env/abk.env"
-fi
-# END <<<<<< DO_NOT_REMOVE <<<<<< ABK_ENV
-EOF
-)
-    if grep -Fq "$LCL_EXPECTED_CONTENT" "$LCL_TEST_SHELL_ENV"; then
+    if grep -Fq '# BEGIN >>>>>> DO_NOT_REMOVE >>>>>> ABK_ENV' "$LCL_TEST_SHELL_ENV"; then
         PrintTrace "$TRACE_ERROR" "${RED}[ERROR] ABK config is FOUND in $LCL_TEST_SHELL_ENV${NC}"
+        cat "$LCL_TEST_SHELL_ENV"
         return 1
     fi
-
 
     PrintTrace "$TRACE_INFO" "${GRN}[OK] ValidateShellEnvironmentRemoved for: $LCL_TEST_SHELL_ENV${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
