@@ -7,6 +7,7 @@
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
             "check": {
+                "git": ["command -v git"],
                 "jq": ["command -v jq"],
                 "nodenv": ["command -v nodenv"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
@@ -15,6 +16,7 @@
                 "yq": ["command -v yq"]
             },
             "install": {
+                "git": ["brew install git"],
                 "jq": ["brew install jq"],
                 "nodenv": [
                     "brew install nodenv",
@@ -30,6 +32,7 @@
                 "yq": ["brew install yq"]
             },
             "uninstall": {
+                "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
                 "nodenv": [
                     "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
@@ -73,6 +76,7 @@
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "check": {
+                    "git": ["command -v git"],
                     "jq": ["command -v jq"],
                     "nodenv": ["command -v nodenv"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
@@ -80,6 +84,7 @@
                     "yq": ["command -v yq"]
                 },
                 "install": {
+                    "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
                     "nodenv": [
                         "git clone https://github.com/nodenv/nodenv.git ~/.nodenv",
@@ -99,6 +104,7 @@
                     "yq": ["sudo snap install yq"]
                 },
                 "uninstall": {
+                    "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],
                     "nodenv": [
                         "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",

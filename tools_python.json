@@ -9,6 +9,7 @@
             "check": {
                 "direnv": ["command -v direnv"],
                 "exiftool": ["command -v exiftool"],
+                "git": ["command -v git"],
                 "jq": ["command -v jq"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "parallel": ["command -v parallel"],
@@ -24,6 +25,7 @@
                     "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                 ],
                 "exiftool": ["brew install exiftool"],
+                "git": ["brew install git"],
                 "jq": ["brew install jq"],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
@@ -50,6 +52,7 @@
                     "brew uninstall direnv"
                 ],
                 "exiftool": ["brew uninstall exiftool"],
+                "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
@@ -100,6 +103,7 @@
             "tools": {
                 "check": {
                     "direnv": ["command -v direnv"],
+                    "git": ["command -v git"],
                     "jq": ["command -v jq"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
@@ -113,6 +117,7 @@
                         "sudo apt install -y direnv",
                         "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                     ],
+                    "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
@@ -138,6 +143,7 @@
                         "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
                         "sudo apt remove -y direnv"
                     ],
+                    "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",

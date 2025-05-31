@@ -24,8 +24,8 @@
                 "ruff": ["command -v ruff"],
                 "serverless": ["command -v serverless"],
                 "shellcheck": ["command -v shellcheck"],
-                "tree": ["command -v tree"],
                 "tfenv": ["command -v tfenv"],
+                "tree": ["command -v tree"],
                 "typescript": ["command -v tsc"],
                 "uv": ["command -v uv"],
                 "wget": ["command -v wget"],
@@ -255,7 +255,6 @@
         },
         "fonts": {
             "check": {
-                "homebrew/cask-fonts": ["brew tap | grep ^homebrew/cask-fonts$"],
                 "font-agave-nerd-font": ["brew list --cask | grep ^font-agave-nerd-font$"],
                 "font-comic-shanns-mono-nerd-font": ["brew list --cask | grep ^font-comic-shanns-mono-nerd-font$"],
                 "font-droid-sans-mono-nerd-font": ["brew list --cask | grep ^font-droid-sans-mono-nerd-font$"],
@@ -265,7 +264,6 @@
                 "font-hack-nerd-font": ["brew list --cask | grep ^font-hack-nerd-font$"]
             },
             "install": {
-                "homebrew/cask-fonts": ["brew tap homebrew/cask-fonts"],
                 "font-agave-nerd-font": ["brew install --cask font-agave-nerd-font"],
                 "font-comic-shanns-mono-nerd-font": ["brew install --cask font-comic-shanns-mono-nerd-font"],
                 "font-droid-sans-mono-nerd-font": ["brew install --cask font-droid-sans-mono-nerd-font"],
@@ -281,8 +279,7 @@
                 "font-cascadia-code": ["brew uninstall --cask font-cascadia-code"],
                 "font-cascadia-code-pl": ["brew uninstall --cask font-cascadia-code-pl"],
                 "font-caskaydia-cove-nerd-font": ["brew uninstall --cask font-caskaydia-cove-nerd-font"],
-                "font-hack-nerd-font": ["brew uninstall --cask font-hack-nerd-font"],
-                "homebrew/cask-fonts": ["brew untap homebrew/cask-fonts"]
+                "font-hack-nerd-font": ["brew uninstall --cask font-hack-nerd-font"]
             }
         }
     },
@@ -336,6 +333,7 @@
                         "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                     ],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
+                    "git": ["sudo apt install -y git"],
                     "pass": ["sudo apt install -y pass"],
                     "gpg": ["sudo apt install -y gnupg"],
                     "jq": ["sudo apt install -y jq"],
@@ -403,6 +401,7 @@
                         "sudo apt remove -y direnv"
                     ],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
+                    "git": ["sudo apt remove -y git"],
                     "pass": ["sudo apt remove -y pass"],
                     "gpg": ["sudo apt remove -y gnupg"],
                     "jq": ["sudo apt remove -y jq"],

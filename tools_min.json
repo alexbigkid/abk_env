@@ -7,6 +7,7 @@
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
             "check": {
+                "git": ["command -v git"],
                 "jq": ["command -v jq"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "wget": ["command -v wget"],
@@ -16,6 +17,7 @@
                 "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
+                "git": ["brew install git"],
                 "jq": ["brew install jq"],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
@@ -38,6 +40,7 @@
                 ]
             },
             "uninstall": {
+                "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
@@ -102,6 +105,7 @@
             "tools": {
                 "check": {
                     "ffmpeg": ["command -v ffmpeg"],
+                    "git": ["command -v git"],
                     "jq": ["command -v jq"],
                     "mplayer": ["command -v mplayer"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
@@ -113,6 +117,7 @@
                 },
                 "install": {
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
+                    "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "oh-my-posh": [
@@ -134,6 +139,7 @@
                 },
                 "uninstall": {
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
+                    "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "oh-my-posh": [
