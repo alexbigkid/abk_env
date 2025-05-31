@@ -16,10 +16,10 @@ ABK tool environment setup for developers
 
 ## Support for
 ### OS supported
-- [x] MacOS
-- [x] Linux / Debian distro
-- [x] Linux / Ubuntu distro
-- [x] Linux / Raspbian distro
+- [x] MacOS ["13 - Ventura", "14 - Sonoma", "15 - Sequoia"]
+- [x] Linux / Debian distro ["11 - bullseye", "12 - bookworm"]
+- [x] Linux / Ubuntu distro ["22.04", "24.04"]
+- [x] Linux / Raspbian distro ["11 - bullseye", "12 - bookworm"]
 - [ ] Windows
 
 ### Shells supported
