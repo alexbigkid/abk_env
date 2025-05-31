@@ -134,7 +134,7 @@ echo "-> $0 ($*)"
 export TRACE_LEVEL=$TRACE_INFO
 
 # Is number of parameters ok
-[ "$#" -ne 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: wrong number of parameters${NC}"
+[ "$#" -gt 1 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: wrong number of parameters${NC}"
 
 # check Pre-Requisites
 AbkLib_CheckPreRequisites || PrintUsageAndExitWithCode 1 "${RED}ERROR: cannot proceed Pre-Requisites are not met${NC}"
