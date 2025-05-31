@@ -16,7 +16,7 @@ PrintUsageAndExitWithCode() {
     echo "usage: $0"
     echo "  $0 --help           - display this info"
     echo
-    echo -e $2
+    echo -e "$2"
     echo "errorExitCode = $1"
     exit $1
 }
@@ -147,9 +147,9 @@ __deleteBinDirLink() {
     local LCL_EXIT_CODE=0
 
     PrintTrace "$TRACE_DEBUG" "LCL_CURRENT_DIR = $LCL_CURRENT_DIR"
-    if [ -d $HOME_BIN_DIR ]; then
+    if [ -d "$HOME_BIN_DIR" ]; then
         PrintTrace "$TRACE_INFO" "[Deleting directory link $HOME_BIN_DIR to $LCL_CURRENT_DIR/$SH_BIN_DIR ...]"
-        rm $HOME_BIN_DIR || LCL_EXIT_CODE=$?
+        rm "$HOME_BIN_DIR" || LCL_EXIT_CODE=$?
     fi
 
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"

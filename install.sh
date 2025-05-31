@@ -16,7 +16,7 @@ PrintUsageAndExitWithCode() {
     echo "usage: $0"
     echo "  $0 --help           - display this info"
     echo
-    echo -e $2
+    echo -e "$2"
     echo "errorExitCode = $1"
     exit $1
 }
@@ -227,7 +227,7 @@ install_abkEnv_main() {
     local MAIN_TOOLS_JSON_FILE
     local MAIN_TOOLS_JSON
 
-    [ -f $MAIN_ABK_LIB_FILE ] && . $MAIN_ABK_LIB_FILE || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
+    [ -f "$MAIN_ABK_LIB_FILE" ] && . "$MAIN_ABK_LIB_FILE" || PrintUsageAndExitWithCode 1 "${RED}ERROR: $MAIN_ABK_LIB_FILE could not be found.${NC}"
     # export TRACE_LEVEL=$TRACE_DEBUG
     export TRACE_LEVEL=$TRACE_INFO
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
@@ -242,9 +242,9 @@ install_abkEnv_main() {
     PrintTrace "$TRACE_INFO"
 
     # is parameter --help?
-    [ "$#" -eq 1 ] && [ "$1" == "--help" ] && PrintUsageAndExitWithCode $ERROR_CODE_SUCCESS
+    [ "$#" -eq 1 ] && [ "$1" == "--help" ] && PrintUsageAndExitWithCode "$ERROR_CODE_SUCCESS"
 
-    AbkLib_CheckPreRequisites || PrintUsageAndExitWithCode $ERROR_CODE_GENERAL_ERROR "${RED}ERROR: cannot proceed Pre-Requisites are not met${NC}"
+    AbkLib_CheckPreRequisites || PrintUsageAndExitWithCode "$ERROR_CODE_GENERAL_ERROR" "${RED}ERROR: cannot proceed Pre-Requisites are not met${NC}"
 
     # Is number of parameters ok
     if [ "$#" -eq 0 ]; then
