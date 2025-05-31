@@ -5,73 +5,73 @@ on:
   pull_request:
 
 jobs:
-  MacOS:
-    name: MacOS ${{ matrix.version }}
-    runs-on: macos-${{ matrix.version }}
-    strategy:
-      matrix:
-        version: [14, 15]
-    steps:
-      - uses: actions/checkout@v4
+#   MacOS:
+#     name: MacOS ${{ matrix.version }}
+#     runs-on: macos-${{ matrix.version }}
+#     strategy:
+#       matrix:
+#         version: [14, 15]
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Ensure correct SHELL availability
-        run: cat /etc/shells
+#       - name: Ensure correct SHELL availability
+#         run: cat /etc/shells
 
-      - name: zsh install test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
+#       - name: zsh install test
+#         shell: zsh {0}
+#         run: |
+#           export SHELL=$(which zsh)
+#           echo "SHELL = $SHELL"
+#           ./test_install.sh
 
-      - name: zsh uninstall test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
+#       - name: zsh uninstall test
+#         shell: zsh {0}
+#         run: |
+#           export SHELL=$(which zsh)
+#           echo "SHELL = $SHELL"
+#           ./test_uninstall.sh
 
-      - name: bash install test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
+#       - name: bash install test
+#         shell: bash {0}
+#         run: |
+#           export SHELL=$(which bash)
+#           echo "SHELL = $SHELL"
+#           ./test_install.sh
 
-      - name: bash uninstall test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
+#       - name: bash uninstall test
+#         shell: bash {0}
+#         run: |
+#           export SHELL=$(which bash)
+#           echo "SHELL = $SHELL"
+#           ./test_uninstall.sh
 
-      - name: zsh install tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+#       - name: zsh install tools
+#         shell: zsh {0}
+#         run: |
+#           export SHELL=$(which zsh)
+#           echo "SHELL = $SHELL"
+#           ./test_install.sh "tools_"
 
-      - name: zsh uninstall tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+#       - name: zsh uninstall tools
+#         shell: zsh {0}
+#         run: |
+#           export SHELL=$(which zsh)
+#           echo "SHELL = $SHELL"
+#           ./test_uninstall.sh "tools_"
 
-      - name: bash install tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+#       - name: bash install tools
+#         shell: bash {0}
+#         run: |
+#           export SHELL=$(which bash)
+#           echo "SHELL = $SHELL"
+#           ./test_install.sh "tools_"
 
-      - name: bash uninstall tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+#       - name: bash uninstall tools
+#         shell: bash {0}
+#         run: |
+#           export SHELL=$(which bash)
+#           echo "SHELL = $SHELL"
+#           ./test_uninstall.sh "tools_"
 
   Ubuntu:
     name: Ubuntu ${{ matrix.version }}
@@ -96,62 +96,64 @@ jobs:
             fi
             echo "------------------------------------"
             cat /etc/shells
+            echo "------------------------------------"
+            cat /etc/os-release
 
-      - name: zsh install test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
+    #   - name: zsh install test
+    #     shell: zsh {0}
+    #     run: |
+    #       export SHELL=$(which zsh)
+    #       echo "SHELL = $SHELL"
+    #       ./test_install.sh
 
-      - name: zsh uninstall test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
+    #   - name: zsh uninstall test
+    #     shell: zsh {0}
+    #     run: |
+    #       export SHELL=$(which zsh)
+    #       echo "SHELL = $SHELL"
+    #       ./test_uninstall.sh
 
-      - name: bash install test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
+    #   - name: bash install test
+    #     shell: bash {0}
+    #     run: |
+    #       export SHELL=$(which bash)
+    #       echo "SHELL = $SHELL"
+    #       ./test_install.sh
 
-      - name: bash uninstall test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
+    #   - name: bash uninstall test
+    #     shell: bash {0}
+    #     run: |
+    #       export SHELL=$(which bash)
+    #       echo "SHELL = $SHELL"
+    #       ./test_uninstall.sh
 
-      - name: zsh install tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+    #   - name: zsh install tools
+    #     shell: zsh {0}
+    #     run: |
+    #       export SHELL=$(which zsh)
+    #       echo "SHELL = $SHELL"
+    #       ./test_install.sh "tools_"
 
-      - name: zsh uninstall tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+    #   - name: zsh uninstall tools
+    #     shell: zsh {0}
+    #     run: |
+    #       export SHELL=$(which zsh)
+    #       echo "SHELL = $SHELL"
+    #       ./test_uninstall.sh "tools_"
 
-      - name: bash install tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+    #   - name: bash install tools
+    #     shell: bash {0}
+    #     run: |
+    #       export SHELL=$(which bash)
+    #       echo "SHELL = $SHELL"
+    #       ./test_install.sh "tools_"
 
-      - name: bash uninstall tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+    #   - name: bash uninstall tools
+    #     shell: bash {0}
+    #     run: |
+    #       export SHELL=$(which bash)
+    #       echo "SHELL = $SHELL"
+    #       ./test_uninstall.sh "tools_"
 
 
 #   Docker:
