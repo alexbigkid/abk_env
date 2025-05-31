@@ -7,9 +7,6 @@
     "ffmpeg": [
       "sudo apt remove -y ffmpeg"
     ],
-    "pass": [
-      "sudo apt remove -y pass"
-    ],
     "mplayer": [
       "sudo apt remove -y mplayer"
     ],
@@ -40,6 +37,9 @@
       "rm -rf \"$(uv python dir)\"",
       "rm -rf \"$(uv tool dir)\"",
       "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
+    ],
+    "xclip": [
+      "sudo apt remove -y xclip"
     ],
     "zsh-autosuggestions": [
       "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
