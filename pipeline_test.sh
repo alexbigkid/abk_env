@@ -70,7 +70,7 @@ ValidatePackageInstall() {
         return 1
     fi
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation for: $LCL_INSTALLATION_FILE${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ${FUNCNAME[0]} for: $LCL_INSTALLATION_FILE${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
@@ -89,7 +89,7 @@ ValidatePackageUninstall() {
         return 1
     fi
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation for: $LCL_INSTALLATION_FILE${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ${FUNCNAME[0]} for: $LCL_INSTALLATION_FILE${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
@@ -121,7 +121,7 @@ EOF
         return 1
     fi
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] ValidateShellEnvironmentAdded for: $LCL_TEST_SHELL_ENV${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK]  ${FUNCNAME[0]} for: $LCL_TEST_SHELL_ENV${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
@@ -144,7 +144,7 @@ ValidateShellEnvironmentRemoved() {
         return 1
     fi
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] ValidateShellEnvironmentRemoved for: $LCL_TEST_SHELL_ENV${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] ${FUNCNAME[0]} for: $LCL_TEST_SHELL_ENV${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
@@ -188,7 +188,7 @@ ValidateLinksCreated() {
         done
     ) || return 1
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ValidateLinksCreated${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation  ${FUNCNAME[0]}${NC}"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
@@ -225,7 +225,27 @@ ValidateLinksDeleted() {
         done
     ) || return 1
 
-    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation ValidateLinksDeleted${NC}"
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validation  ${FUNCNAME[0]}${NC}"
+    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
+    return 0
+}
+
+
+ValidateDirectoryEmpty() {
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
+    local LCL_CHECK_DIR="$1"
+
+    if [ ! -d "$LCL_CHECK_DIR" ]; then
+        PrintTrace $TRACE_ERROR "${RED}ERROR: $LCL_CHECK_DIR is not a directory or does not exist${NC}"
+        return 1
+    fi
+
+    if [ !-z "$(ls -A "$LCL_CHECK_DIR")" ]; then
+        PrintTrace $TRACE_ERROR  "${RED}ERROR: Directory $LCL_CHECK_DIR is not empty.${NC}"
+        return 1
+    fi
+
+    PrintTrace "$TRACE_INFO" "${GRN}[OK] Validated $LCL_CHECK_DIR is empty."
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} (0)"
     return 0
 }
@@ -316,6 +336,12 @@ ValidateShellEnvironmentRemoved "$TEST_SHELL_ENV" || PrintUsageAndExitWithCode 1
 PrintTrace "$TRACE_INFO" "${YLW}============================================================${NC}"
 PrintTrace "$TRACE_INFO" "${YLW}==> [TEST] Validate: LINKs has been deleted${NC}"
 ValidateLinksDeleted || PrintUsageAndExitWithCode 1 "${RED}ERROR: Validation of LINKs deletion failed${NC}"
+
+
+PrintTrace "$TRACE_INFO" "${YLW}============================================================${NC}"
+EMPTY_PACKAGE_DIR="unixPackages"
+PrintTrace "$TRACE_INFO" "${YLW}==> [TEST] Validate: directory '$EMPTY_PACKAGE_DIR' is empty${NC}"
+ValidateDirectoryEmpty "$EMPTY_PACKAGE_DIR" || PrintUsageAndExitWithCode $? "${RED}ERROR: Directory $EMPTY_PACKAGE_DIR is not empty${NC}"
 
 
 PrintTrace "$TRACE_INFO" "${GRN}============================================================${NC}"
