@@ -19,7 +19,7 @@ jobs:
             echo "--------Shells----------------------"
             cat /etc/shells
             echo "-------MacOS SW version-------------"
-            cat sw_vers
+            sw_vers
 
       - name: zsh install test
         shell: zsh {0}
