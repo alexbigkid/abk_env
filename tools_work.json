@@ -461,7 +461,6 @@
             },
             "apps": {
                 "check": {
-                    ""
                     "visual-studio-code": ["command -v code"]
                 },
                 "install":{

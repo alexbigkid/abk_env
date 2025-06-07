@@ -6,6 +6,9 @@
     "microsoft-teams": [
       "brew uninstall --cask microsoft-teams"
     ],
+    "rectangle": [
+      "brew uninstall --cask rectangle"
+    ],
     "slack": [
       "brew uninstall --cask slack"
     ]
