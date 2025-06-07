@@ -190,6 +190,11 @@
                     "ls \"/Applications/Raspberry Pi Imager.app\"",
                     "ls \"~/Applications/Raspberry Pi Imager.app\""
                 ],
+                "rectangle": [
+                    "brew list --cask | grep ^rectangle$",
+                    "ls \"/Applications/Rectangle.app\"",
+                    "ls \"~/Applications/Rectangle.app\""
+                ],
                 "slack": [
                     "brew list --cask | grep ^slack$",
                     "ls \"/Applications/Slack.app\"",
@@ -218,6 +223,7 @@
                 "mqttx": ["brew install --cask mqttx"],
                 "onedrive": ["brew install --cask onedrive"],
                 "raspberry-pi-imager": ["brew install --cask raspberry-pi-imager"],
+                "rectangle": ["brew install --cask rectangle"],
                 "slack": ["brew install --cask slack"],
                 "visual-studio-code": [
                     "brew install --cask visual-studio-code",
@@ -243,6 +249,7 @@
                 "mqttx": ["brew uninstall --cask mqttx"],
                 "onedrive": ["brew uninstall --cask onedrive"],
                 "raspberry-pi-imager": ["brew uninstall --cask raspberry-pi-imager"],
+                "rectangle": ["brew uninstall --cask rectangle"],
                 "slack": ["brew uninstall --cask slack"],
                 "visual-studio-code": [
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
@@ -454,6 +461,7 @@
             },
             "apps": {
                 "check": {
+                    ""
                     "visual-studio-code": ["command -v code"]
                 },
                 "install":{
