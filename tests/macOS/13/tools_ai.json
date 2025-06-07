@@ -1,7 +1,10 @@
 {
-  "installed_tools": {
+  "installed_apps": {
     "claude": [
-      "npm uninstall -g @anthropic-ai/claude-code"
+      "brew uninstall --cask claude"
+    ],
+    "windsurf": [
+      "brew uninstall --cask windsurf"
     ]
   }
 }
