@@ -14,18 +14,62 @@ ABK tool environment setup for developers
 * Private/Company wide pass manager
 
 
+## Design
+Check, install and uninstall instructions are configured in json files
+
+### life cycle of installed tools
+```mermaid
+flowchart LR
+    %% Define styles
+    classDef jsonStyle fill:#e3f2fd,stroke:#2196f3,stroke-width:2,color:#0d47a1;
+    classDef installStyle fill:#e8f5e9,stroke:#4caf50,stroke-width:2,color:#1b5e20;
+    classDef procStyle fill:#fffde7,stroke:#fbc02d,stroke-width:2,stroke-dasharray: 5, color:#f57f17;
+    classDef uninstallStyle fill:#fff3e0,stroke:#ff9800,stroke-width:2,color:#e65100;
+    classDef testStyle fill:#fce4ec,stroke:#e91e63,stroke-width:2,color:#880e4f;
+
+    %% Define nodes
+    json_files("📁 <b>JSON files</b><br/>tools_abk.json<br/>tools_node.json<br/>tools_python.json<br/>tools_work.json")
+    install("📦 <b>install.sh</b>")
+    installed("🗂️ <b>Uninstall instructions</b><br/>for installed tools<br/>in <b>unixPackages</b> dir")
+    uninstall("🧹 <b>uninstall.sh</b>")
+
+    %% Apply styles
+    class json_files jsonStyle
+    class install installStyle
+    class installed procStyle
+    class uninstall uninstallStyle
+
+    %% Define edges
+    json_files --> install
+    install --> installed
+    installed --> uninstall
+```
+
+
 ## Support for
 ### OS supported
-- [x] MacOS ["13 - Ventura", "14 - Sonoma", "15 - Sequoia"]
-- [x] Linux / Debian distro ["11 - bullseye", "12 - bookworm"]
-- [x] Linux / Ubuntu distro ["22.04", "24.04"]
-- [x] Linux / Raspbian distro ["11 - bullseye", "12 - bookworm"]
+- [x] MacOS
+  - [ ] 11 - Big Sur - could work, not tested
+  - [ ] 12 - Monterey - could work, not tested
+  - [x] 13 - Ventura
+  - [x] 14 - Sonoma
+  - [x] 15 - Sequoia
+- [x] Linux / Debian distro
+  - [x] 11 - bullseye
+  - [x] 12 - bookworm
+- [x] Linux / Ubuntu distro
+  - [ ] 20.04 - support removed
+  - [x] 22.04
+  - [x] 24.04
+- [x] Linux / Raspbian distro
+  - [x] 11 - bullseye
+  - [x] 12 - bookworm
 - [ ] Windows
 
 ### Shells supported
 - [x] /bin/bash
 - [ ] /bin/csh
-- [ ] /bin/ksh453945
+- [ ] /bin/ksh
 - [ ] /bin/sh
 - [ ] /bin/tcsh
 - [x] /bin/zsh
@@ -117,13 +161,13 @@ For you convenience I prepared few installation packages listed below:
 
 ### Example of MacOS apps installed
 
-| tool                                                               | description                                                             |
-| :----------------------------------------------------------------- | :---------------------------------------------------------------------- |
-| [brave-browser](https://github.com/brave/brave-browser)            | Secure, fast Web browser based on Chromium just like Chrome             |
-| [docker](https://github.com/docker)                                | Docker helps developers to abstract virtual environments                |
-| [flycut](https://github.com/TermiT/Flycut)                         | Flycut is a clean and simple clipboard manager for developers           |
-| [onedrive](https://www.microsoft.com/en-us/microsoft-365/onedrive) | Company's online storage.                                               |
-| [visual-studio-code](https://github.com/microsoft/vscode)          | The best code editor ever :)                                            |
+| tool                                                               | description                                                   |
+| :----------------------------------------------------------------- | :------------------------------------------------------------ |
+| [brave-browser](https://github.com/brave/brave-browser)            | Secure, fast Web browser based on Chromium just like Chrome   |
+| [docker](https://github.com/docker)                                | Docker helps developers to abstract virtual environments      |
+| [flycut](https://github.com/TermiT/Flycut)                         | Flycut is a clean and simple clipboard manager for developers |
+| [onedrive](https://www.microsoft.com/en-us/microsoft-365/onedrive) | Company's online storage.                                     |
+| [visual-studio-code](https://github.com/microsoft/vscode)          | The best code editor ever :)                                  |
 
 
 ### Fonts installed
