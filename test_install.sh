@@ -182,10 +182,9 @@ ABK_SHELL="${SHELL##*/}"
 [ "$ABK_SHELL" != "bash" ] && [ "$ABK_SHELL" != "zsh" ] && PrintTrace "$TRACE_ERROR" "${RED}ERROR: $ABK_SHELL is not supported. Please consider using bash or zsh${NC}" && exit 1
 
 
-# Find test_*.json files in root directory
+# find all json installation files
 shopt -s nullglob
-# TEST_PACKAGE_FILES=(./test_*.json)
-FILE_PREFIX="${1:-test_}"
+FILE_PREFIX="${1:-tools_}"
 TEST_PACKAGE_FILES=(./"${FILE_PREFIX}"*.json)
 shopt -u nullglob
 [ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no file with prefix found: ${FILE_PREFIX}${NC}"
