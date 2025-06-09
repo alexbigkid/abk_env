@@ -154,7 +154,8 @@ ABK_SHELL="${SHELL##*/}"
 shopt -s nullglob
 # TEST_PACKAGE_FILES=(./test_*.json)
 FILE_PREFIX="${1:-test_}"
-TEST_PACKAGE_FILES=(./"${FILE_PREFIX}"*.json)
+# TEST_PACKAGE_FILES=(./"${FILE_PREFIX}"*.json)
+mapfile -t TEST_PACKAGE_FILES < <(printf "%s\n" ./"${FILE_PREFIX}"*.json | sort -r)
 shopt -u nullglob
 [ ${#TEST_PACKAGE_FILES[@]} -eq 0 ] && PrintUsageAndExitWithCode 1 "${RED}ERROR: no file with prefix found: ${FILE_PREFIX}${NC}"
 
