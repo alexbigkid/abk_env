@@ -7,7 +7,7 @@
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
             "check": {
-                "claude-squad": ["command -v command -v claude-squad"],
+                "claude": ["command -v claude"],
                 "git": ["command -v git"],
                 "jq": ["command -v jq"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
@@ -18,7 +18,7 @@
                 "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
-                "claude-squad": ["brew install claude-squad"],
+                "claude": ["npm install -g @anthropic-ai/claude-code"],
                 "git": ["brew install git"],
                 "jq": ["brew install jq"],
                 "oh-my-posh": [
@@ -42,7 +42,7 @@
                 ]
             },
             "uninstall": {
-                "claude-squad": ["brew uninstall claude-squad"],
+                "claude": ["npm uninstall -g @anthropic-ai/claude-code"],
                 "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
                 "oh-my-posh": [
@@ -67,11 +67,6 @@
         },
         "apps": {
             "check": {
-                "claude": [
-                    "brew list --cask | grep ^claude$",
-                    "ls \"/Applications/Claude.app\"",
-                    "ls \"~/Applications/Claude.app\""
-                ],
                 "flycut": [
                     "brew list --cask | grep ^flycut$",
                     "ls \"/Applications/Flycut.app\"",
@@ -84,12 +79,10 @@
                 ]
             },
             "install": {
-                "claude": ["brew install --cask claude"],
                 "flycut": ["brew install --cask flycut"],
                 "windsurf": ["brew install --cask windsurf"]
             },
             "uninstall": {
-                "claude": ["brew uninstall --cask claude"],
                 "flycut": ["brew uninstall --cask flycut"],
                 "windsurf": ["brew uninstall --cask windsurf"]
             }
