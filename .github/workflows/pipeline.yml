@@ -21,34 +21,6 @@ jobs:
             echo "-------MacOS SW version-------------"
             sw_vers
 
-      - name: zsh install test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
-
-      - name: zsh uninstall test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
-
-      - name: bash install test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
-
-      - name: bash uninstall test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
-
       - name: zsh install tools
         shell: zsh {0}
         run: |
@@ -102,34 +74,6 @@ jobs:
             cat /etc/shells
             echo "--------Linux os-release------------"
             cat /etc/os-release
-
-      - name: zsh install test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
-
-      - name: zsh uninstall test
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
-
-      - name: bash install test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh
-
-      - name: bash uninstall test
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh
 
       - name: zsh install tools
         shell: zsh {0}
@@ -195,6 +139,6 @@ jobs:
 #           docker pull ${{ matrix.os }}:${{ matrix.version }}
 #           docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace ${{ matrix.os }}:${{ matrix.version }} /bin/bash -c "
 #             apt-get update && apt-get install -y bash sudo curl gnupg
-#             ./test-install.sh
-#             ./test-uninstall.sh
+#             ./test_install.sh
+#             ./test_uninstall.sh
 #           "
