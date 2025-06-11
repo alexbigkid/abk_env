@@ -38,5 +38,44 @@ git config --global alias.stash-staged '!bash -c "git stash --keep-index; git st
 git config --global alias.move-staged '!bash -c "git stash-staged;git commit -m "temp"; git stash; git reset --hard HEAD^; git stash pop"'
 git config --global alias.sinceDate "!git log --pretty=format:'%Cred%h %Cgreen%cd%Creset | %s%C(auto)%d %Cgreen[%an]%Creset' --date=local --since=\"$1\""
 
+git config --global alias.tmajor "!f() { \
+  BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
+  if [ \"\$BRANCH\" = \"main\" ]; then \
+    git pull && git push && \
+    git tag -f major -m 'release: major' && \
+    git push -f origin major && \
+    git tag -d major && \
+    $HOME_BIN_DIR/alexIsAwesome.sh;
+  else \
+    echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
+  fi; \
+}; f"
+
+git config --global alias.tminor "!f() { \
+  BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
+  if [ \"\$BRANCH\" = \"main\" ]; then \
+    git pull && git push && \
+    git tag -f minor -m 'release: minor' && \
+    git push -f origin minor && \
+    git tag -d minor && \
+    $HOME_BIN_DIR/alexIsAwesome.sh;
+  else \
+    echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
+  fi; \
+}; f"
+
+git config --global alias.tpatch "!f() { \
+  BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
+  if [ \"\$BRANCH\" = \"main\" ]; then \
+    git pull && git push && \
+    git tag -f patch -m 'release: patch' && \
+    git push -f origin patch && \
+    git tag -d patch && \
+    $HOME_BIN_DIR/alexIsAwesome.sh;
+  else \
+    echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
+  fi; \
+}; f"
+
 echo -e "${YELLOW}<- $0${NC}"
 exit 0
