@@ -3,11 +3,8 @@
     "bat": [
       "sudo apt remove -y bat"
     ],
-    "diff-so-fancy": [
-      "sudo apt remove -y diff-so-fancy"
-    ],
     "direnv": [
-      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
       "sudo apt remove -y direnv"
     ],
     "exa": [
@@ -17,7 +14,7 @@
       "sudo apt remove -y ffmpeg"
     ],
     "fzf": [
-      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
       "sudo apt remove -y fzf"
     ],
     "mplayer": [
@@ -27,24 +24,24 @@
       "sudo apt remove -y nmap"
     ],
     "nodenv": [
-      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
-      "sudo find /usr/local/bin -type l -name 'nodenv' -delete",
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
+      "sudo find /usr/local/bin -type l -name 'nodenv' -delete || true",
       "rm -Rf ~/.nodenv"
     ],
     "oh-my-posh": [
-      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
       "rm -f ./unixBin/oh-my-posh"
     ],
     "serverless": [
       "sudo npm uninstall -g serverless"
     ],
     "tfenv": [
-      "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete",
-      "sudo find /usr/local/bin -type l -name 'tfenv' -delete",
+      "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete || true",
+      "sudo find /usr/local/bin -type l -name 'tfenv' -delete || true",
       "rm -Rf ~/.tfenv"
     ],
     "uv": [
-      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
       "uv tool uninstall ruff || true",
       "uv cache clean",
       "rm -rf \"$(uv python dir)\"",
@@ -55,11 +52,11 @@
       "sudo apt remove -y xclip"
     ],
     "zsh-autosuggestions": [
-      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
       "sudo apt remove -y zsh-autosuggestions"
     ],
     "zsh-syntax-highlighting": [
-      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
       "sudo apt remove -y zsh-syntax-highlighting"
     ]
   },

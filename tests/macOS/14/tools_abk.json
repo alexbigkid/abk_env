@@ -7,7 +7,7 @@
       "brew uninstall diff-so-fancy"
     ],
     "direnv": [
-      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
       "brew uninstall direnv"
     ],
     "exiftool": [
@@ -17,7 +17,7 @@
       "brew uninstall eza"
     ],
     "fzf": [
-      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
       "brew uninstall fzf"
     ],
     "helm": [
@@ -33,12 +33,12 @@
       "brew uninstall nmap"
     ],
     "nodenv": [
-      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
       "brew uninstall nodenv",
       "rm -Rf ~/.nodenv"
     ],
     "oh-my-posh": [
-      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
       "brew uninstall oh-my-posh"
     ],
     "parallel": [
@@ -61,19 +61,19 @@
       "brew uninstall typescript"
     ],
     "uv": [
-      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
       "brew uninstall uv"
     ],
     "zsh-autocomplete": [
-      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
       "brew uninstall zsh-autocomplete"
     ],
     "zsh-autosuggestions": [
-      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
       "brew uninstall zsh-autosuggestions"
     ],
     "zsh-syntax-highlighting": [
-      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
       "brew uninstall zsh-syntax-highlighting"
     ]
   },
