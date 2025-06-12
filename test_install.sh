@@ -115,6 +115,7 @@ ValidateLinksCreated() {
     local LCL_LINKS_DIR="./unixBin/env"
     local LCL_LINKS_FILES=(
         "LINK_direnv.env"
+        "LINK_fzf.env"
         "LINK_nodenv.env"
         "LINK_oh-my-posh.env"
         "LINK_pyenv.env"

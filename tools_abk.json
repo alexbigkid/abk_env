@@ -40,19 +40,19 @@
             "install": {
                 "aws": [
                     "brew install awscli",
-                    "(cd unixBin/env && ln -s XXX_aws.env LINK_aws.env)"
+                    "(cd unixBin/env && [ ! -L LINK_aws.env ] && ln -s XXX_aws.env LINK_aws.env || true)"
                 ],
                 "bat": ["brew install bat"],
                 "diff-so-fancy": ["brew install diff-so-fancy"],
                 "direnv": [
                     "brew install direnv",
-                    "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
+                    "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
                 ],
                 "exiftool": ["brew install exiftool"],
                 "eza": ["brew install eza"],
                 "fzf": [
                     "brew install fzf",
-                    "(cd unixBin/env && ln -s XXX_fzf.env LINK_fzf.env)"
+                    "(cd unixBin/env && [ ! -L LINK_fzf.env ] && ln -s XXX_fzf.env LINK_fzf.env || true)"
                 ],
                 "git": ["brew install git"],
                 "helm": ["brew install helm"],
@@ -63,12 +63,12 @@
                 "nmap": ["brew install nmap"],
                 "nodenv": [
                     "brew install nodenv",
-                    "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
+                    "(cd unixBin/env && [ ! -L LINK_nodenv.env ] && ln -s XXX_nodenv.env LINK_nodenv.env || true)"
                 ],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
-                    "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
+                    "(cd unixBin/env && [ ! -L LINK_oh-my-posh.env ] && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env || true)"
                 ],
                 "parallel": ["brew install parallel"],
                 "ruff": ["brew install ruff"],
@@ -79,7 +79,7 @@
                 "typescript": ["brew install typescript"],
                 "uv": [
                     "brew install uv",
-                    "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
+                    "(cd unixBin/env && [ ! -L LINK_uv.env ] && ln -s XXX_uv.env LINK_uv.env || true)"
                 ],
                 "wget": ["brew install wget"],
                 "yq": ["brew install yq"],
@@ -98,19 +98,19 @@
             },
             "uninstall": {
                 "aws": [
-                    "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_aws.env' -delete || true",
                     "brew uninstall awscli"
                 ],
                 "bat": ["brew uninstall bat"],
                 "diff-so-fancy": ["brew uninstall diff-so-fancy"],
                 "direnv": [
-                    "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
                     "brew uninstall direnv"
                 ],
                 "exiftool": ["brew uninstall exiftool"],
                 "eza": ["brew uninstall eza"],
                 "fzf": [
-                    "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
                     "brew uninstall fzf"
                 ],
                 "git": ["brew uninstall git"],
@@ -121,12 +121,12 @@
                 "kind": ["brew uninstall kind"],
                 "nmap": ["brew uninstall nmap"],
                 "nodenv": [
-                    "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
                     "brew uninstall nodenv",
                     "rm -Rf ~/.nodenv"
                 ],
                 "oh-my-posh": [
-                    "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
                     "brew uninstall oh-my-posh"
                 ],
                 "parallel": ["brew uninstall parallel"],
@@ -140,21 +140,21 @@
                 "tree": ["brew uninstall tree"],
                 "typescript": ["brew uninstall typescript"],
                 "uv": [
-                    "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
                     "brew uninstall uv"
                 ],
                 "wget": ["brew uninstall wget"],
                 "yq": ["brew uninstall yq"],
                 "zsh-autocomplete": [
-                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
                     "brew uninstall zsh-autocomplete"
                 ],
                 "zsh-autosuggestions": [
-                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
                     "brew uninstall zsh-autosuggestions"
                 ],
                 "zsh-syntax-highlighting": [
-                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
                     "brew uninstall zsh-syntax-highlighting"
                 ]
             }
@@ -269,7 +269,6 @@
                 "check": {
                     "aws": ["command -v aws"],
                     "bat": ["command -v bat"],
-                    "diff-so-fancy": ["command -v diff-so-fancy"],
                     "direnv": ["command -v direnv"],
                     "ffmpeg": ["command -v ffmpeg"],
                     "exa": ["command -v exa"],
@@ -302,19 +301,18 @@
                         "sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli",
                         "[ -d ./aws ] && rm -Rf aws",
                         "[ -e ./awscliv2.zip ] && rm -f awscliv2.zip",
-                        "(cd unixBin/env && ln -s XXX_aws.env LINK_aws.env)"
+                        "(cd unixBin/env && [ ! -L LINK_aws.env ] && ln -s XXX_aws.env LINK_aws.env || true)"
                     ],
                     "bat": ["sudo apt install -y bat"],
-                    "diff-so-fancy": ["sudo apt install -y diff-so-fancy"],
                     "direnv": [
                         "sudo apt install -y direnv",
-                        "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
+                        "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
                     ],
                     "exa": ["sudo apt install -y exa"],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
                     "fzf": [
                         "sudo apt install -y fzf",
-                        "(cd unixBin/env && ln -s XXX_fzf.env LINK_fzf.env)"
+                        "(cd unixBin/env && [ ! -L LINK_fzf.env ] &&ln -s XXX_fzf.env LINK_fzf.env || true)"
                     ],
                     "git": ["sudo apt install -y git"],
                     "pass": ["sudo apt install -y pass"],
@@ -330,12 +328,12 @@
                         "mkdir -p $(nodenv root)/plugins",
                         "git clone https://github.com/nodenv/node-build.git $(nodenv root)/plugins/node-build",
                         "git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases",
-                        "(cd unixBin/env && ln -s XXX_nodenv.env LINK_nodenv.env)"
+                        "(cd unixBin/env && [ ! -L LINK_nodenv.env ] &&ln -s XXX_nodenv.env LINK_nodenv.env || true)"
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
                         "./unixBin/oh-my-posh init $ABK_SHELL",
-                        "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
+                        "(cd unixBin/env && [ ! -L LINK_oh-my-posh.env ] &&ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env || true)"
                     ],
                     "parallel": ["sudo apt install -y parallel"],
                     "serverless": ["sudo npm install -g serverless"],
@@ -343,13 +341,13 @@
                     "tfenv": [
                         "git clone https://github.com/tfutils/tfenv.git ~/.tfenv",
                         "sudo ln -vs ~/.tfenv/bin/tfenv /usr/local/bin/tfenv",
-                        "(cd unixBin/env && ln -s XXX_tfenv.env LINK_tfenv.env)"
+                        "(cd unixBin/env && [ ! -L LINK_tfenv.env ] && ln -s XXX_tfenv.env LINK_tfenv.env || true)"
                     ],
                     "tree": ["sudo apt install -y tree"],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
                         "(cd \"$HOME/.local/bin\" && ./uv tool install ruff) || true",
-                        "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
+                        "(cd unixBin/env && [ ! -L LINK_uv.env ] && ln -s XXX_uv.env LINK_uv.env || true)"
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo snap install yq"],
@@ -365,21 +363,20 @@
                 },
                 "uninstall": {
                     "aws": [
-                        "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
-                        "sudo find /usr/local/bin -type l -name 'aws' -delete",
-                        "sudo find /usr/local/bin -type l -name 'aws_completer' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_aws.env' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'aws' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'aws_completer' -delete || true",
                         "[ -d /usr/local/aws-cli ] && sudo rm -Rf /usr/local/aws-cli"
                     ],
                     "bat": ["sudo apt remove -y bat"],
-                    "diff-so-fancy": ["sudo apt remove -y diff-so-fancy"],
                     "direnv": [
-                        "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
                         "sudo apt remove -y direnv"
                     ],
                     "exa": ["sudo apt remove -y exa"],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
                     "fzf": [
-                        "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
                         "sudo apt remove -y fzf"
                     ],
                     "git": ["sudo apt remove -y git"],
@@ -390,25 +387,25 @@
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "nmap": ["sudo apt remove -y nmap"],
                     "nodenv": [
-                        "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete",
-                        "sudo find /usr/local/bin -type l -name 'nodenv' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'nodenv' -delete || true",
                         "rm -Rf ~/.nodenv"
                     ],
                     "oh-my-posh": [
-                        "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
                         "rm -f ./unixBin/oh-my-posh"
                     ],
                     "parallel": ["sudo apt remove -y parallel"],
                     "serverless": ["sudo npm uninstall -g serverless"],
                     "shellcheck": ["sudo apt remove -y shellcheck"],
                     "tfenv": [
-                        "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete",
-                        "sudo find /usr/local/bin -type l -name 'tfenv' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'tfenv' -delete || true",
                         "rm -Rf ~/.tfenv"
                     ],
                     "tree": ["sudo apt remove -y tree"],
                     "uv": [
-                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
                         "uv tool uninstall ruff || true",
                         "uv cache clean",
                         "rm -rf \"$(uv python dir)\"",
@@ -419,11 +416,11 @@
                     "yq": ["sudo snap remove yq"],
                     "xclip": ["sudo apt remove -y xclip"],
                     "zsh-autosuggestions": [
-                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
                         "sudo apt remove -y zsh-autosuggestions"
                     ],
                     "zsh-syntax-highlighting": [
-                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
                         "sudo apt remove -y zsh-syntax-highlighting"
                     ]
                 }
