@@ -8,8 +8,12 @@
         "tools": {
             "check": {
                 "aws": ["command -v aws"],
+                "bat": ["command -v bat"],
+                "diff-so-fancy": ["command -v diff-so-fancy"],
                 "direnv": ["command -v direnv"],
                 "exiftool": ["command -v exiftool"],
+                "eza": ["command -v eza"],
+                "fzf": ["command -v fzf"],
                 "git": ["command -v git"],
                 "helm": ["command -v helm"],
                 "pass": ["command -v pass"],
@@ -38,11 +42,18 @@
                     "brew install awscli",
                     "(cd unixBin/env && ln -s XXX_aws.env LINK_aws.env)"
                 ],
+                "bat": ["brew install bat"],
+                "diff-so-fancy": ["brew install diff-so-fancy"],
                 "direnv": [
                     "brew install direnv",
                     "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                 ],
                 "exiftool": ["brew install exiftool"],
+                "eza": ["brew install eza"],
+                "fzf": [
+                    "brew install fzf",
+                    "(cd unixBin/env && ln -s XXX_fzf.env LINK_fzf.env)"
+                ],
                 "git": ["brew install git"],
                 "helm": ["brew install helm"],
                 "pass": ["brew install pass"],
@@ -90,11 +101,18 @@
                     "find ./unixBin/env -type l -name 'LINK_aws.env' -delete",
                     "brew uninstall awscli"
                 ],
+                "bat": ["brew uninstall bat"],
+                "diff-so-fancy": ["brew uninstall diff-so-fancy"],
                 "direnv": [
                     "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
                     "brew uninstall direnv"
                 ],
                 "exiftool": ["brew uninstall exiftool"],
+                "eza": ["brew uninstall eza"],
+                "fzf": [
+                    "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+                    "brew uninstall fzf"
+                ],
                 "git": ["brew uninstall git"],
                 "helm": ["brew uninstall helm"],
                 "pass": ["brew uninstall pass"],
@@ -250,8 +268,12 @@
             "tools": {
                 "check": {
                     "aws": ["command -v aws"],
+                    "bat": ["command -v bat"],
+                    "diff-so-fancy": ["command -v diff-so-fancy"],
                     "direnv": ["command -v direnv"],
                     "ffmpeg": ["command -v ffmpeg"],
+                    "exa": ["command -v exa"],
+                    "fzf": ["command -v fzf"],
                     "git": ["command -v git"],
                     "pass": ["command -v pass"],
                     "gpg": ["command -v gpg"],
@@ -282,11 +304,18 @@
                         "[ -e ./awscliv2.zip ] && rm -f awscliv2.zip",
                         "(cd unixBin/env && ln -s XXX_aws.env LINK_aws.env)"
                     ],
+                    "bat": ["sudo apt install -y bat"],
+                    "diff-so-fancy": ["sudo apt install -y diff-so-fancy"],
                     "direnv": [
                         "sudo apt install -y direnv",
                         "(cd unixBin/env && ln -s XXX_direnv.env LINK_direnv.env)"
                     ],
+                    "exa": ["sudo apt install -y exa"],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
+                    "fzf": [
+                        "sudo apt install -y fzf",
+                        "(cd unixBin/env && ln -s XXX_fzf.env LINK_fzf.env)"
+                    ],
                     "git": ["sudo apt install -y git"],
                     "pass": ["sudo apt install -y pass"],
                     "gpg": ["sudo apt install -y gnupg"],
@@ -341,11 +370,18 @@
                         "sudo find /usr/local/bin -type l -name 'aws_completer' -delete",
                         "[ -d /usr/local/aws-cli ] && sudo rm -Rf /usr/local/aws-cli"
                     ],
+                    "bat": ["sudo apt remove -y bat"],
+                    "diff-so-fancy": ["sudo apt remove -y diff-so-fancy"],
                     "direnv": [
                         "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
                         "sudo apt remove -y direnv"
                     ],
+                    "exa": ["sudo apt remove -y exa"],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
+                    "fzf": [
+                        "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+                        "sudo apt remove -y fzf"
+                    ],
                     "git": ["sudo apt remove -y git"],
                     "pass": ["sudo apt remove -y pass"],
                     "gpg": ["sudo apt remove -y gnupg"],

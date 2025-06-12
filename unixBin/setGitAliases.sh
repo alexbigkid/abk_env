@@ -4,7 +4,7 @@ ABK_COLOR_FILE="env/000_colors.env"
 [ -f $ABK_COLOR_FILE ] && . $ABK_COLOR_FILE
 
 echo -e "${YELLOW}-> $0${NC}"
-echo '----- GIT alias configuration ------'
+echo '----- GIT alias configuration start ------'
 
 git config --global alias.alias "config --get-regexp ^alias\."
 git config --global alias.lcnf 'config --list --show-origin'
@@ -77,5 +77,13 @@ git config --global alias.tpatch "!f() { \
   fi; \
 }; f"
 
+
+if command -v diff-so-fancy &>/dev/null; then
+    git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+else
+    git config --global --unset core.pager
+fi
+
+echo '----- GIT alias configuration done ------'
 echo -e "${YELLOW}<- $0${NC}"
 exit 0
