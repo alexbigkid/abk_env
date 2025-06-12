@@ -1,11 +1,24 @@
 {
   "installed_tools": {
+    "bat": [
+      "sudo apt remove -y bat"
+    ],
+    "diff-so-fancy": [
+      "sudo apt remove -y diff-so-fancy"
+    ],
     "direnv": [
       "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
       "sudo apt remove -y direnv"
     ],
+    "exa": [
+      "sudo apt remove -y exa"
+    ],
     "ffmpeg": [
       "sudo apt remove -y ffmpeg"
+    ],
+    "fzf": [
+      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+      "sudo apt remove -y fzf"
     ],
     "mplayer": [
       "sudo apt remove -y mplayer"

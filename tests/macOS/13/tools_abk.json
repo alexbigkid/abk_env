@@ -1,11 +1,24 @@
 {
   "installed_tools": {
+    "bat": [
+      "brew uninstall bat"
+    ],
+    "diff-so-fancy": [
+      "brew uninstall diff-so-fancy"
+    ],
     "direnv": [
       "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete",
       "brew uninstall direnv"
     ],
     "exiftool": [
       "brew uninstall exiftool"
+    ],
+    "eza": [
+      "brew uninstall eza"
+    ],
+    "fzf": [
+      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete",
+      "brew uninstall fzf"
     ],
     "helm": [
       "brew uninstall helm"
