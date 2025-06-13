@@ -38,39 +38,39 @@ git config --global alias.stash-staged '!bash -c "git stash --keep-index; git st
 git config --global alias.move-staged '!bash -c "git stash-staged;git commit -m "temp"; git stash; git reset --hard HEAD^; git stash pop"'
 git config --global alias.sinceDate "!git log --pretty=format:'%Cred%h %Cgreen%cd%Creset | %s%C(auto)%d %Cgreen[%an]%Creset' --date=local --since=\"$1\""
 
-git config --global alias.tmajor "!f() { \
+git config --global alias.rel-major "!f() { \
   BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
   if [ \"\$BRANCH\" = \"main\" ]; then \
     git pull && git push && \
-    git tag -f major -m 'release: major' && \
-    git push -f origin major && \
-    git tag -d major && \
+    git tag -f rel-major -m 'release: rel-major' && \
+    git push -f origin rel-major && \
+    git tag -d rel-major && \
     $HOME_BIN_DIR/alexIsAwesome.sh;
   else \
     echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
   fi; \
 }; f"
 
-git config --global alias.tminor "!f() { \
+git config --global alias.rel-minor "!f() { \
   BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
   if [ \"\$BRANCH\" = \"main\" ]; then \
     git pull && git push && \
-    git tag -f minor -m 'release: minor' && \
-    git push -f origin minor && \
-    git tag -d minor && \
+    git tag -f rel-minor -m 'release: rel-minor' && \
+    git push -f origin rel-minor && \
+    git tag -d rel-minor && \
     $HOME_BIN_DIR/alexIsAwesome.sh;
   else \
     echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
   fi; \
 }; f"
 
-git config --global alias.tpatch "!f() { \
+git config --global alias.rel-patch "!f() { \
   BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
   if [ \"\$BRANCH\" = \"main\" ]; then \
     git pull && git push && \
-    git tag -f patch -m 'release: patch' && \
-    git push -f origin patch && \
-    git tag -d patch && \
+    git tag -f rel-patch -m 'release: rel-patch' && \
+    git push -f origin rel-patch && \
+    git tag -d rel-patch && \
     $HOME_BIN_DIR/alexIsAwesome.sh;
   else \
     echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
