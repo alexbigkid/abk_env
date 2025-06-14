@@ -2,7 +2,7 @@
     "macOS": {
         "description": "Installing ABK tool set for MacOS",
         "supported_versions": {
-            "macOS": ["11", "12", "13", "14", "15"]
+            "macOS": ["13", "14", "15"]
         },
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
