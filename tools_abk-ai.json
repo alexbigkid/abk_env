@@ -150,24 +150,10 @@
             },
             "apps": {
                 "check": {
-                    "windsurf": ["dpkg -l | grep ^ii.*windsurf$"]
                 },
                 "install":{
-                    "windsurf": [
-                        "curl -fsSL \"https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/windsurf.gpg\" | sudo gpg --dearmor -o /usr/share/keyrings/windsurf-stable-archive-keyring.gpg",
-                        "echo \"deb [signed-by=/usr/share/keyrings/windsurf-stable-archive-keyring.gpg arch=amd64] https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt stable main\" | sudo tee /etc/apt/sources.list.d/windsurf.list > /dev/null",
-                        "sudo apt update",
-                        "sudo apt install -y windsurf"
-                    ]
                 },
                 "uninstall": {
-                    "windsurf": [
-                        "sudo apt remove --purge -y windsurf",
-                        "sudo rm /etc/apt/sources.list.d/windsurf.list",
-                        "sudo rm /usr/share/keyrings/windsurf-stable-archive-keyring.gpg",
-                        "sudo apt autoremove",
-                        "sudo apt clean"
-                    ]
                 }
             },
             "fonts": {
