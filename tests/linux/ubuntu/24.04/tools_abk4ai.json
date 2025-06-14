@@ -1,0 +1,7 @@
+{
+  "installed_tools": {
+    "claude": [
+      "npm uninstall -g @anthropic-ai/claude-code"
+    ]
+  }
+}
