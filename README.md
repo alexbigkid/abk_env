@@ -232,3 +232,12 @@ If at some point you'd like to uninstall installed packages, you can run <code>.
 * <code>./uninstall.sh tools_node.json</code> - will uninstall all node packages. Since it was recorded what tools have been installed only the packages which has been previously installed with <code>tools_node.json</code> will be uninstalled.
 * <code>./uninstall.sh tools_min.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code>
 * <code>./uninstall.sh tools_min.json tools_node.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code> and <code>tools_node.json</code>
+
+
+## Git branch rename from master to main
+```shell
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
+```
