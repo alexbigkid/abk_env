@@ -1,2 +1,16 @@
 {
+  "installed_tools": {
+    "detekt": [
+      "brew uninstall detekt"
+    ],
+    "ktlint": [
+      "brew uninstall ktlint"
+    ]
+  },
+  "installed_apps": {
+    "android-studio": [
+      "find ./unixBin/env -type l -name 'LINK_mobile.env' -delete || true",
+      "brew uninstall --cask android-studio"
+    ]
+  }
 }
