@@ -1,107 +1,130 @@
 name: abk_env
-
 on:
-  push:
-  pull_request:
+    push:
+        branches:
+            - main
+        tags:
+            - 'rel-patch'
+            - 'rel-minor'
+            - 'rel-major'
+
+permissions:
+    contents: write  # Needed for handle-release-tags job to push tags
+
+# Prevent duplicate runs - prioritize by commit SHA
+concurrency:
+    group: ${{ github.workflow }}-${{ github.sha }}
+    cancel-in-progress: true
+
+env:
+    ENV: prod
 
 jobs:
-  MacOS:
-    name: MacOS ${{ matrix.version }}
-    runs-on: macos-${{ matrix.version }}
-    strategy:
-      matrix:
-        version: [13, 14, 15]
-    steps:
-      - uses: actions/checkout@v4
+    MacOS:
+        name: MacOS ${{ matrix.version }}
+        runs-on: macos-${{ matrix.version }}
+        strategy:
+            matrix:
+                version: [13, 14, 15]
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v4
 
-      - name: Ensure correct SHELL availability
-        run: |
-            echo "--------Shells----------------------"
-            cat /etc/shells
-            echo "-------MacOS SW version-------------"
-            sw_vers
+            - name: Check runner
+              run: .github/scripts/AgentInfo.sh
 
-      - name: zsh install tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+            - name: Ensure correct SHELL availability
+              run: |
+                echo "--------Shells----------------------"
+                cat /etc/shells
+                echo "-------MacOS SW version-------------"
+                sw_vers
 
-      - name: zsh uninstall tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+            - name: zsh install tools
+              shell: zsh {0}
+              run: |
+                export SHELL=$(which zsh)
+                echo "SHELL = $SHELL"
+                ./test_install.sh "tools_"
 
-      - name: bash install tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+            - name: zsh uninstall tools
+              shell: zsh {0}
+              run: |
+                export SHELL=$(which zsh)
+                echo "SHELL = $SHELL"
+                ./test_uninstall.sh "tools_"
 
-      - name: bash uninstall tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+            - name: bash install tools
+              shell: bash {0}
+              run: |
+                export SHELL=$(which bash)
+                echo "SHELL = $SHELL"
+                ./test_install.sh "tools_"
 
-  Ubuntu:
-    name: Ubuntu ${{ matrix.version }}
-    runs-on: ubuntu-${{ matrix.version }}
-    strategy:
-      matrix:
-        version: [22.04, 24.04]
-    steps:
-      - uses: actions/checkout@v4
+            - name: bash uninstall tools
+              shell: bash {0}
+              run: |
+                export SHELL=$(which bash)
+                echo "SHELL = $SHELL"
+                ./test_uninstall.sh "tools_"
 
-      - name: Ensure zsh is installed
-        run: |
-            SHELL_CMD="zsh"
-            echo "Checking if $SHELL_CMD is installed..."
-            if ! command -v "$SHELL_CMD" &> /dev/null; then
-                echo "$SHELL_CMD not found, attempting to install..."
-                sudo apt-get update
-                sudo apt-get install -y "$SHELL_CMD"
-                echo "$SHELL_CMD just installed."
-            else
-                echo "$SHELL_CMD is already installed."
-            fi
-            echo "--------Shells----------------------"
-            cat /etc/shells
-            echo "--------Linux os-release------------"
-            cat /etc/os-release
+    Ubuntu:
+        name: Ubuntu ${{ matrix.version }}
+        runs-on: ubuntu-${{ matrix.version }}
+        strategy:
+            matrix:
+                version: [22.04, 24.04]
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v4
 
-      - name: zsh install tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+            - name: Check runner
+              run: .github/scripts/AgentInfo.sh
 
-      - name: zsh uninstall tools
-        shell: zsh {0}
-        run: |
-          export SHELL=$(which zsh)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+            - name: Ensure zsh is installed
+              run: |
+                SHELL_CMD="zsh"
+                echo "Checking if $SHELL_CMD is installed..."
+                if ! command -v "$SHELL_CMD" &> /dev/null; then
+                    echo "$SHELL_CMD not found, attempting to install..."
+                    sudo apt-get update
+                    sudo apt-get install -y "$SHELL_CMD"
+                    echo "$SHELL_CMD just installed."
+                else
+                    echo "$SHELL_CMD is already installed."
+                fi
+                echo "--------Shells----------------------"
+                cat /etc/shells
+                echo "--------Linux os-release------------"
+                cat /etc/os-release
 
-      - name: bash install tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_install.sh "tools_"
+            - name: zsh install tools
+              shell: zsh {0}
+              run: |
+                export SHELL=$(which zsh)
+                echo "SHELL = $SHELL"
+                ./test_install.sh "tools_"
 
-      - name: bash uninstall tools
-        shell: bash {0}
-        run: |
-          export SHELL=$(which bash)
-          echo "SHELL = $SHELL"
-          ./test_uninstall.sh "tools_"
+            - name: zsh uninstall tools
+              shell: zsh {0}
+              run: |
+                export SHELL=$(which zsh)
+                echo "SHELL = $SHELL"
+                ./test_uninstall.sh "tools_"
+
+            - name: bash install tools
+              shell: bash {0}
+              run: |
+                export SHELL=$(which bash)
+                echo "SHELL = $SHELL"
+                ./test_install.sh "tools_"
+
+            - name: bash uninstall tools
+              shell: bash {0}
+              run: |
+                export SHELL=$(which bash)
+                echo "SHELL = $SHELL"
+                ./test_uninstall.sh "tools_"
 
 
 #   Docker:
@@ -142,3 +165,19 @@ jobs:
 #             ./test_install.sh
 #             ./test_uninstall.sh
 #           "
+
+    handle-release-tags:
+        name: Handle Release Tags
+        needs: [MacOS, Ubuntu]
+        runs-on: ubuntu-latest
+        if: always() && !cancelled()  # Run whether tests pass or fail, but not if cancelled due to concurrency
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+                token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+                persist-credentials: true
+
+            - name: Handle release tags
+              run: ./.github/scripts/handle_release_tags.sh "${{ needs.MacOS.result }}" "${{ needs.Ubuntu.result }}" "${{ github.ref_name }}"

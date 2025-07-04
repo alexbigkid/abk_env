@@ -29,6 +29,12 @@ The `test_install.sh` script validates:
 - Shell environment configuration is added to `.bashrc`/`.zshrc`
 - Symbolic links are created properly in `unixBin/env/`
 
+### Version Management
+- `./unixBin/setGitAliases.sh` - Sets up all git aliases (includes versioning)
+- `git rel-patch` - Trigger patch version release pipeline
+- `git rel-minor` - Trigger minor version release pipeline
+- `git rel-major` - Trigger major version release pipeline
+
 ## Architecture
 
 ### Core Components
@@ -43,6 +49,12 @@ The `test_install.sh` script validates:
 - JSON files (`tools_*.json`) define tool installation instructions per OS
 - `unixBin/env/` - Contains environment configuration files and shell themes
 - `unixPackages/` - Tracks installed packages for clean uninstallation
+
+**Version Management:**
+- `VERSION` file tracks current version in semantic versioning format (major.minor.patch)
+- `.github/workflows/pipeline.yml` - GitHub Actions workflow for testing and releases
+- `.github/scripts/handle_release_tags.sh` - Release tag handler (used by pipeline only)
+- `.github/scripts/AgentInfo.sh` - Runner information script
 
 **Shell Environment:**
 - Supports bash and zsh shells
@@ -87,6 +99,9 @@ Each `tools_*.json` file contains platform-specific installation instructions:
 - `unixBin/env/` - Environment configuration files
 - `unixPackages/` - Tracks installed packages
 - `tests/` - Platform-specific validation files
+- `VERSION` - Current version number in semantic versioning format
+- `.github/scripts/` - Pipeline scripts (release handling, agent info)
+- `.github/workflows/pipeline.yml` - GitHub Actions workflow for testing and releases
 
 ## Development Notes
 
@@ -103,3 +118,25 @@ The system integrates with shell configuration by:
 - Creating `~/bin` symlink to `unixBin/` directory
 - Setting up environment variables and aliases
 - Configuring oh-my-posh for terminal theming
+
+## Version Management Workflow
+
+The repository uses semantic versioning (major.minor.patch) with automated release management:
+
+1. **Trigger Release**: Use `git rel-patch`, `git rel-minor`, or `git rel-major`
+2. **Automated Pipeline Process**: 
+   - Git aliases push temporary tag (`rel-patch`, `rel-minor`, `rel-major`)
+   - GitHub Actions detects tag and triggers testing pipeline
+   - **Runs installation tests** on macOS (13, 14, 15) and Ubuntu (22.04, 24.04)
+   - Tests both bash and zsh shells with install/uninstall validation
+   - **If tests pass**: `handle_release_tags.sh` bumps version, updates `VERSION` file
+   - Commits version change to main branch  
+   - Creates final version tag (e.g., `v1.0.1`)
+   - Cleans up temporary trigger tag
+   - **If tests fail**: No release is created, temporary tags are cleaned up
+3. **Setup**: Run `./unixBin/setGitAliases.sh` to configure git aliases
+
+**Release Types:**
+- **Patch** (x.y.Z): Bug fixes, minor improvements
+- **Minor** (x.Y.0): New features, backward-compatible changes  
+- **Major** (X.0.0): Breaking changes, major features
