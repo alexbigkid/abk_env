@@ -1,26 +1,2 @@
 {
-  "installed_tools": {
-    "openjdk-21": [
-      "sudo apt remove -y openjdk-21"
-    ]
-  },
-  "installed_apps": {
-    "android-studio": [
-      "find ./unixBin/env -type l -name 'LINK_mobile.env' -delete || true",
-      "sudo apt remove android-studio",
-      "sudo apt purge android-studio",
-      "sudo add-apt-repository --remove ppa:maarten-fonville/android-studio",
-      "sudo apt update",
-      "rm -rf ~/.AndroidStudio*",
-      "rm -rf ~/.cache/Google/AndroidStudio*",
-      "rm -rf ~/.cache/JetBrains/AndroidStudio*",
-      "rm -rf ~/.local/share/Google/AndroidStudio*",
-      "rm -rf ~/.local/share/JetBrains/AndroidStudio*",
-      "rm -f ~/.local/share/applications/android-studio.desktop",
-      "rm -f /usr/share/applications/android-studio.desktop",
-      "update-desktop-database ~/.local/share/applications/ 2>/dev/null",
-      "sudo apt autoremove",
-      "sudo apt autoclean"
-    ]
-  }
 }
