@@ -1,0 +1,224 @@
+{
+    "macOS": {
+        "description": "Installing ABK tool set for MacOS",
+        "supported_versions": {
+            "macOS": ["13", "14", "15"]
+        },
+        "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
+        "tools": {
+            "check": {
+                "detekt": ["command -v detekt"],
+                "git": ["command -v git"],
+                "gradle": ["command -v gradle"],
+                "jq": ["command -v jq"],
+                "kotlin": ["command -v kotlin"],
+                "ktlint": ["command -v ktlint"],
+                "oh-my-posh": ["brew list | grep oh-my-posh"],
+                "openjdk@21": ["brew list | grep openjdk@21"],
+                "wget": ["command -v wget"],
+                "yq": ["command -v yq"],
+                "xcode-select": ["xcode-select -p"],
+                "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
+                "zsh-autosuggestions": ["brew list | grep zsh-autosuggestions"],
+                "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
+            },
+            "install": {
+                "detekt": ["brew install detekt"],
+                "git": ["brew install git"],
+                "jq": ["brew install jq"],
+                "gradle": ["brew install gradle"],
+                "kotlin": ["brew install kotlin"],
+                "ktlint": ["brew install ktlint"],
+                "oh-my-posh": [
+                    "brew install oh-my-posh",
+                    "oh-my-posh init $ABK_SHELL",
+                    "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
+                ],
+                "openjdk@21": ["brew install openjdk@21"],
+                "wget": ["brew install wget"],
+                "yq": ["brew install yq"],
+                "xcode-select": ["xcode-select --install"],
+                "zsh-autocomplete": [
+                    "brew install zsh-autocomplete",
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
+                ],
+                "zsh-autosuggestions": [
+                    "brew install zsh-autosuggestions",
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
+                ],
+                "zsh-syntax-highlighting": [
+                    "brew install zsh-syntax-highlighting",
+                    "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
+                ]
+            },
+            "uninstall": {
+                "detekt": ["brew uninstall detekt"],
+                "git": ["brew uninstall git"],
+                "gradle": ["brew uninstall gradle"],
+                "jq": ["brew uninstall jq"],
+                "kotlin": ["brew uninstall kotlin"],
+                "ktlint": ["brew uninstall ktlint"],
+                "oh-my-posh": [
+                    "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                    "brew uninstall oh-my-posh"
+                ],
+                "openjdk@21": ["brew uninstall openjdk@21"],
+                "wget": ["brew uninstall wget"],
+                "yq": ["brew uninstall yq"],
+                "xcode-select": ["sudo rm -rf /Library/Developer/CommandLineTools && sudo xcode-select --reset"],
+                "zsh-autocomplete": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autocomplete"
+                ],
+                "zsh-autosuggestions": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-autosuggestions"
+                ],
+                "zsh-syntax-highlighting": [
+                    "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                    "brew uninstall zsh-syntax-highlighting"
+                ]
+            }
+        },
+        "apps": {
+            "check": {
+                "android-studio": [
+                    "brew list --cask | grep ^android-studio$",
+                    "ls \"/Applications/Android Studio.app\"",
+                    "ls \"~/Applications/Android Studio.app\""
+                ]
+            },
+            "install": {
+                "android-studio": [
+                    "brew install --cask android-studio",
+                    "(cd unixBin/env && [ ! -L LINK_mobile.env ] && ln -s XXX_mobile.env LINK_mobile.env || true)"
+                ]
+            },
+            "uninstall": {
+                "android-studio": [
+                    "find ./unixBin/env -type l -name 'LINK_mobile.env' -delete || true",
+                    "brew uninstall --cask android-studio"
+                ]
+            }
+        },
+        "fonts": {
+            "check": {
+            },
+            "install": {
+            },
+            "uninstall": {
+            }
+        }
+    },
+    "linux": {
+        "debian": {
+            "description": "Installing ABK tool set for Linux / Debian based distro",
+            "supported_versions": {
+                "debian": ["11", "12"],
+                "raspbian": ["11", "12"],
+                "ubuntu": ["22.04", "24.04"]
+            },
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "tools": {
+                "check": {
+                    "ffmpeg": ["command -v ffmpeg"],
+                    "git": ["command -v git"],
+                    "jq": ["command -v jq"],
+                    "mplayer": ["command -v mplayer"],
+                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
+                    "openjdk-21": ["apt list --installed | grep openjdk-21"],
+                    "wget": ["command -v wget"],
+                    "yq": ["command -v yq"],
+                    "xclip": ["command -v xclip"],
+                    "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
+                },
+                "install": {
+                    "ffmpeg": ["sudo apt install -y ffmpeg"],
+                    "git": ["sudo apt install -y git"],
+                    "jq": ["sudo apt install -y jq"],
+                    "mplayer": ["sudo apt install -y mplayer"],
+                    "oh-my-posh": [
+                        "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
+                        "./unixBin/oh-my-posh init $ABK_SHELL",
+                        "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
+                    ],
+                    "openjdk-21": ["sudo apt install -y openjdk-21"],
+                    "wget": ["sudo apt install -y wget"],
+                    "yq": ["sudo snap install yq"],
+                    "xclip": ["sudo apt install -y xclip"],
+                    "zsh-autosuggestions": [
+                        "sudo apt install -y zsh-autosuggestions",
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "sudo apt install -y zsh-syntax-highlighting",
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
+                    ]
+                },
+                "uninstall": {
+                    "ffmpeg": ["sudo apt remove -y ffmpeg"],
+                    "git": ["sudo apt remove -y git"],
+                    "jq": ["sudo apt remove -y jq"],
+                    "mplayer": ["sudo apt remove -y mplayer"],
+                    "oh-my-posh": [
+                        "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
+                        "rm -f ./unixBin/oh-my-posh"
+                    ],
+                    "openjdk-21": ["sudo apt remove -y openjdk-21"],
+                    "wget": ["sudo apt remove -y wget"],
+                    "yq": ["sudo snap remove yq"],
+                    "xclip": ["sudo apt remove -y xclip"],
+                    "zsh-autosuggestions": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-autosuggestions"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
+                        "sudo apt remove -y zsh-syntax-highlighting"
+                    ]
+                }
+            },
+            "apps": {
+                "check": {
+                    "android-studio": ["which android-studio"]
+                },
+                "install":{
+                    "android-studio": [
+                        "sudo add-apt-repository ppa:maarten-fonville/android-studio",
+                        "sudo apt update",
+                        "sudo apt install android-studio",
+                        "(cd unixBin/env && [ ! -L LINK_mobile.env ] && ln -s XXX_mobile.env LINK_mobile.env || true)"
+                    ]
+                },
+                "uninstall": {
+                    "android-studio": [
+                        "find ./unixBin/env -type l -name 'LINK_mobile.env' -delete || true",
+                        "sudo apt remove android-studio",
+                        "sudo apt purge android-studio",
+                        "sudo add-apt-repository --remove ppa:maarten-fonville/android-studio",
+                        "sudo apt update",
+                        "rm -rf ~/.AndroidStudio*",
+                        "rm -rf ~/.cache/Google/AndroidStudio*",
+                        "rm -rf ~/.cache/JetBrains/AndroidStudio*",
+                        "rm -rf ~/.local/share/Google/AndroidStudio*",
+                        "rm -rf ~/.local/share/JetBrains/AndroidStudio*",
+                        "rm -f ~/.local/share/applications/android-studio.desktop",
+                        "rm -f /usr/share/applications/android-studio.desktop",
+                        "update-desktop-database ~/.local/share/applications/ 2>/dev/null",
+                        "sudo apt autoremove",
+                        "sudo apt autoclean"
+                    ]
+                }
+            },
+            "fonts": {
+                "check": {
+                },
+                "install": {
+                },
+                "uninstall": {
+                }
+            }
+        }
+    }
+}
