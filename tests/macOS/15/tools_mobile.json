@@ -5,6 +5,11 @@
     ],
     "ktlint": [
       "brew uninstall ktlint"
+    ],
+    "rbenv": [
+      "find ./unixBin/env -type l -name 'LINK_rbenv.env' -delete || true",
+      "brew uninstall rbenv",
+      "rm -Rf ~/.rbenv"
     ]
   },
   "installed_apps": {
