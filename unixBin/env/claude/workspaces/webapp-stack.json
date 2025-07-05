@@ -1,0 +1,57 @@
+{
+  "name": "webapp-stack",
+  "description": "Full-stack web application workspace",
+  "projects": [
+    {
+      "name": "frontend",
+      "path": "${WORKSPACE_ROOT}/frontend",
+      "type": "react-typescript",
+      "port": 3000,
+      "startCommand": "npm run dev",
+      "buildCommand": "npm run build",
+      "testCommand": "npm test"
+    },
+    {
+      "name": "backend",
+      "path": "${WORKSPACE_ROOT}/backend", 
+      "type": "node-express",
+      "port": 8000,
+      "startCommand": "npm run dev",
+      "buildCommand": "npm run build",
+      "testCommand": "npm test"
+    },
+    {
+      "name": "database",
+      "path": "${WORKSPACE_ROOT}/database",
+      "type": "postgresql",
+      "port": 5432,
+      "migrations": "migrations/",
+      "seeds": "seeds/"
+    }
+  ],
+  "sharedConfig": {
+    "database": {
+      "host": "localhost",
+      "port": 5432,
+      "name": "${DB_NAME}",
+      "user": "${DB_USER}",
+      "password": "${DB_PASSWORD}"
+    },
+    "api": {
+      "baseUrl": "http://localhost:8000/api",
+      "version": "v1"
+    },
+    "development": {
+      "hotReload": true,
+      "debug": true,
+      "logLevel": "debug"
+    }
+  },
+  "scripts": {
+    "start-all": "docker-compose up -d",
+    "stop-all": "docker-compose down", 
+    "reset-db": "npm run migrate:reset && npm run seed",
+    "test-all": "npm run test:frontend && npm run test:backend",
+    "deploy": "./scripts/deploy.sh"
+  }
+}

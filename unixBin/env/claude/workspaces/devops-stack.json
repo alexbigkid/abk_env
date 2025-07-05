@@ -1,0 +1,64 @@
+{
+  "name": "devops-stack",
+  "description": "DevOps and infrastructure management workspace",
+  "projects": [
+    {
+      "name": "terraform-infrastructure",
+      "path": "${WORKSPACE_ROOT}/infrastructure",
+      "type": "terraform",
+      "commands": {
+        "plan": "terraform plan",
+        "apply": "terraform apply",
+        "destroy": "terraform destroy"
+      }
+    },
+    {
+      "name": "kubernetes-manifests",
+      "path": "${WORKSPACE_ROOT}/k8s",
+      "type": "kubernetes",
+      "commands": {
+        "apply": "kubectl apply -f .",
+        "delete": "kubectl delete -f .",
+        "status": "kubectl get all"
+      }
+    },
+    {
+      "name": "ansible-playbooks",
+      "path": "${WORKSPACE_ROOT}/ansible",
+      "type": "ansible",
+      "commands": {
+        "run": "ansible-playbook -i inventory site.yml",
+        "check": "ansible-playbook -i inventory site.yml --check"
+      }
+    },
+    {
+      "name": "monitoring-stack",
+      "path": "${WORKSPACE_ROOT}/monitoring",
+      "type": "docker-compose",
+      "services": ["prometheus", "grafana", "alertmanager"]
+    }
+  ],
+  "infrastructure": {
+    "cloud": {
+      "provider": "${CLOUD_PROVIDER}",
+      "region": "${CLOUD_REGION}"
+    },
+    "kubernetes": {
+      "cluster": "${K8S_CLUSTER_NAME}",
+      "namespace": "${K8S_NAMESPACE}"
+    },
+    "monitoring": {
+      "prometheus": "http://localhost:9090",
+      "grafana": "http://localhost:3000",
+      "alertmanager": "http://localhost:9093"
+    }
+  },
+  "scripts": {
+    "setup-env": "./scripts/setup-environment.sh",
+    "deploy-infra": "cd infrastructure && terraform apply",
+    "deploy-apps": "kubectl apply -f k8s/",
+    "start-monitoring": "cd monitoring && docker-compose up -d",
+    "backup": "./scripts/backup-data.sh",
+    "rollback": "./scripts/rollback.sh"
+  }
+}

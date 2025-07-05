@@ -1,0 +1,68 @@
+{
+  "name": "microservices",
+  "description": "Microservices architecture workspace",
+  "projects": [
+    {
+      "name": "user-service",
+      "path": "${WORKSPACE_ROOT}/services/user-service",
+      "type": "node-express",
+      "port": 8001,
+      "database": "users_db",
+      "startCommand": "npm run dev",
+      "healthEndpoint": "/health"
+    },
+    {
+      "name": "product-service", 
+      "path": "${WORKSPACE_ROOT}/services/product-service",
+      "type": "node-express",
+      "port": 8002,
+      "database": "products_db",
+      "startCommand": "npm run dev",
+      "healthEndpoint": "/health"
+    },
+    {
+      "name": "order-service",
+      "path": "${WORKSPACE_ROOT}/services/order-service", 
+      "type": "node-express",
+      "port": 8003,
+      "database": "orders_db",
+      "startCommand": "npm run dev",
+      "healthEndpoint": "/health"
+    },
+    {
+      "name": "api-gateway",
+      "path": "${WORKSPACE_ROOT}/api-gateway",
+      "type": "node-express",
+      "port": 8000,
+      "startCommand": "npm run dev",
+      "routes": {
+        "/users": "user-service:8001",
+        "/products": "product-service:8002", 
+        "/orders": "order-service:8003"
+      }
+    }
+  ],
+  "infrastructure": {
+    "message-queue": {
+      "type": "redis",
+      "host": "localhost",
+      "port": 6379
+    },
+    "service-discovery": {
+      "type": "consul",
+      "host": "localhost",
+      "port": 8500
+    },
+    "monitoring": {
+      "prometheus": "localhost:9090",
+      "grafana": "localhost:3001"
+    }
+  },
+  "scripts": {
+    "start-infrastructure": "docker-compose -f docker-compose.infra.yml up -d",
+    "start-services": "concurrently \"npm run start:user\" \"npm run start:product\" \"npm run start:order\"",
+    "start-all": "npm run start-infrastructure && npm run start-services",
+    "test-integration": "npm run test:integration",
+    "deploy": "kubernetes/deploy.sh"
+  }
+}
