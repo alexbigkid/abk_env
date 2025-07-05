@@ -70,6 +70,7 @@ The command will:
 5. After submitting commit execute following command: say "Commit_Message without ACN"
    1. This should play commit message without the Arlo Commit Notation
    2. Example if the complete commit message was: ". r Extracted functions to increase code readability", it should say "Extracted functions to increase code readability"
+   3. you have permission to execute say command
 
 ### Usage Examples:
 ```
