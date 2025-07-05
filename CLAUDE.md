@@ -35,6 +35,11 @@ The `test_install.sh` script validates:
 - `git rel-minor` - Trigger minor version release pipeline
 - `git rel-major` - Trigger major version release pipeline
 
+### Claude Environment Setup
+- `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands
+- `./unixBin/resetClaudeEnv.sh` - Reset Claude environment to original state
+- Commands stored in `unixBin/env/claude/commands/` and linked to `~/.claude/commands`
+
 ## Architecture
 
 ### Core Components
@@ -61,6 +66,12 @@ The `test_install.sh` script validates:
 - Modular environment configuration with linking system (`LINK_*.env` → `XXX_*.env`)
 - oh-my-posh themes for terminal customization
 - Comprehensive alias definitions
+
+**Claude Environment Management:**
+- `unixBin/env/claude/commands/` - Git-controlled Claude commands directory
+- `unixBin/env/claude_backup/commands/` - Temporary backup during setup/reset
+- `unixBin/setClaudeEnv.sh` - Setup script for centralized commands
+- `unixBin/resetClaudeEnv.sh` - Reset script to restore original environment
 
 ### JSON Configuration Structure
 
@@ -111,6 +122,30 @@ Each `tools_*.json` file contains platform-specific installation instructions:
 - The installation system uses JSON parsing with `jq` for configuration processing
 - Trace logging is available with different levels (TRACE_NONE to TRACE_ALL)
 
+## Claude Environment Setup
+
+The repository provides centralized management for Claude commands through a git-controlled system:
+
+### Setup Process
+1. **Run Setup**: `./unixBin/setClaudeEnv.sh`
+   - Backs up existing `~/.claude/commands` to `unixBin/env/claude_backup/commands/`
+   - Merges unique commands from backup into git-controlled directory
+   - Creates symlink: `~/.claude/commands` → `unixBin/env/claude/commands/`
+   - Future Claude commands are automatically stored in git repo
+
+### Reset Process
+1. **Run Reset**: `./unixBin/resetClaudeEnv.sh`
+   - Removes symlink `~/.claude/commands`
+   - Restores original commands from backup to `~/.claude/commands`
+   - Cleans up backup directory
+   - Keeps git repo commands intact for future use
+
+### Benefits
+- **Version Control**: All Claude commands stored in git for easy replication
+- **Non-Destructive**: Existing commands are preserved and merged
+- **Reversible**: Complete restoration to original state
+- **Cross-Machine**: Easy setup replication across different computers
+
 ## Shell Integration
 
 The system integrates with shell configuration by:
@@ -124,13 +159,13 @@ The system integrates with shell configuration by:
 The repository uses semantic versioning (major.minor.patch) with automated release management:
 
 1. **Trigger Release**: Use `git rel-patch`, `git rel-minor`, or `git rel-major`
-2. **Automated Pipeline Process**: 
+2. **Automated Pipeline Process**:
    - Git aliases push temporary tag (`rel-patch`, `rel-minor`, `rel-major`)
    - GitHub Actions detects tag and triggers testing pipeline
    - **Runs installation tests** on macOS (13, 14, 15) and Ubuntu (22.04, 24.04)
    - Tests both bash and zsh shells with install/uninstall validation
    - **If tests pass**: `handle_release_tags.sh` bumps version, updates `VERSION` file
-   - Commits version change to main branch  
+   - Commits version change to main branch
    - Creates final version tag (e.g., `v1.0.1`)
    - Cleans up temporary trigger tag
    - **If tests fail**: No release is created, temporary tags are cleaned up
@@ -138,5 +173,5 @@ The repository uses semantic versioning (major.minor.patch) with automated relea
 
 **Release Types:**
 - **Patch** (x.y.Z): Bug fixes, minor improvements
-- **Minor** (x.Y.0): New features, backward-compatible changes  
+- **Minor** (x.Y.0): New features, backward-compatible changes
 - **Major** (X.0.0): Breaking changes, major features
