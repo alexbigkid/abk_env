@@ -32,6 +32,7 @@ checkPrerequisiteToolsAreInstalled () {
     local LCL_EXIT_CODE=0
     local LCL_REQUIRED_TOOLS=(
         rsync
+        envsubst
     )
 
     if ! command -v claude &>/dev/null; then
@@ -124,6 +125,181 @@ createClaudeCommandLinks() {
 }
 
 
+processConfigTemplates() {
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
+    local LCL_CURRENT_DIR=$PWD
+    local LCL_EXIT_CODE=0
+    local LCL_ABK_CLAUDE_CONFIG_DIR="$LCL_CURRENT_DIR/unixBin/env/claude/config"
+    local LCL_CLAUDE_CONFIG_DIR="$CLAUDE_DIR/config"
+
+    PrintTrace "$TRACE_DEBUG" "LCL_ABK_CLAUDE_CONFIG_DIR = $LCL_ABK_CLAUDE_CONFIG_DIR"
+    PrintTrace "$TRACE_DEBUG" "LCL_CLAUDE_CONFIG_DIR = $LCL_CLAUDE_CONFIG_DIR"
+
+    # Ensure target config directory exists
+    mkdir -p "$LCL_CLAUDE_CONFIG_DIR"
+
+    # Process each template file
+    for template_file in "$LCL_ABK_CLAUDE_CONFIG_DIR"/*.template.*; do
+        if [ -f "$template_file" ]; then
+            local LCL_FILE_NAME
+            LCL_FILE_NAME=$(basename "$template_file")
+            local LCL_OUTPUT_FILE="$LCL_CLAUDE_CONFIG_DIR/${LCL_FILE_NAME/.template/}"
+
+            PrintTrace "$TRACE_INFO" "[Processing template: $LCL_FILE_NAME -> $(basename "$LCL_OUTPUT_FILE")]"
+
+            # Use envsubst to replace environment variables
+            if envsubst < "$template_file" > "$LCL_OUTPUT_FILE"; then
+                # Set restrictive permissions
+                chmod 600 "$LCL_OUTPUT_FILE"
+                PrintTrace "$TRACE_DEBUG" "Generated config file: $LCL_OUTPUT_FILE"
+            else
+                PrintTrace "$TRACE_ERROR" "${RED}ERROR: Failed to process template $template_file${NC}"
+                LCL_EXIT_CODE=1
+            fi
+        fi
+    done
+
+    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    return $LCL_EXIT_CODE
+}
+
+
+createClaudeConfigLinks() {
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
+    local LCL_CURRENT_DIR=$PWD
+    local LCL_ABK_CLAUDE_BACKUP_DIR="$LCL_CURRENT_DIR/unixBin/env/claude_backup"
+    local LCL_ABK_CLAUDE_BACKUP_CONFIG_DIR="$LCL_ABK_CLAUDE_BACKUP_DIR/config"
+    local LCL_EXIT_CODE=0
+
+    local LCL_CLAUDE_CONFIG_DIR="$CLAUDE_DIR/config"
+    local LCL_ABK_CLAUDE_CONFIG_DIR="$LCL_CURRENT_DIR/unixBin/env/claude/config"
+
+    PrintTrace "$TRACE_DEBUG" "LCL_CLAUDE_CONFIG_DIR = $LCL_CLAUDE_CONFIG_DIR"
+    PrintTrace "$TRACE_DEBUG" "LCL_ABK_CLAUDE_CONFIG_DIR = $LCL_ABK_CLAUDE_CONFIG_DIR"
+    PrintTrace "$TRACE_DEBUG" "LCL_ABK_CLAUDE_BACKUP_CONFIG_DIR = $LCL_ABK_CLAUDE_BACKUP_CONFIG_DIR"
+
+    # Ensure backup directory exists
+    mkdir -p "$LCL_ABK_CLAUDE_BACKUP_DIR"
+
+    # Check if ~/.claude/config exists and is not a symlink
+    if [ -d "$LCL_CLAUDE_CONFIG_DIR" ] && [ ! -L "$LCL_CLAUDE_CONFIG_DIR" ]; then
+        PrintTrace "$TRACE_INFO" "[Found existing config directory - backing up to $LCL_ABK_CLAUDE_BACKUP_CONFIG_DIR]"
+
+        # Remove old backup if it exists
+        [ -d "$LCL_ABK_CLAUDE_BACKUP_CONFIG_DIR" ] && rm -rf "$LCL_ABK_CLAUDE_BACKUP_CONFIG_DIR"
+
+        # Move existing config to backup
+        mv "$LCL_CLAUDE_CONFIG_DIR" "$LCL_ABK_CLAUDE_BACKUP_CONFIG_DIR"
+    elif [ -L "$LCL_CLAUDE_CONFIG_DIR" ]; then
+        PrintTrace "$TRACE_INFO" "[Config directory is already a symlink - removing it]"
+        rm "$LCL_CLAUDE_CONFIG_DIR"
+    fi
+
+    # Process templates to generate config files
+    processConfigTemplates || LCL_EXIT_CODE=$?
+
+    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    return $LCL_EXIT_CODE
+}
+
+
+createClaudeTemplateLinks() {
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
+    local LCL_CURRENT_DIR=$PWD
+    local LCL_ABK_CLAUDE_BACKUP_DIR="$LCL_CURRENT_DIR/unixBin/env/claude_backup"
+    local LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR="$LCL_ABK_CLAUDE_BACKUP_DIR/templates"
+    local LCL_EXIT_CODE=0
+
+    local LCL_CLAUDE_TEMPLATES_DIR="$CLAUDE_DIR/templates"
+    local LCL_ABK_CLAUDE_TEMPLATES_DIR="$LCL_CURRENT_DIR/unixBin/env/claude/templates"
+
+    PrintTrace "$TRACE_DEBUG" "LCL_CLAUDE_TEMPLATES_DIR = $LCL_CLAUDE_TEMPLATES_DIR"
+    PrintTrace "$TRACE_DEBUG" "LCL_ABK_CLAUDE_TEMPLATES_DIR = $LCL_ABK_CLAUDE_TEMPLATES_DIR"
+    PrintTrace "$TRACE_DEBUG" "LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR = $LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR"
+
+    # Ensure backup directory exists
+    mkdir -p "$LCL_ABK_CLAUDE_BACKUP_DIR"
+
+    # Check if ~/.claude/templates exists and is not a symlink
+    if [ -d "$LCL_CLAUDE_TEMPLATES_DIR" ] && [ ! -L "$LCL_CLAUDE_TEMPLATES_DIR" ]; then
+        PrintTrace "$TRACE_INFO" "[Found existing templates directory - backing up to $LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR]"
+
+        # Remove old backup if it exists
+        [ -d "$LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR" ] && rm -rf "$LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR"
+
+        # Move existing templates to backup
+        mv "$LCL_CLAUDE_TEMPLATES_DIR" "$LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR"
+
+        # Merge backed up templates into git repo templates (only copy files that don't exist)
+        if [ -d "$LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR" ]; then
+            PrintTrace "$TRACE_INFO" "[Merging unique templates from backup into git repo]"
+            rsync -av --ignore-existing "$LCL_ABK_CLAUDE_BACKUP_TEMPLATES_DIR"/ "$LCL_ABK_CLAUDE_TEMPLATES_DIR"/ 2>/dev/null || true
+        fi
+    elif [ -L "$LCL_CLAUDE_TEMPLATES_DIR" ]; then
+        PrintTrace "$TRACE_INFO" "[Templates directory is already a symlink - removing it]"
+        rm "$LCL_CLAUDE_TEMPLATES_DIR"
+    fi
+
+    # Ensure the target directory exists
+    mkdir -p "$LCL_ABK_CLAUDE_TEMPLATES_DIR"
+
+    # Create the symlink
+    PrintTrace "$TRACE_INFO" "[Creating symlink: $LCL_CLAUDE_TEMPLATES_DIR -> $LCL_ABK_CLAUDE_TEMPLATES_DIR]"
+    ln -s "$LCL_ABK_CLAUDE_TEMPLATES_DIR" "$LCL_CLAUDE_TEMPLATES_DIR" || LCL_EXIT_CODE=$?
+
+    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    return $LCL_EXIT_CODE
+}
+
+
+createClaudeWorkspaceLinks() {
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
+    local LCL_CURRENT_DIR=$PWD
+    local LCL_ABK_CLAUDE_BACKUP_DIR="$LCL_CURRENT_DIR/unixBin/env/claude_backup"
+    local LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR="$LCL_ABK_CLAUDE_BACKUP_DIR/workspaces"
+    local LCL_EXIT_CODE=0
+
+    local LCL_CLAUDE_WORKSPACES_DIR="$CLAUDE_DIR/workspaces"
+    local LCL_ABK_CLAUDE_WORKSPACES_DIR="$LCL_CURRENT_DIR/unixBin/env/claude/workspaces"
+
+    PrintTrace "$TRACE_DEBUG" "LCL_CLAUDE_WORKSPACES_DIR = $LCL_CLAUDE_WORKSPACES_DIR"
+    PrintTrace "$TRACE_DEBUG" "LCL_ABK_CLAUDE_WORKSPACES_DIR = $LCL_ABK_CLAUDE_WORKSPACES_DIR"
+    PrintTrace "$TRACE_DEBUG" "LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR = $LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR"
+
+    # Ensure backup directory exists
+    mkdir -p "$LCL_ABK_CLAUDE_BACKUP_DIR"
+
+    # Check if ~/.claude/workspaces exists and is not a symlink
+    if [ -d "$LCL_CLAUDE_WORKSPACES_DIR" ] && [ ! -L "$LCL_CLAUDE_WORKSPACES_DIR" ]; then
+        PrintTrace "$TRACE_INFO" "[Found existing workspaces directory - backing up to $LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR]"
+
+        # Remove old backup if it exists
+        [ -d "$LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR" ] && rm -rf "$LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR"
+
+        # Move existing workspaces to backup
+        mv "$LCL_CLAUDE_WORKSPACES_DIR" "$LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR"
+
+        # Merge backed up workspaces into git repo workspaces (only copy files that don't exist)
+        if [ -d "$LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR" ]; then
+            PrintTrace "$TRACE_INFO" "[Merging unique workspaces from backup into git repo]"
+            rsync -av --ignore-existing "$LCL_ABK_CLAUDE_BACKUP_WORKSPACES_DIR"/ "$LCL_ABK_CLAUDE_WORKSPACES_DIR"/ 2>/dev/null || true
+        fi
+    elif [ -L "$LCL_CLAUDE_WORKSPACES_DIR" ]; then
+        PrintTrace "$TRACE_INFO" "[Workspaces directory is already a symlink - removing it]"
+        rm "$LCL_CLAUDE_WORKSPACES_DIR"
+    fi
+
+    # Ensure the target directory exists
+    mkdir -p "$LCL_ABK_CLAUDE_WORKSPACES_DIR"
+
+    # Create the symlink
+    PrintTrace "$TRACE_INFO" "[Creating symlink: $LCL_CLAUDE_WORKSPACES_DIR -> $LCL_ABK_CLAUDE_WORKSPACES_DIR]"
+    ln -s "$LCL_ABK_CLAUDE_WORKSPACES_DIR" "$LCL_CLAUDE_WORKSPACES_DIR" || LCL_EXIT_CODE=$?
+
+    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
+    return $LCL_EXIT_CODE
+}
+
 
 #---------------------------
 # main
@@ -154,6 +330,9 @@ set -e
 checkPrerequisiteToolsAreInstalled || PrintUsageAndExitWithCode $? "${RED}❌ claude is not installed. Please install claude. Aborting.${NC}"
 createClaudeDir || PrintUsageAndExitWithCode $? "${RED}❌ createClaudeDir failed. Aborting.${NC}"
 createClaudeCommandLinks || PrintUsageAndExitWithCode $? "${RED}❌ createClaudeCommandLinks failed. Aborting.${NC}"
+createClaudeConfigLinks || PrintUsageAndExitWithCode $? "${RED}❌ createClaudeConfigLinks failed. Aborting.${NC}"
+createClaudeTemplateLinks || PrintUsageAndExitWithCode $? "${RED}❌ createClaudeTemplateLinks failed. Aborting.${NC}"
+createClaudeWorkspaceLinks || PrintUsageAndExitWithCode $? "${RED}❌ createClaudeWorkspaceLinks failed. Aborting.${NC}"
 
 PrintTrace "$TRACE_FUNCTION" "<- $0 ($EXIT_CODE)"
 echo
