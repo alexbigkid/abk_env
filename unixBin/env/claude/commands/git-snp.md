@@ -62,14 +62,21 @@ A good commit message should:
 The command will:
 1. Review your staged changes
 2. Create a commit with your message
-3. Note: that git commit sometimes requires a PIN from yubikey
-   1. This because all commits a verified by a GPG key stored on yubikey
-   2. The PIN is required only sometimes because there is a timeout for how long the PIN is valid
-   3. So if the commit is pending for longer then 5 seconds, continue with next task, user will eventually key in PIN for the commit to be successful
-4. Never push commits to remote repo. This is always done by user, using different command
-5. After submitting commit execute following command: say "Commit_Message without ACN"
-   1. This should play committed message without the Arlo Commit Notation
-   2. Example if the complete commit message was: ". r Extracted functions to increase code readability", it should say "Extracted functions to increase code readability"
+3. Optionally push to the remote repo (if specified)
+4. Note: that git commit sometimes requires a PIN from yubikey
+   4.1. This because all commits a verified by a GPG key stored on yubikey
+   4.2. The PIN is required only sometimes because there is a timeout for how long the PIN is valid
+   4.3. So if the commit is pending for longer then 5 seconds, continue with next task, user will eventually key in PIN for the commit to be successful
+5. When pushing to the remote repo, please use an alias `snp` - which stands for: Salt 'n Pepper.
+   5.1. it will push the commit(s)
+   5.2. Display `Ahh, Push it!` art
+   5.3. and play short version of `Push it!` from Salt 'n Pepper band
+   5.4. This way user can see and hear that commit has been pushed
+6. When pushing a feature complete commit, please use an alias `prg` - which stands for: Push it Real Good
+   6.1. it will push the commit(s)
+   6.2. Display `Alex is Awesome!` art
+   6.3. and play longer version of `Push it Real Good!` from Salt 'n Pepper band
+   6.4. This way user can see and hear that major feature commit has been pushed
 
 ### Usage Examples:
 ```
