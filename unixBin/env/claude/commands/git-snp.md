@@ -34,7 +34,7 @@ Note: that `snp` which executes `git push` sometimes requires a PIN from yubikey
 ## Best Practices
 After pushing commits to remote repo, we should improve further the quality of the changes just committed by following steps below:
 - think hard, analyze the code for possible improvements
-- search for common patterns, for possibility to extract those patterns into a modular functions
+- search for common patterns, for possibility to extract those patterns into a modular functions.
 - if some methods are too long, try to shorten them by extracting logical part into methods.
 - Analyze committed code. For Kotlin you could use `detekt` tool for code quality analysis
 - think hard: is there a possibility for improvement by introducing a design patterns like: strategy or observer pattern. There are more design patterns available on https://refactoring.guru/design-patterns
