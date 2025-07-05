@@ -3,3 +3,15 @@
 unixPackages/*
 unixBin/env/LINK_*
 unixBin/oh-my-posh
+
+# Claude Environment - Generated config files (contain secrets)
+# Only templates should be version controlled
+unixBin/env/claude_backup/
+# Generated config files in ~/.claude/ are not in git anyway, but exclude any local copies
+*.generated.json
+*config.json
+!*.template.*
+
+# Personal state directories (if ever copied locally)
+claude-projects/
+claude-todos/
