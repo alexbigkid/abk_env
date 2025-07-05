@@ -10,11 +10,13 @@
                 "detekt": ["command -v detekt"],
                 "git": ["command -v git"],
                 "gradle": ["command -v gradle"],
+                "fastlane": ["command -v fastlane"],
                 "jq": ["command -v jq"],
                 "kotlin": ["command -v kotlin"],
                 "ktlint": ["command -v ktlint"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "openjdk@21": ["brew list | grep openjdk@21"],
+                "rbenv": ["command -v rbenv"],
                 "wget": ["command -v wget"],
                 "yq": ["command -v yq"],
                 "xcode-select": ["xcode-select -p"],
@@ -25,8 +27,9 @@
             "install": {
                 "detekt": ["brew install detekt"],
                 "git": ["brew install git"],
-                "jq": ["brew install jq"],
                 "gradle": ["brew install gradle"],
+                "fastlane": ["brew install fastlane"],
+                "jq": ["brew install jq"],
                 "kotlin": ["brew install kotlin"],
                 "ktlint": ["brew install ktlint"],
                 "oh-my-posh": [
@@ -35,6 +38,10 @@
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "openjdk@21": ["brew install openjdk@21"],
+                "rbenv": [
+                    "brew install rbenv",
+                    "(cd unixBin/env && [ ! -L LINK_rbenv.env ] && ln -s XXX_rbenv.env LINK_rbenv.env || true)"
+                ],
                 "wget": ["brew install wget"],
                 "yq": ["brew install yq"],
                 "xcode-select": ["xcode-select --install"],
@@ -55,6 +62,7 @@
                 "detekt": ["brew uninstall detekt"],
                 "git": ["brew uninstall git"],
                 "gradle": ["brew uninstall gradle"],
+                "fastlane": ["brew uninstall fastlane"],
                 "jq": ["brew uninstall jq"],
                 "kotlin": ["brew uninstall kotlin"],
                 "ktlint": ["brew uninstall ktlint"],
@@ -63,6 +71,11 @@
                     "brew uninstall oh-my-posh"
                 ],
                 "openjdk@21": ["brew uninstall openjdk@21"],
+                "rbenv": [
+                    "find ./unixBin/env -type l -name 'LINK_rbenv.env' -delete || true",
+                    "brew uninstall rbenv",
+                    "rm -Rf ~/.rbenv"
+                ],
                 "wget": ["brew uninstall wget"],
                 "yq": ["brew uninstall yq"],
                 "xcode-select": ["sudo rm -rf /Library/Developer/CommandLineTools && sudo xcode-select --reset"],

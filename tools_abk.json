@@ -13,7 +13,6 @@
                 "direnv": ["command -v direnv"],
                 "exiftool": ["command -v exiftool"],
                 "eza": ["command -v eza"],
-                "fastlane": ["command -v fastlane"],
                 "fzf": ["command -v fzf"],
                 "git": ["command -v git"],
                 "helm": ["command -v helm"],
@@ -51,7 +50,6 @@
                 ],
                 "exiftool": ["brew install exiftool"],
                 "eza": ["brew install eza"],
-                "fastlane": ["brew install fastlane"],
                 "fzf": [
                     "brew install fzf",
                     "(cd unixBin/env && [ ! -L LINK_fzf.env ] && ln -s XXX_fzf.env LINK_fzf.env || true)"
@@ -111,7 +109,6 @@
                 ],
                 "exiftool": ["brew uninstall exiftool"],
                 "eza": ["brew uninstall eza"],
-                "fastlane": ["brew uninstall fastlane"],
                 "fzf": [
                     "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
                     "brew uninstall fzf"
