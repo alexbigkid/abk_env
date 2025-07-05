@@ -83,15 +83,19 @@ The command will:
 ## Best Practices
 - Commit often with small, focused changes
 - Each commit should represent a single logical change
+- Try to create single line commits without extra craft
+- Don't add add additional info like: Generated with [Claude Code](https://claude.ai/code), because we want to have the commit message as short as possible
+- If there are already files staged, don't stage more files, use only staged file for commit
 - Test your implementation changes before committing
 - If possible, create unit tests for implemented feature
 - Run unit tests before committing
-- Run linting tool, here are a few examples:
+- If available, run linting tool, here are a few examples:
   - Python: uv run ruff check --fix
   - TypeScript: eslint . --ext .ts --fix
   - Kotlin: ktlint -F
   - Bash: shellcheck <bash-shell-script.sh>
 - Similarly, run auto formatting tool
   - Python: uv run ruff format
+- you have the permission to run all those linting and formatting tools, no need to ask user for permission to lint and auto format
 - Use meaningful commit messages that help other developers understand the change
 - Keep commits atomic - if you need to revert, you can revert the entire feature/fix
