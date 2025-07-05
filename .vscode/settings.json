@@ -12,6 +12,7 @@
         "chsh",
         "compdef",
         "compinit",
+        "creational",
         "detekt",
         "direnv",
         "distro",
