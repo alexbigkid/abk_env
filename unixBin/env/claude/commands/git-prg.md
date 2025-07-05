@@ -1,4 +1,4 @@
-# Git PRG command
+# git prg slash command
 
 ## Usage
 `/git-prg [release-type]`

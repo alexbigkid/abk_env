@@ -1,4 +1,4 @@
-# Git SNP Slash command
+# git snp slash command
 
 ## Usage
 `/git-snp`

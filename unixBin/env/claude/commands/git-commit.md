@@ -1,4 +1,4 @@
-# Git Commit Slash command
+# git commit slash command
 
 ## Usage
 `/git-commit [message]`
