@@ -16,6 +16,7 @@
         "direnv",
         "distro",
         "easiliy",
+        "envsubst",
         "esac",
         "executiontime",
         "exiftool",
