@@ -36,9 +36,12 @@ The `test_install.sh` script validates:
 - `git rel-major` - Trigger major version release pipeline
 
 ### Claude Environment Setup
-- `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands
+- `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands, configs, templates, and workspaces
 - `./unixBin/resetClaudeEnv.sh` - Reset Claude environment to original state
-- Commands stored in `unixBin/env/claude/commands/` and linked to `~/.claude/commands`
+- **Commands**: `unixBin/env/claude/commands/` → `~/.claude/commands` (symlinked)
+- **Templates**: `unixBin/env/claude/templates/` → `~/.claude/templates` (symlinked) 
+- **Workspaces**: `unixBin/env/claude/workspaces/` → `~/.claude/workspaces` (symlinked)
+- **Config**: `unixBin/env/claude/config/*.template.*` → `~/.claude/config/*.json` (generated with env vars)
 
 ## Architecture
 
@@ -68,9 +71,12 @@ The `test_install.sh` script validates:
 - Comprehensive alias definitions
 
 **Claude Environment Management:**
-- `unixBin/env/claude/commands/` - Git-controlled Claude commands directory
-- `unixBin/env/claude_backup/commands/` - Temporary backup during setup/reset
-- `unixBin/setClaudeEnv.sh` - Setup script for centralized commands
+- `unixBin/env/claude/commands/` - Git-controlled Claude commands directory (symlinked)
+- `unixBin/env/claude/templates/` - Git-controlled code templates and snippets (symlinked)
+- `unixBin/env/claude/workspaces/` - Git-controlled workspace configurations (symlinked)
+- `unixBin/env/claude/config/` - Template configuration files with environment variable placeholders
+- `unixBin/env/claude_backup/` - Temporary backup during setup/reset operations
+- `unixBin/setClaudeEnv.sh` - Setup script for centralized environment management
 - `unixBin/resetClaudeEnv.sh` - Reset script to restore original environment
 
 ### JSON Configuration Structure
@@ -124,27 +130,113 @@ Each `tools_*.json` file contains platform-specific installation instructions:
 
 ## Claude Environment Setup
 
-The repository provides centralized management for Claude commands through a git-controlled system:
+The repository provides comprehensive centralized management for Claude development environment through a git-controlled system:
+
+### Extended Environment Components
+
+**Commands** (`~/.claude/commands/`)
+- Git-controlled command definitions and workflows
+- Symlinked from `unixBin/env/claude/commands/`
+- Preserved and merged during setup
+
+**Templates** (`~/.claude/templates/`)
+- Code templates and project scaffolding
+- React components, Express routes, Docker setups, GitHub Actions
+- ABK bash script templates with proper structure
+- Symlinked from `unixBin/env/claude/templates/`
+
+**Workspaces** (`~/.claude/workspaces/`)
+- Multi-project configuration definitions
+- Full-stack web app, microservices, DevOps stacks
+- Project relationships and shared configurations
+- Symlinked from `unixBin/env/claude/workspaces/`
+
+**Configuration** (`~/.claude/config/`)
+- Secure configuration with environment variable substitution
+- API keys loaded from environment variables or password managers
+- MCP server configurations, Claude settings, project preferences
+- Generated from templates in `unixBin/env/claude/config/`
 
 ### Setup Process
 1. **Run Setup**: `./unixBin/setClaudeEnv.sh`
-   - Backs up existing `~/.claude/commands` to `unixBin/env/claude_backup/commands/`
-   - Merges unique commands from backup into git-controlled directory
-   - Creates symlink: `~/.claude/commands` → `unixBin/env/claude/commands/`
-   - Future Claude commands are automatically stored in git repo
+   - **Prerequisites**: Installs required tools (`rsync`, `envsubst`)
+   - **Commands**: Backs up and symlinks `~/.claude/commands` → `unixBin/env/claude/commands/`
+   - **Templates**: Symlinks `~/.claude/templates` → `unixBin/env/claude/templates/`
+   - **Workspaces**: Symlinks `~/.claude/workspaces` → `unixBin/env/claude/workspaces/`
+   - **Configuration**: Processes templates with `envsubst` to generate secure config files
+   - **Backup**: Existing files preserved in `unixBin/env/claude_backup/`
 
 ### Reset Process
 1. **Run Reset**: `./unixBin/resetClaudeEnv.sh`
-   - Removes symlink `~/.claude/commands`
-   - Restores original commands from backup to `~/.claude/commands`
-   - Cleans up backup directory
-   - Keeps git repo commands intact for future use
+   - **Cleanup Order**: Removes workspaces, templates, config, and commands (reverse order)
+   - **Restoration**: Restores original files from backup directories
+   - **Security**: Removes generated configuration files containing secrets
+   - **Git Safety**: Keeps git repo contents intact for future use
+
+### Security Model
+- **Templates Only in Git**: Only `.template.*` files are version controlled
+- **Environment Variables**: Secrets loaded from `$ANTHROPIC_API_KEY`, `$(pass dev/api/key)`, etc.
+- **Generated Configs**: Local config files have restrictive permissions (600)
+- **No Secrets in Git**: API keys and secrets never committed to repository
+
+### Configuration Templates
+
+**API Configuration** (`api-config.template.json`)
+```json
+{
+  "anthropic": {
+    "apiKey": "${ANTHROPIC_API_KEY}",
+    "endpoint": "https://api.anthropic.com/v1"
+  },
+  "github": {
+    "token": "${GITHUB_TOKEN}"
+  }
+}
+```
+
+**MCP Servers** (`mcp-servers.template.json`)
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+    },
+    "postgres": {
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
+      }
+    }
+  }
+}
+```
+
+### Available Templates
+
+**Code Templates**:
+- `react-component.tsx` - TypeScript React component with props interface
+- `express-route.js` - Express.js API endpoint with error handling
+- `abk-script.sh` - ABK-style bash script with proper structure
+- `package-json.template` - Node.js package.json with common dependencies
+- `github-actions-node.yml` - CI/CD workflow for Node.js projects
+
+**Infrastructure Templates**:
+- `docker-setup/` - Dockerfile and docker-compose configurations
+- Docker security best practices with non-root users
+
+**Workspace Configurations**:
+- `webapp-stack.json` - Full-stack web application (frontend/backend/database)
+- `microservices.json` - Microservices architecture with API gateway
+- `devops-stack.json` - DevOps tools (Terraform, Kubernetes, Ansible, monitoring)
 
 ### Benefits
-- **Version Control**: All Claude commands stored in git for easy replication
-- **Non-Destructive**: Existing commands are preserved and merged
+- **Version Control**: All development patterns and configurations in git
+- **Security**: Secrets managed through environment variables and password managers
+- **Consistency**: Standardized project structures and configurations across machines
+- **Non-Destructive**: Existing Claude setup preserved and merged
 - **Reversible**: Complete restoration to original state
-- **Cross-Machine**: Easy setup replication across different computers
+- **Cross-Machine**: Easy replication of entire development environment
+- **Team Sharing**: Git-controlled templates and workspaces for team consistency
 
 ## Shell Integration
 
