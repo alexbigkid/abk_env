@@ -17,11 +17,11 @@ git add .
 git add path/to/file.txt
 ```
 
-### 2. Write a dDescriptive Commit Message
+### 2. Write a descriptive Commit Message
 A good commit message should:
 - Use Arlo Commit Notation (ACN): https://github.com/arlobelshee/ArlosCommitNotation
   1. Risk Level Notation
-     - . : Addresses all known and unknown risks / ntended Change, Known Invariants, Unknown Invariants
+     - . : Addresses all known and unknown risks / Intended Change, Known Invariants, Unknown Invariants
      - ^ : Addresses all known risks / Intended Change, Known Invariants
      - ! : Some known risks remain unverified / Intended Change
      - @ : No risk attestation
@@ -41,16 +41,16 @@ A good commit message should:
 
 #### Examples of Good Commit Message
 - `. f Add user authentication system`
-- `. b fix Dropdown menu positioning issue`
+- `. b Fix Dropdown menu positioning issue`
 - `. r Update API endpoint for user profiles`
 - `. r Remove deprecated helper methods`
 - `^ r Refactor database connection logic`
 - `. d Update documentation / README.md`
-- `! F validate user feature complete, but missing unit test coverage`
-- `@ F WIP: validate user feature complete, but failing tests`
+- `! f validate user feature complete, but missing unit test coverage`
+- `@ f WIP: validate user feature complete, but failing tests`
 - `. e set usb_mode Environment to true`
-- `. t implement unit tests for user validation feature`
-- `. a auto format using: ruff format`
+- `. t Implement unit tests for user validation feature`
+- `. a Auto format using: ruff format`
 
 #### Examples of Bad Commit Messages
 - `stuff`
@@ -63,12 +63,12 @@ The command will:
 1. Review your staged changes
 2. Create a commit with your message
 3. Note: that git commit sometimes requires a PIN from yubikey
-   1. This because all commits a verified by a GPG key stored on yubikey
+   1. This is because all commits are verified by a GPG key stored on yubikey
    2. The PIN is required only sometimes because there is a timeout for how long the PIN is valid
-   3. So if the commit is pending for longer then 5 seconds, continue with next task, user will eventually key in PIN for the commit to be successful
+   3. So if the commit is pending for longer than 5 seconds, continue with next task, user will eventually key in PIN for the commit to be successful
 4. Never push commits to remote repo. This is always done by user, using different command
 5. After submitting commit execute following command: say "Commit_Message without ACN"
-   1. This should play committed message without the Arlo Commit Notation
+   1. This should play commit message without the Arlo Commit Notation
    2. Example if the complete commit message was: ". r Extracted functions to increase code readability", it should say "Extracted functions to increase code readability"
 
 ### Usage Examples:
@@ -86,12 +86,12 @@ The command will:
 - Test your implementation changes before committing
 - If possible, create unit tests for implemented feature
 - Run unit tests before committing
-- Run linting tool, here few examples:
+- Run linting tool, here are a few examples:
   - Python: uv run ruff check --fix
   - TypeScript: eslint . --ext .ts --fix
   - Kotlin: ktlint -F
   - Bash: shellcheck <bash-shell-script.sh>
-- Similarly run auto formatting tool
+- Similarly, run auto formatting tool
   - Python: uv run ruff format
 - Use meaningful commit messages that help other developers understand the change
 - Keep commits atomic - if you need to revert, you can revert the entire feature/fix
