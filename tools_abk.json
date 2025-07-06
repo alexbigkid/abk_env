@@ -14,6 +14,7 @@
                 "exiftool": ["command -v exiftool"],
                 "eza": ["command -v eza"],
                 "fzf": ["command -v fzf"],
+                "gh": ["command -v gh"],
                 "git": ["command -v git"],
                 "helm": ["command -v helm"],
                 "pass": ["command -v pass"],
@@ -54,6 +55,7 @@
                     "brew install fzf",
                     "(cd unixBin/env && [ ! -L LINK_fzf.env ] && ln -s XXX_fzf.env LINK_fzf.env || true)"
                 ],
+                "gh": ["brew install gh"],
                 "git": ["brew install git"],
                 "helm": ["brew install helm"],
                 "pass": ["brew install pass"],
@@ -113,6 +115,7 @@
                     "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
                     "brew uninstall fzf"
                 ],
+                "gh": ["brew uninstall gh"],
                 "git": ["brew uninstall git"],
                 "helm": ["brew uninstall helm"],
                 "pass": ["brew uninstall pass"],
@@ -273,6 +276,7 @@
                     "ffmpeg": ["command -v ffmpeg"],
                     "exa": ["command -v exa"],
                     "fzf": ["command -v fzf"],
+                    "gh": ["command -v gh"],
                     "git": ["command -v git"],
                     "pass": ["command -v pass"],
                     "gpg": ["command -v gpg"],
@@ -314,6 +318,7 @@
                         "sudo apt install -y fzf",
                         "(cd unixBin/env && [ ! -L LINK_fzf.env ] &&ln -s XXX_fzf.env LINK_fzf.env || true)"
                     ],
+                    "gh": ["sudo apt install -y gh"],
                     "git": ["sudo apt install -y git"],
                     "pass": ["sudo apt install -y pass"],
                     "gpg": ["sudo apt install -y gnupg"],
@@ -379,6 +384,7 @@
                         "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
                         "sudo apt remove -y fzf"
                     ],
+                    "gh": ["sudo apt remove -y gh"],
                     "git": ["sudo apt remove -y git"],
                     "pass": ["sudo apt remove -y pass"],
                     "gpg": ["sudo apt remove -y gnupg"],
