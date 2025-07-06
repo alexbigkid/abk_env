@@ -12,8 +12,10 @@ This command helps you create well structured git commits with descriptive messa
 Before using this command, make sure you have staged the files you want to commit:
 ```bash
 # stage all modified files
+git pull
 git add .
 # or stage specific files
+git pull
 git add path/to/file.txt
 ```
 
@@ -82,6 +84,7 @@ The command will:
 ```
 
 ## Best Practices
+- Always pull before committing changes
 - Commit often with small, focused changes
 - Each commit should represent a single logical change
 - Try to create single line commits without extra craft
