@@ -16,6 +16,8 @@
                 "ktlint": ["command -v ktlint"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "openjdk@21": ["brew list | grep openjdk@21"],
+                "openjdk": ["brew list | grep openjdk"],
+                "jenv": ["brew list | grep jenv"],
                 "rbenv": ["command -v rbenv"],
                 "wget": ["command -v wget"],
                 "yq": ["command -v yq"],
@@ -38,6 +40,17 @@
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "openjdk@21": ["brew install openjdk@21"],
+                "openjdk": ["brew install openjdk"],
+                "jenv": [
+                    "brew install jenv",
+                    "export PATH=$HOME/.jenv/bin:$PATH",
+                    "eval \"$(jenv init -)\"",
+                    "jenv enable-plugin export",
+                    "jenv add /opt/homebrew/opt/openjdk@21",
+                    "jenv add /opt/homebrew/opt/openjdk",
+                    "jenv global 21",
+                    "(cd unixBin/env && [ ! -L LINK_mobile.env ] && ln -s XXX_mobile.env LINK_mobile.env || true)"
+                ],
                 "rbenv": [
                     "brew install rbenv",
                     "(cd unixBin/env && [ ! -L LINK_rbenv.env ] && ln -s XXX_rbenv.env LINK_rbenv.env || true)"
@@ -71,6 +84,12 @@
                     "brew uninstall oh-my-posh"
                 ],
                 "openjdk@21": ["brew uninstall openjdk@21"],
+                "openjdk": ["brew uninstall openjdk"],
+                "jenv": [
+                    "find ./unixBin/env -type l -name 'LINK_mobile.env' -delete",
+                    "brew uninstall jenv",
+                    "rm -rf ~/.jenv"
+                ],
                 "rbenv": [
                     "find ./unixBin/env -type l -name 'LINK_rbenv.env' -delete || true",
                     "brew uninstall rbenv",
