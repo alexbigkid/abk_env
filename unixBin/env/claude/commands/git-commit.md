@@ -70,10 +70,10 @@ The command will:
    2. The PIN is required only sometimes because there is a timeout for how long the PIN is valid
    3. So if the commit is pending for longer than 5 seconds, continue with next task, user will eventually key in PIN for the commit to be successful
 5. Never push commits to remote repo. This is always done by user, using different command
-6. After submitting commit execute following command: `say "Commit_Message without ACN"`
+<!-- 6. After submitting commit execute following command: `say "Commit_Message without ACN"`
    1. This should play commit message without the Arlo Commit Notation
    2. Example if the complete commit message was: ". r Extracted functions to increase code readability", it should say "Extracted functions to increase code readability"
-   3. you have permission to execute `say` command, no need to ask permission
+   3. you have permission to execute `say` command, no need to ask permission -->
 
 ### Usage Examples:
 ```

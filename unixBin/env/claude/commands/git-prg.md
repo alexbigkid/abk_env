@@ -43,7 +43,7 @@ When pushing a feature complete commit, please use an alias `prg` - which stands
 ## Best Practices
 After pushing commits to remote repo, we should create a release
 - `prg` alias command will push changes to remote repo
-- `git rel-patch` git alias for creating tag named re-patch, which will create a patch release on CI/CD pipeline
-- `git rel-minor` git alias for creating tag named re-minor, which will create a minor release on CI/CD pipeline
-- `git rel-major` git alias for creating tag named re-major, which will create a major release on CI/CD pipeline
+- `git rel-patch` git alias for creating tag named rel-patch, which will create a patch release on CI/CD pipeline
+- `git rel-minor` git alias for creating tag named rel-minor, which will create a minor release on CI/CD pipeline
+- `git rel-major` git alias for creating tag named rel-major, which will create a major release on CI/CD pipeline
 - when `git-prg` is used without parameter, use your best judgement to pick the correct release type
