@@ -7,8 +7,8 @@
 TRACE=1
 EXIT_CODE=0
 EXPECTED_NUMBER_OF_PARAMETERS=1
-SCRIPT_NAME=$(basename $0)
-SCRIPT_PATH=$(dirname $0)
+SCRIPT_NAME=$(basename "$0")
+SCRIPT_PATH=$(dirname "$0")
 ABK_LIB_FILE="$SCRIPT_PATH/abkLib.sh"
 PE_PSWD_APP_DIR=${PASSWORD_STORE_DIR:-$HOME/.password-store}
 
