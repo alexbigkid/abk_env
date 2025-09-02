@@ -155,10 +155,11 @@ jobs:
               shell: wsl-bash {0}
               run: |
                 sudo apt update
-                sudo apt install -y zsh bash
+                sudo apt install -y zsh bash dos2unix
                 echo "--------Available shells after install-------"
                 which bash || echo "bash not found"
                 which zsh || echo "zsh not found"
+                which dos2unix || echo "dos2unix not found"
                 bash --version || echo "bash version check failed"
 
             - name: zsh install tools (WSL)
@@ -166,28 +167,36 @@ jobs:
               run: |
                 export SHELL=$(which zsh)
                 echo "SHELL = $SHELL"
-                /bin/bash ./test_install.sh "wsl"
+                dos2unix ./test_install.sh || true
+                chmod +x ./test_install.sh
+                /bin/bash -x ./test_install.sh "wsl"
 
             - name: zsh uninstall tools (WSL)
               shell: wsl-bash {0}
               run: |
                 export SHELL=$(which zsh)
                 echo "SHELL = $SHELL"
-                /bin/bash ./test_uninstall.sh "wsl"
+                dos2unix ./test_uninstall.sh || true
+                chmod +x ./test_uninstall.sh
+                /bin/bash -x ./test_uninstall.sh "wsl"
 
             - name: bash install tools (WSL)
               shell: wsl-bash {0}
               run: |
                 export SHELL=$(which bash)
                 echo "SHELL = $SHELL"
-                /bin/bash ./test_install.sh "wsl"
+                dos2unix ./test_install.sh || true
+                chmod +x ./test_install.sh
+                /bin/bash -x ./test_install.sh "wsl"
 
             - name: bash uninstall tools (WSL)
               shell: wsl-bash {0}
               run: |
                 export SHELL=$(which bash)
                 echo "SHELL = $SHELL"
-                /bin/bash ./test_uninstall.sh "wsl"
+                dos2unix ./test_uninstall.sh || true
+                chmod +x ./test_uninstall.sh
+                /bin/bash -x ./test_uninstall.sh "wsl"
 
 
 #   Docker:

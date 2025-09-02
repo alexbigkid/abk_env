@@ -27,7 +27,7 @@
       "brew uninstall pass"
     ],
     "just": [
-      "sudo apt remove -y just"
+      "brew uninstall just"
     ],
     "kind": [
       "brew uninstall kind"
