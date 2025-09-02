@@ -135,6 +135,8 @@ jobs:
         steps:
             - name: checkout repo
               uses: actions/checkout@v4
+              with:
+                core.autocrlf: false
 
             - name: Setup WSL
               uses: Vampire/setup-wsl@v3
@@ -155,13 +157,11 @@ jobs:
               shell: wsl-bash {0}
               run: |
                 sudo apt update
-                sudo apt install -y bash dos2unix
+                sudo apt install -y bash
                 echo "--------Available tools after install-------"
                 which bash || echo "bash not found"
-                which dos2unix || echo "dos2unix not found"
                 bash --version || echo "bash version check failed"
-                echo "--------Converting line endings for all shell scripts-------"
-                find . -name "*.sh" -type f -exec dos2unix {} \; || true
+                echo "--------Setting execute permissions-------"
                 chmod +x ./test_install.sh ./test_uninstall.sh ./unixBin/*.sh
 
             - name: bash install tools (WSL)
