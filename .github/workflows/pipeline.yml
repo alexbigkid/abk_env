@@ -140,7 +140,7 @@ jobs:
               uses: Vampire/setup-wsl@v3
               with:
                 distribution: Ubuntu-${{ matrix.version }}
-                additional-packages: curl git
+                additional-packages: curl git bash
 
             - name: Check WSL environment
               shell: wsl-bash {0}
@@ -155,35 +155,39 @@ jobs:
               shell: wsl-bash {0}
               run: |
                 sudo apt update
-                sudo apt install -y zsh
+                sudo apt install -y zsh bash
+                echo "--------Available shells after install-------"
+                which bash || echo "bash not found"
+                which zsh || echo "zsh not found"
+                bash --version || echo "bash version check failed"
 
             - name: zsh install tools (WSL)
               shell: wsl-bash {0}
               run: |
                 export SHELL=$(which zsh)
                 echo "SHELL = $SHELL"
-                bash ./test_install.sh "wsl"
+                /bin/bash ./test_install.sh "wsl"
 
             - name: zsh uninstall tools (WSL)
               shell: wsl-bash {0}
               run: |
                 export SHELL=$(which zsh)
                 echo "SHELL = $SHELL"
-                bash ./test_uninstall.sh "wsl"
+                /bin/bash ./test_uninstall.sh "wsl"
 
             - name: bash install tools (WSL)
               shell: wsl-bash {0}
               run: |
                 export SHELL=$(which bash)
                 echo "SHELL = $SHELL"
-                bash ./test_install.sh "wsl"
+                /bin/bash ./test_install.sh "wsl"
 
             - name: bash uninstall tools (WSL)
               shell: wsl-bash {0}
               run: |
                 export SHELL=$(which bash)
                 echo "SHELL = $SHELL"
-                bash ./test_uninstall.sh "wsl"
+                /bin/bash ./test_uninstall.sh "wsl"
 
 
 #   Docker:

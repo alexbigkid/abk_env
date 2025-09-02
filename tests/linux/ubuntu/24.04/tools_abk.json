@@ -17,11 +17,11 @@
       "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
       "sudo apt remove -y fzf"
     ],
-    "just": [
-      "sudo apt remove -y just"
-    ],
     "pass": [
       "sudo apt remove -y pass"
+    ],
+    "just": [
+      "sudo apt remove -y just"
     ],
     "mplayer": [
       "sudo apt remove -y mplayer"
