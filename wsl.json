@@ -1,0 +1,252 @@
+{
+    "linux": {
+        "debian": {
+            "description": "Installing ABK tool set for Linux / Debian based distro",
+            "supported_versions": {
+                "debian": ["11", "12"],
+                "raspbian": ["11", "12"],
+                "ubuntu": ["22.04", "24.04"]
+            },
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "tools": {
+                "check": {
+                    "aws": ["command -v aws"],
+                    "bat": ["command -v bat"],
+                    "direnv": ["command -v direnv"],
+                    "ffmpeg": ["command -v ffmpeg"],
+                    "exa": ["command -v exa"],
+                    "fzf": ["command -v fzf"],
+                    "gh": ["command -v gh"],
+                    "git": ["command -v git"],
+                    "pass": ["command -v pass"],
+                    "gpg": ["command -v gpg"],
+                    "jq": ["command -v jq"],
+                    "just": ["command -v just"],
+                    "kind": ["command -v kind"],
+                    "mplayer": ["command -v mplayer"],
+                    "nmap": ["command -v nmap"],
+                    "nodenv": ["command -v nodenv"],
+                    "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
+                    "parallel": ["command -v parallel"],
+                    "serverless": ["command -v serverless"],
+                    "shellcheck": ["command -v shellcheck"],
+                    "tfenv": ["command -v tfenv"],
+                    "tree": ["command -v tree"],
+                    "uv": ["command -v uv"],
+                    "wget": ["command -v wget"],
+                    "yq": ["command -v yq"],
+                    "xclip": ["command -v xclip"],
+                    "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
+                    "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
+                },
+                "install": {
+                    "aws": [
+                        "curl \"https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip\" -o \"awscliv2.zip\"",
+                        "unzip awscliv2.zip",
+                        "sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli",
+                        "[ -d ./aws ] && rm -Rf aws",
+                        "[ -e ./awscliv2.zip ] && rm -f awscliv2.zip",
+                        "(cd unixBin/env && [ ! -L LINK_aws.env ] && ln -s XXX_aws.env LINK_aws.env || true)"
+                    ],
+                    "bat": ["sudo apt install -y bat"],
+                    "direnv": [
+                        "sudo apt install -y direnv",
+                        "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
+                    ],
+                    "exa": ["sudo apt install -y exa"],
+                    "ffmpeg": ["sudo apt install -y ffmpeg"],
+                    "fzf": [
+                        "sudo apt install -y fzf",
+                        "(cd unixBin/env && [ ! -L LINK_fzf.env ] &&ln -s XXX_fzf.env LINK_fzf.env || true)"
+                    ],
+                    "gh": ["sudo apt install -y gh"],
+                    "git": ["sudo apt install -y git"],
+                    "pass": ["sudo apt install -y pass"],
+                    "gpg": ["sudo apt install -y gnupg"],
+                    "jq": ["sudo apt install -y jq"],
+                    "just": ["sudo apt install -y just"],
+                    "kind": ["sudo apt install -y kind"],
+                    "mplayer": ["sudo apt install -y mplayer"],
+                    "nmap": ["sudo apt install -y nmap"],
+                    "nodenv": [
+                        "git clone https://github.com/nodenv/nodenv.git ~/.nodenv",
+                        "sudo ln -vs ~/.nodenv/bin/nodenv /usr/local/bin/nodenv",
+                        "(cd ~/.nodenv src/configure && make -C src || true)",
+                        "mkdir -p $(nodenv root)/plugins",
+                        "git clone https://github.com/nodenv/node-build.git $(nodenv root)/plugins/node-build",
+                        "git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases",
+                        "(cd unixBin/env && [ ! -L LINK_nodenv.env ] &&ln -s XXX_nodenv.env LINK_nodenv.env || true)"
+                    ],
+                    "oh-my-posh": [
+                        "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
+                        "./unixBin/oh-my-posh init $ABK_SHELL",
+                        "(cd unixBin/env && [ ! -L LINK_oh-my-posh.env ] &&ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env || true)"
+                    ],
+                    "parallel": ["sudo apt install -y parallel"],
+                    "serverless": ["sudo npm install -g serverless"],
+                    "shellcheck": ["sudo apt install -y shellcheck"],
+                    "tfenv": [
+                        "git clone https://github.com/tfutils/tfenv.git ~/.tfenv",
+                        "sudo ln -vs ~/.tfenv/bin/tfenv /usr/local/bin/tfenv",
+                        "(cd unixBin/env && [ ! -L LINK_tfenv.env ] && ln -s XXX_tfenv.env LINK_tfenv.env || true)"
+                    ],
+                    "tree": ["sudo apt install -y tree"],
+                    "uv": [
+                        "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                        "(cd \"$HOME/.local/bin\" && ./uv tool install ruff) || true",
+                        "(cd unixBin/env && [ ! -L LINK_uv.env ] && ln -s XXX_uv.env LINK_uv.env || true)"
+                    ],
+                    "wget": ["sudo apt install -y wget"],
+                    "yq": ["sudo snap install yq"],
+                    "xclip": ["sudo apt install -y xclip"],
+                    "zsh-autosuggestions": [
+                        "sudo apt install -y zsh-autosuggestions",
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "sudo apt install -y zsh-syntax-highlighting",
+                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
+                    ]
+                },
+                "uninstall": {
+                    "aws": [
+                        "find ./unixBin/env -type l -name 'LINK_aws.env' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'aws' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'aws_completer' -delete || true",
+                        "[ -d /usr/local/aws-cli ] && sudo rm -Rf /usr/local/aws-cli"
+                    ],
+                    "bat": ["sudo apt remove -y bat"],
+                    "direnv": [
+                        "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
+                        "sudo apt remove -y direnv"
+                    ],
+                    "exa": ["sudo apt remove -y exa"],
+                    "ffmpeg": ["sudo apt remove -y ffmpeg"],
+                    "fzf": [
+                        "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
+                        "sudo apt remove -y fzf"
+                    ],
+                    "gh": ["sudo apt remove -y gh"],
+                    "git": ["sudo apt remove -y git"],
+                    "pass": ["sudo apt remove -y pass"],
+                    "gpg": ["sudo apt remove -y gnupg"],
+                    "jq": ["sudo apt remove -y jq"],
+                    "just": ["sudo apt remove -y just"],
+                    "kind": ["sudo apt remove -y kind"],
+                    "mplayer": ["sudo apt remove -y mplayer"],
+                    "nmap": ["sudo apt remove -y nmap"],
+                    "nodenv": [
+                        "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'nodenv' -delete || true",
+                        "rm -Rf ~/.nodenv"
+                    ],
+                    "oh-my-posh": [
+                        "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
+                        "rm -f ./unixBin/oh-my-posh"
+                    ],
+                    "parallel": ["sudo apt remove -y parallel"],
+                    "serverless": ["sudo npm uninstall -g serverless"],
+                    "shellcheck": ["sudo apt remove -y shellcheck"],
+                    "tfenv": [
+                        "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete || true",
+                        "sudo find /usr/local/bin -type l -name 'tfenv' -delete || true",
+                        "rm -Rf ~/.tfenv"
+                    ],
+                    "tree": ["sudo apt remove -y tree"],
+                    "uv": [
+                        "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
+                        "uv tool uninstall ruff || true",
+                        "uv cache clean",
+                        "rm -rf \"$(uv python dir)\"",
+                        "rm -rf \"$(uv tool dir)\"",
+                        "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
+                    ],
+                    "wget": ["sudo apt remove -y wget"],
+                    "yq": ["sudo snap remove yq"],
+                    "xclip": ["sudo apt remove -y xclip"],
+                    "zsh-autosuggestions": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
+                        "sudo apt remove -y zsh-autosuggestions"
+                    ],
+                    "zsh-syntax-highlighting": [
+                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
+                        "sudo apt remove -y zsh-syntax-highlighting"
+                    ]
+                }
+            },
+            "apps": {
+                "check": {
+                },
+                "install":{
+                },
+                "uninstall": {
+                }
+            },
+            "fonts": {
+                "check": {
+                    "font_installation_start": [""],
+                    "font-agave-nerd-font": ["ls ~/.fonts/AgaveNerdFont*"],
+                    "font-comic-shanns-mono-nerd-font": ["ls ~/.fonts/ComicShannsMonoNerdFont*"],
+                    "font-droid-sans-mono-nerd-font": ["ls ~/.fonts/DroidSansMNerdFont*"],
+                    "font-cascadia-code": ["ls ~/.fonts/CaskaydiaCoveNerdFont*"],
+                    "font-hack-nerd-font": ["ls ~/.fonts/Hack*"],
+                    "font_installation_cleanup": [""]
+                },
+                "install": {
+                    "font_installation_start": ["mkdir -p ~/.fonts"],
+                    "font-agave-nerd-font": [
+                        "ABK_FONT_NAME=Agave",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
+                        "rm -f fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-comic-shanns-mono-nerd-font": [
+                        "ABK_FONT_NAME=ComicShannsMono",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
+                        "rm -f fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-droid-sans-mono-nerd-font": [
+                        "ABK_FONT_NAME=DroidSansMono",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/DroidSansMNerdFont* ~/.fonts/",
+                        "rm -f fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-cascadia-code": [
+                        "ABK_FONT_NAME=CascadiaCode",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/CaskaydiaCoveNerdFont* ~/.fonts/",
+                        "rm -f fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font-hack-nerd-font": [
+                        "ABK_FONT_NAME=Hack",
+                        "curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/${ABK_FONT_NAME}.tar.xz -o fonts.tar.xz",
+                        "mkdir -p ./fonts && tar -xvf fonts.tar.xz -C ./fonts",
+                        "mv ./fonts/${ABK_FONT_NAME}NerdFont* ~/.fonts/",
+                        "rm -f fonts.tar.xz",
+                        "rm -Rf ./fonts"
+                    ],
+                    "font_installation_cleanup": [
+                        "fc-cache -fv"
+                    ]
+                },
+                "uninstall": {
+                    "font-agave-nerd-font": ["rm -f ~/.fonts/AgaveNerdFont*"],
+                    "font-comic-shanns-mono-nerd-font": ["rm -f ~/.fonts/ComicShannsMonoNerdFont*"],
+                    "font-droid-sans-mono-nerd-font": ["rm -f ~/.fonts/DroidSansMNerdFont*"],
+                    "font-cascadia-code": ["rm -f ~/.fonts/CaskaydiaCoveNerdFont*"],
+                    "font-hack-nerd-font": ["rm -f ~/.fonts/Hack*"],
+                    "font_installation_cleanup": ["fc-cache -fv"]
+                }
+            }
+        }
+    }
+}

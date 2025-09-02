@@ -126,6 +126,65 @@ jobs:
                 echo "SHELL = $SHELL"
                 ./test_uninstall.sh "tools_"
 
+    WSL:
+        name: WSL Ubuntu ${{ matrix.version }}
+        runs-on: windows-latest
+        strategy:
+            matrix:
+                version: [22.04, 24.04]
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v4
+
+            - name: Setup WSL
+              uses: Vampire/setup-wsl@v3
+              with:
+                distribution: Ubuntu-${{ matrix.version }}
+                additional-packages: curl git
+
+            - name: Check WSL environment
+              shell: wsl-bash {0}
+              run: |
+                echo "--------WSL Environment-----------"
+                uname -a
+                cat /etc/os-release
+                echo "--------Shells----------------------"
+                cat /etc/shells
+
+            - name: Install zsh in WSL
+              shell: wsl-bash {0}
+              run: |
+                sudo apt update
+                sudo apt install -y zsh
+
+            - name: zsh install tools (WSL)
+              shell: wsl-bash {0}
+              run: |
+                export SHELL=$(which zsh)
+                echo "SHELL = $SHELL"
+                ./test_install.sh "wsl"
+
+            - name: zsh uninstall tools (WSL)
+              shell: wsl-bash {0}
+              run: |
+                export SHELL=$(which zsh)
+                echo "SHELL = $SHELL"
+                ./test_uninstall.sh "wsl"
+
+            - name: bash install tools (WSL)
+              shell: wsl-bash {0}
+              run: |
+                export SHELL=$(which bash)
+                echo "SHELL = $SHELL"
+                ./test_install.sh "wsl"
+
+            - name: bash uninstall tools (WSL)
+              shell: wsl-bash {0}
+              run: |
+                export SHELL=$(which bash)
+                echo "SHELL = $SHELL"
+                ./test_uninstall.sh "wsl"
+
 
 #   Docker:
 #     name: Linux Docker - ${{ matrix.os }}:${{ matrix.version }}
@@ -168,7 +227,7 @@ jobs:
 
     handle-release-tags:
         name: Handle Release Tags
-        needs: [MacOS, Ubuntu]
+        needs: [MacOS, Ubuntu, WSL]
         runs-on: ubuntu-latest
         if: always() && !cancelled()  # Run whether tests pass or fail, but not if cancelled due to concurrency
         steps:
@@ -180,4 +239,4 @@ jobs:
                 persist-credentials: true
 
             - name: Handle release tags
-              run: ./.github/scripts/handle_release_tags.sh "${{ needs.MacOS.result }}" "${{ needs.Ubuntu.result }}" "${{ github.ref_name }}"
+              run: ./.github/scripts/handle_release_tags.sh "${{ needs.MacOS.result }}" "${{ needs.Ubuntu.result }}" "${{ needs.WSL.result }}" "${{ github.ref_name }}"
