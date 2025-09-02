@@ -35,9 +35,7 @@
                     "uv": ["command -v uv"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
-                    "xclip": ["command -v xclip"],
-                    "zsh-autosuggestions": ["apt list --installed | grep zsh-autosuggestions"],
-                    "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
+                    "xclip": ["command -v xclip"]
                 },
                 "install": {
                     "aws": [
@@ -98,15 +96,7 @@
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo snap install yq"],
-                    "xclip": ["sudo apt install -y xclip"],
-                    "zsh-autosuggestions": [
-                        "sudo apt install -y zsh-autosuggestions",
-                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
-                    ],
-                    "zsh-syntax-highlighting": [
-                        "sudo apt install -y zsh-syntax-highlighting",
-                        "(cd unixBin/env && [ ! -L LINK_zsh_plugins.env ] && ln -s XXX_zsh_plugins.env LINK_zsh_plugins.env || true)"
-                    ]
+                    "xclip": ["sudo apt install -y xclip"]
                 },
                 "uninstall": {
                     "aws": [
@@ -163,15 +153,7 @@
                     ],
                     "wget": ["sudo apt remove -y wget"],
                     "yq": ["sudo snap remove yq"],
-                    "xclip": ["sudo apt remove -y xclip"],
-                    "zsh-autosuggestions": [
-                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
-                        "sudo apt remove -y zsh-autosuggestions"
-                    ],
-                    "zsh-syntax-highlighting": [
-                        "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
-                        "sudo apt remove -y zsh-syntax-highlighting"
-                    ]
+                    "xclip": ["sudo apt remove -y xclip"]
                 }
             },
             "apps": {

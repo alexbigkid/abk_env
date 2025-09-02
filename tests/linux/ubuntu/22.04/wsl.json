@@ -80,14 +80,6 @@
     ],
     "xclip": [
       "sudo apt remove -y xclip"
-    ],
-    "zsh-autosuggestions": [
-      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
-      "sudo apt remove -y zsh-autosuggestions"
-    ],
-    "zsh-syntax-highlighting": [
-      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
-      "sudo apt remove -y zsh-syntax-highlighting"
     ]
   },
   "installed_fonts": {
