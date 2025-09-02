@@ -167,8 +167,8 @@ jobs:
               run: |
                 export SHELL=$(which zsh)
                 echo "SHELL = $SHELL"
-                dos2unix ./test_install.sh || true
-                chmod +x ./test_install.sh
+                find . -name "*.sh" -type f -exec dos2unix {} \; || true
+                chmod +x ./test_install.sh ./test_uninstall.sh ./unixBin/*.sh
                 /bin/bash -x ./test_install.sh "wsl"
 
             - name: zsh uninstall tools (WSL)
@@ -176,8 +176,6 @@ jobs:
               run: |
                 export SHELL=$(which zsh)
                 echo "SHELL = $SHELL"
-                dos2unix ./test_uninstall.sh || true
-                chmod +x ./test_uninstall.sh
                 /bin/bash -x ./test_uninstall.sh "wsl"
 
             - name: bash install tools (WSL)
@@ -185,8 +183,6 @@ jobs:
               run: |
                 export SHELL=$(which bash)
                 echo "SHELL = $SHELL"
-                dos2unix ./test_install.sh || true
-                chmod +x ./test_install.sh
                 /bin/bash -x ./test_install.sh "wsl"
 
             - name: bash uninstall tools (WSL)
@@ -194,8 +190,6 @@ jobs:
               run: |
                 export SHELL=$(which bash)
                 echo "SHELL = $SHELL"
-                dos2unix ./test_uninstall.sh || true
-                chmod +x ./test_uninstall.sh
                 /bin/bash -x ./test_uninstall.sh "wsl"
 
 

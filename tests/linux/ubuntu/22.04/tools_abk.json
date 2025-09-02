@@ -17,6 +17,9 @@
       "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
       "sudo apt remove -y fzf"
     ],
+    "pass": [
+      "sudo apt remove -y pass"
+    ],
     "just": [
       "sudo apt remove -y just"
     ],
@@ -50,9 +53,6 @@
       "rm -rf \"$(uv python dir)\"",
       "rm -rf \"$(uv tool dir)\"",
       "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
-    ],
-    "xclip": [
-      "sudo apt remove -y xclip"
     ],
     "zsh-autosuggestions": [
       "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
