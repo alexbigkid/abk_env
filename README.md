@@ -145,8 +145,6 @@ For you convenience I prepared few installation packages listed below:
 | [oh-my-posh](https://ohmyposh.dev/)                                             | lets you easiliy configure your terminal prompt                                                               |
 | [parallel](https://github.com/flesler/parallel)                                 | CLI tool to execute shell commands in parallel                                                                |
 | [pass](https://www.passwordstore.org)                                           | password manager, which works well with <code>direnv</code> tool                                              |
-| [pyenv](https://github.com/pyenv/pyenv)                                         | lets you easily switch between multiple versions of Python                                                    |
-| [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)                   | is a pyenv plugin, which manages virtualenvs for Python                                                       |
 | [ruff](https://github.com/astral-sh/ruff)                                       | python code linter                                                                                            |
 | [serverless](https://www.serverless.com/framework/docs)                         | lets you deploy serverless infrastructure services to AWS                                                     |
 | [tfenv](https://github.com/tfutils/tfenv)                                       | lets you easily switch between multiple versions of Terraform                                                 |

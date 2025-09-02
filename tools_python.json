@@ -13,7 +13,6 @@
                 "jq": ["command -v jq"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "parallel": ["command -v parallel"],
-                "pyenv": ["command -v pyenv"],
                 "ruff": ["command -v ruff"],
                 "uv": ["command -v uv"],
                 "wget": ["command -v wget"],
@@ -33,11 +32,6 @@
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                 ],
                 "parallel": ["brew install parallel"],
-                "pyenv": [
-                    "brew install pyenv",
-                    "brew install pyenv-virtualenv",
-                    "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
-                ],
                 "ruff": ["brew install ruff"],
                 "uv": [
                     "brew install uv",
@@ -59,12 +53,6 @@
                     "brew uninstall oh-my-posh"
                 ],
                 "parallel": ["brew uninstall parallel"],
-                "pyenv": [
-                    "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
-                    "brew uninstall pyenv-virtualenv",
-                    "brew uninstall pyenv",
-                    "rm -Rf ~/.pyenv"
-                ],
                 "ruff": ["brew uninstall ruff"],
                 "uv": [
                     "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
@@ -107,7 +95,6 @@
                     "jq": ["command -v jq"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
-                    "pyenv": ["command -v pyenv"],
                     "uv": ["command -v uv"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"]
@@ -125,11 +112,6 @@
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "parallel": ["sudo apt install -y parallel"],
-                    "pyenv": [
-                        "sudo DEBIAN_FRONTEND=noninteractive apt install -yq make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev",
-                        "curl -fsSL https://pyenv.run | bash",
-                        "(cd unixBin/env && ln -s XXX_pyenv.env LINK_pyenv.env)"
-                    ],
                     "uv": [
                         "curl -LsSf https://astral.sh/uv/install.sh | sh",
                         "(cd \"$HOME/.local/bin\" && ./uv tool install ruff) || true",
@@ -150,11 +132,6 @@
                         "rm -f ./unixBin/oh-my-posh"
                     ],
                     "parallel": ["sudo apt remove -y parallel"],
-                    "pyenv": [
-                        "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
-                        "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
-                        "rm -Rf ~/.pyenv"
-                    ],
                     "uv": [
                         "find ./unixBin/env -type l -name 'LINK_uv.env' -delete",
                         "uv tool uninstall ruff || true",
