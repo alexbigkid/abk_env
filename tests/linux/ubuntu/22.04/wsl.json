@@ -13,9 +13,6 @@
       "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
       "sudo apt remove -y direnv"
     ],
-    "exa": [
-      "sudo apt remove -y exa"
-    ],
     "ffmpeg": [
       "sudo apt remove -y ffmpeg"
     ],
@@ -30,10 +27,10 @@
       "sudo apt remove -y pass"
     ],
     "just": [
-      "sudo snap remove just"
+      "sudo rm -f /usr/local/bin/just"
     ],
     "kind": [
-      "sudo apt remove -y kind"
+      "sudo rm -f /usr/local/bin/kind"
     ],
     "mplayer": [
       "sudo apt remove -y mplayer"
@@ -54,7 +51,8 @@
       "sudo apt remove -y parallel"
     ],
     "serverless": [
-      "sudo npm uninstall -g serverless"
+      "export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"",
+      "npm uninstall -g serverless"
     ],
     "shellcheck": [
       "sudo apt remove -y shellcheck"
@@ -63,9 +61,6 @@
       "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete || true",
       "sudo find /usr/local/bin -type l -name 'tfenv' -delete || true",
       "rm -Rf ~/.tfenv"
-    ],
-    "tree": [
-      "sudo apt remove -y tree"
     ],
     "uv": [
       "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
@@ -76,7 +71,7 @@
       "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
     ],
     "yq": [
-      "sudo snap remove yq"
+      "sudo rm -f /usr/local/bin/yq"
     ],
     "xclip": [
       "sudo apt remove -y xclip"
