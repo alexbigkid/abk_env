@@ -95,8 +95,8 @@
                         "export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"",
                         "nodenv install 22.18.0",
                         "nodenv global 22.18.0",
-                        "echo \"node version\n\" && node --version",
-                        "echo \"npm version\n\" && npm --version",
+                        "node --version",
+                        "npm --version",
                         "(cd unixBin/env && [ ! -L LINK_nodenv.env ] && ln -s XXX_nodenv.env LINK_nodenv.env || true)"
                     ],
                     "oh-my-posh": [
