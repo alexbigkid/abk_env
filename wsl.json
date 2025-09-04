@@ -20,7 +20,7 @@
                     "bat": ["command -v bat"],
                     "direnv": ["command -v direnv"],
                     "ffmpeg": ["command -v ffmpeg"],
-                    "exa": ["command -v exa"],
+                    "eza": ["command -v eza"],
                     "fzf": ["command -v fzf"],
                     "gh": ["command -v gh"],
                     "git": ["command -v git"],
@@ -31,6 +31,8 @@
                     "kind": ["command -v kind"],
                     "mplayer": ["command -v mplayer"],
                     "nmap": ["command -v nmap"],
+                    "nodejs": ["command -v node"],
+                    "npm": ["command -v npm"],
                     "nodenv": ["command -v nodenv"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
@@ -62,7 +64,7 @@
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y direnv --no-install-recommends",
                         "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
                     ],
-                    "exa": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y exa --no-install-recommends"],
+                    "eza": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y eza --no-install-recommends"],
                     "ffmpeg": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y ffmpeg --no-install-recommends"],
                     "fzf": [
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y fzf --no-install-recommends",
@@ -80,9 +82,15 @@
                         "sudo chmod +x /usr/local/bin/just",
                         "rm -f just.tar.gz"
                     ],
-                    "kind": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y kind --no-install-recommends"],
+                    "kind": [
+                        "curl -L https://kind.sigs.k8s.io/dl/v0.26.0/kind-linux-amd64 -o kind",
+                        "sudo mv kind /usr/local/bin/kind",
+                        "sudo chmod +x /usr/local/bin/kind"
+                    ],
                     "mplayer": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y mplayer --no-install-recommends"],
                     "nmap": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y nmap --no-install-recommends"],
+                    "nodejs": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs --no-install-recommends"],
+                    "npm": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y npm --no-install-recommends"],
                     "nodenv": [
                         "git clone https://github.com/nodenv/nodenv.git ~/.nodenv",
                         "sudo ln -vs ~/.nodenv/bin/nodenv /usr/local/bin/nodenv",
@@ -131,7 +139,7 @@
                         "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
                         "sudo apt remove -y direnv"
                     ],
-                    "exa": ["sudo apt remove -y exa"],
+                    "eza": ["sudo apt remove -y eza"],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
                     "fzf": [
                         "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
@@ -143,9 +151,11 @@
                     "gpg": ["sudo apt remove -y gnupg"],
                     "jq": ["sudo apt remove -y jq"],
                     "just": ["sudo rm -f /usr/local/bin/just"],
-                    "kind": ["sudo apt remove -y kind"],
+                    "kind": ["sudo rm -f /usr/local/bin/kind"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "nmap": ["sudo apt remove -y nmap"],
+                    "nodejs": ["sudo apt remove -y nodejs"],
+                    "npm": ["sudo apt remove -y npm"],
                     "nodenv": [
                         "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
                         "sudo find /usr/local/bin -type l -name 'nodenv' -delete || true",
