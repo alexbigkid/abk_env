@@ -20,7 +20,6 @@
                     "bat": ["command -v bat"],
                     "direnv": ["command -v direnv"],
                     "ffmpeg": ["command -v ffmpeg"],
-                    "eza": ["command -v eza"],
                     "fzf": ["command -v fzf"],
                     "gh": ["command -v gh"],
                     "git": ["command -v git"],
@@ -62,7 +61,6 @@
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y direnv --no-install-recommends",
                         "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
                     ],
-                    "eza": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y eza --no-install-recommends"],
                     "ffmpeg": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y ffmpeg --no-install-recommends"],
                     "fzf": [
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y fzf --no-install-recommends",
@@ -97,8 +95,8 @@
                         "export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"",
                         "nodenv install 22.18.0",
                         "nodenv global 22.18.0",
-                        "echo 'node version\n' && node --version",
-                        "echo 'npm version\n' && npm --version",
+                        "echo \"node version\n\" && node --version",
+                        "echo \"npm version\n\" && npm --version",
                         "(cd unixBin/env && [ ! -L LINK_nodenv.env ] && ln -s XXX_nodenv.env LINK_nodenv.env || true)"
                     ],
                     "oh-my-posh": [
@@ -140,7 +138,6 @@
                         "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
                         "sudo apt remove -y direnv"
                     ],
-                    "eza": ["sudo apt remove -y eza"],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
                     "fzf": [
                         "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
