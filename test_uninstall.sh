@@ -68,18 +68,14 @@ ValidateShellEnvironmentRemoved() {
 ValidateLinksDeleted() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_LINKS_DIR="./unixBin/env"
-    local LCL_LINKS_FILES=(
-        "LINK_aws.env"
-        "LINK_direnv.env"
-        "LINK_fzf.env"
-        "LINK_nodenv.env"
-        "LINK_oh-my-posh.env"
-        "LINK_pyenv.env"
-        "LINK_rbenv.env"
-        "LINK_tfenv.env"
-        "LINK_uv.env"
-        "LINK_zsh_plugins.env"
-    )
+    local LCL_LINKS_FILES=()
+    
+    # Check for any remaining LINK files that should have been deleted
+    for link_file in "$LCL_LINKS_DIR"/LINK_*.env; do
+        if [ -L "$link_file" ]; then
+            LCL_LINKS_FILES+=("$(basename "$link_file")")
+        fi
+    done
 
     # check the links were created
     (

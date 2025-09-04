@@ -113,15 +113,31 @@ EOF
 ValidateLinksCreated() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
     local LCL_LINKS_DIR="./unixBin/env"
-    local LCL_LINKS_FILES=(
-        "LINK_direnv.env"
-        "LINK_fzf.env"
-        "LINK_nodenv.env"
-        "LINK_oh-my-posh.env"
-        "LINK_pyenv.env"
-        "LINK_uv.env"
-        "LINK_zsh_plugins.env"
-    )
+    local LCL_LINKS_FILES=()
+    
+    # Dynamically discover which LINK files should exist based on installed packages
+    if [ -d "./unixPackages" ]; then
+        for package_file in ./unixPackages/*.json; do
+            if [ -f "$package_file" ]; then
+                # Extract tool names that create LINK files from the package
+                while IFS= read -r tool_name; do
+                    local link_file="LINK_${tool_name}.env"
+                    if [ -f "$LCL_LINKS_DIR/$link_file" ]; then
+                        LCL_LINKS_FILES+=("$link_file")
+                    fi
+                done < <(jq -r '.linux.debian.tools.install | keys[]' "$package_file" 2>/dev/null | grep -E "(direnv|fzf|nodenv|oh-my-posh|pyenv|uv|zsh_plugins|aws|rbenv|tfenv)")
+            fi
+        done
+    fi
+    
+    # If no dynamic discovery worked, fall back to checking what actually exists
+    if [ ${#LCL_LINKS_FILES[@]} -eq 0 ]; then
+        for link_file in "$LCL_LINKS_DIR"/LINK_*.env; do
+            if [ -L "$link_file" ]; then
+                LCL_LINKS_FILES+=("$(basename "$link_file")")
+            fi
+        done
+    fi
 
     (
         cd "$LCL_LINKS_DIR" || {
