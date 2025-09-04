@@ -341,6 +341,10 @@ AbkLib_CheckPreRequisites_linux() {
     if ! command -v jq >/dev/null 2>&1; then
         sudo apt install -y jq || LCL_EXIT_CODE=$?
     fi
+    # install unzip
+    if ! command -v unzip >/dev/null 2>&1; then
+        sudo apt install -y unzip || LCL_EXIT_CODE=$?
+    fi
 
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE
