@@ -142,6 +142,7 @@ jobs:
               uses: Vampire/setup-wsl@v3
               with:
                 distribution: Ubuntu-${{ matrix.version }}
+                wsl-version: 2
                 additional-packages: curl git bash
 
             - name: Check WSL environment
@@ -150,6 +151,8 @@ jobs:
                 echo "--------WSL Environment-----------"
                 uname -a
                 cat /etc/os-release
+                echo "--------WSL Version-----------------"
+                cat /proc/version | grep -i microsoft
                 echo "--------Shells----------------------"
                 cat /etc/shells
 

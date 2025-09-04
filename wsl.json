@@ -166,8 +166,8 @@
                     ],
                     "parallel": ["sudo apt remove -y parallel"],
                     "serverless": [
-                        "export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"",
-                        "npm uninstall -g serverless"
+                        "if command -v nodenv >/dev/null 2>&1; then export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"; fi",
+                        "if command -v npm >/dev/null 2>&1; then npm uninstall -g serverless; else echo 'npm not found, skipping serverless uninstall'; fi"
                     ],
                     "shellcheck": ["sudo apt remove -y shellcheck"],
                     "tfenv": [
