@@ -46,7 +46,7 @@
                         "[ -e ./awscliv2.zip ] && rm -f awscliv2.zip",
                         "(cd unixBin/env && [ ! -L LINK_aws.env ] && ln -s XXX_aws.env LINK_aws.env || true)"
                     ],
-                    "bat": ["sudo apt install -y bat"],
+                    "bat": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y bat --no-install-recommends"],
                     "direnv": [
                         "sudo apt install -y direnv",
                         "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
