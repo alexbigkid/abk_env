@@ -105,7 +105,11 @@
                         "(cd unixBin/env && [ ! -L LINK_oh-my-posh.env ] &&ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env || true)"
                     ],
                     "parallel": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y parallel --no-install-recommends"],
-                    "serverless": ["sudo npm install -g serverless"],
+                    "serverless": [
+                        "export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"",
+                        "npm --version",
+                        "npm install -g serverless"
+                    ],
                     "shellcheck": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y shellcheck --no-install-recommends"],
                     "tfenv": [
                         "git clone https://github.com/tfutils/tfenv.git ~/.tfenv",
@@ -162,7 +166,10 @@
                         "rm -f ./unixBin/oh-my-posh"
                     ],
                     "parallel": ["sudo apt remove -y parallel"],
-                    "serverless": ["sudo npm uninstall -g serverless"],
+                    "serverless": [
+                        "export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"",
+                        "npm uninstall -g serverless"
+                    ],
                     "shellcheck": ["sudo apt remove -y shellcheck"],
                     "tfenv": [
                         "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete || true",
