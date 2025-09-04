@@ -51,8 +51,8 @@
       "sudo apt remove -y parallel"
     ],
     "serverless": [
-      "if command -v nodenv >/dev/null 2>&1; then export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"; fi",
-      "if command -v npm >/dev/null 2>&1; then npm uninstall -g serverless; else echo 'npm not found, skipping serverless uninstall'; fi"
+      "if command -v nodenv >/dev/null 2>&1; then export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\" 2>/dev/null || true; fi",
+      "if command -v npm >/dev/null 2>&1; then npm uninstall -g serverless 2>/dev/null || echo 'serverless uninstall failed, but continuing'; else echo 'npm not found, skipping serverless uninstall'; fi"
     ],
     "shellcheck": [
       "sudo apt remove -y shellcheck"
@@ -64,10 +64,10 @@
     ],
     "uv": [
       "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
-      "uv tool uninstall ruff || true",
-      "uv cache clean",
-      "rm -rf \"$(uv python dir)\"",
-      "rm -rf \"$(uv tool dir)\"",
+      "if command -v uv >/dev/null 2>&1; then uv tool uninstall ruff 2>/dev/null || true; fi",
+      "if command -v uv >/dev/null 2>&1; then uv cache clean 2>/dev/null || true; fi",
+      "if command -v uv >/dev/null 2>&1; then rm -rf \"$(uv python dir)\" 2>/dev/null || true; fi",
+      "if command -v uv >/dev/null 2>&1; then rm -rf \"$(uv tool dir)\" 2>/dev/null || true; fi",
       "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
     ],
     "yq": [
