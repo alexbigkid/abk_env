@@ -6,6 +6,16 @@
         },
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
+            "descriptions": {
+                "git": "Distributed version control system for tracking changes in source code",
+                "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
+                "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
+                "zsh-autocomplete": "Real-time type-ahead autocompletion for Zsh with intelligent suggestions",
+                "zsh-autosuggestions": "Fish-like autosuggestions for Zsh based on command history",
+                "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
+            },
             "check": {
                 "git": ["command -v git"],
                 "jq": ["command -v jq"],
@@ -103,6 +113,18 @@
             },
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
+                "descriptions": {
+                    "ffmpeg": "Complete multimedia framework for recording, converting and streaming audio/video",
+                    "git": "Distributed version control system for tracking changes in source code",
+                    "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                    "mplayer": "Cross-platform multimedia player that supports a wide variety of audio/video formats",
+                    "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                    "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
+                    "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
+                    "xclip": "Command line interface to X11 clipboard for copying/pasting in terminal",
+                    "zsh-autosuggestions": "Fish-like autosuggestions for Zsh based on command history",
+                    "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
+                },
                 "check": {
                     "ffmpeg": ["command -v ffmpeg"],
                     "git": ["command -v git"],

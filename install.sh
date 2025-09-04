@@ -141,15 +141,15 @@ __installItem() {
     done <<< "$LCL_CHECK_INSTRUCTIONS"
 
     if [ $LCL_IS_APP_INSTALLED -eq 1 ]; then
+        PrintTrace "$TRACE_INFO" "${YLW}[$LCL_ITEM installing ...]${NC}"
         # Display tool description if available
         if [ "$LCL_DESCRIPTIONS" != "" ] && [ "$LCL_DESCRIPTIONS" != "null" ]; then
             local LCL_TOOL_DESCRIPTION
             LCL_TOOL_DESCRIPTION=$(echo "$LCL_DESCRIPTIONS" | jq -r ".\"$LCL_ITEM\"" 2>/dev/null)
             if [ "$LCL_TOOL_DESCRIPTION" != "null" ] && [ "$LCL_TOOL_DESCRIPTION" != "" ]; then
-                PrintTrace "$TRACE_INFO" "${CYN}  $LCL_ITEM: $LCL_TOOL_DESCRIPTION${NC}"
+                PrintTrace "$TRACE_INFO" "${YLW} $LCL_ITEM: $LCL_TOOL_DESCRIPTION${NC}"
             fi
         fi
-        PrintTrace "$TRACE_INFO" "${YLW}[$LCL_ITEM installing ...]${NC}"
         while IFS= read -r INSTALL_STEP; do
             eval "$INSTALL_STEP"
             LCL_EXIT_CODE=$?

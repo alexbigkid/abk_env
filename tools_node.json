@@ -6,6 +6,15 @@
         },
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
+            "descriptions": {
+                "git": "Distributed version control system for tracking changes in source code",
+                "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                "nodenv": "Node.js version manager that allows easy switching between Node.js versions",
+                "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                "typescript": "Typed superset of JavaScript that compiles to plain JavaScript",
+                "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
+                "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML"
+            },
             "check": {
                 "git": ["command -v git"],
                 "jq": ["command -v jq"],
@@ -75,6 +84,14 @@
             },
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
+                "descriptions": {
+                    "git": "Distributed version control system for tracking changes in source code",
+                    "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                    "nodenv": "Node.js version manager that allows easy switching between Node.js versions",
+                    "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                    "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
+                    "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML"
+                },
                 "check": {
                     "git": ["command -v git"],
                     "jq": ["command -v jq"],

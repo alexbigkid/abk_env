@@ -6,6 +6,26 @@
         },
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
+            "descriptions": {
+                "detekt": "Static code analysis tool for Kotlin that helps detect code smells and style issues",
+                "git": "Distributed version control system for tracking changes in source code",
+                "gradle": "Build automation tool used primarily for Java and Android projects",
+                "fastlane": "Automated tool for iOS and Android deployment and release management",
+                "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                "kotlin": "Modern programming language that runs on the JVM, used for Android development",
+                "ktlint": "Kotlin linter and formatter that enforces official Kotlin coding conventions",
+                "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                "openjdk@21": "Open-source implementation of the Java Platform, Standard Edition version 21",
+                "openjdk": "Open-source implementation of the Java Platform, Standard Edition",
+                "jenv": "Java version manager that allows switching between Java versions easily",
+                "rbenv": "Ruby version manager that allows easy switching between Ruby versions",
+                "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
+                "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
+                "xcode-select": "Command-line tool for managing active Xcode developer directory",
+                "zsh-autocomplete": "Real-time type-ahead autocompletion for Zsh with intelligent suggestions",
+                "zsh-autosuggestions": "Fish-like autosuggestions for Zsh based on command history",
+                "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
+            },
             "check": {
                 "detekt": ["command -v detekt"],
                 "git": ["command -v git"],
