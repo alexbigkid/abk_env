@@ -178,58 +178,18 @@ jobs:
                 echo "SHELL = $SHELL"
                 /bin/bash ./test_uninstall.sh "wsl"
 
+    # handle-release-tags:
+    #     name: Handle Release Tags
+    #     needs: [MacOS, Ubuntu, WSL]
+    #     runs-on: ubuntu-latest
+    #     if: always() && !cancelled()  # Run whether tests pass or fail, but not if cancelled due to concurrency
+    #     steps:
+    #         - name: Checkout code
+    #           uses: actions/checkout@v4
+    #           with:
+    #             fetch-depth: 0
+    #             token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+    #             persist-credentials: true
 
-#   Docker:
-#     name: Linux Docker - ${{ matrix.os }}:${{ matrix.version }}
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         include:
-#           - os: debian
-#             version: "9"
-#           - os: debian
-#             version: "10"
-#           - os: debian
-#             version: "11"
-#           - os: debian
-#             version: "12"
-#           - os: raspbian
-#             version: "9"
-#           - os: raspbian
-#             version: "10"
-#           - os: raspbian
-#             version: "11"
-#           - os: raspbian
-#             version: "12"
-#           - os: ubuntu
-#             version: "20.10"
-#           - os: ubuntu
-#             version: "22.10"
-#           - os: ubuntu
-#             version: "24.04"
-#     steps:
-#       - uses: actions/checkout@v4
-#       - name: Run tool install/uninstall tests in Docker
-#         run: |
-#           docker pull ${{ matrix.os }}:${{ matrix.version }}
-#           docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace ${{ matrix.os }}:${{ matrix.version }} /bin/bash -c "
-#             apt-get update && apt-get install -y bash sudo curl gnupg
-#             ./test_install.sh
-#             ./test_uninstall.sh
-#           "
-
-    handle-release-tags:
-        name: Handle Release Tags
-        needs: [MacOS, Ubuntu, WSL]
-        runs-on: ubuntu-latest
-        if: always() && !cancelled()  # Run whether tests pass or fail, but not if cancelled due to concurrency
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-              with:
-                fetch-depth: 0
-                token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
-                persist-credentials: true
-
-            - name: Handle release tags
-              run: ./.github/scripts/handle_release_tags.sh "${{ needs.MacOS.result }}" "${{ needs.Ubuntu.result }}" "${{ needs.WSL.result }}" "${{ github.ref_name }}"
+    #         - name: Handle release tags
+    #           run: ./.github/scripts/handle_release_tags.sh "${{ needs.MacOS.result }}" "${{ needs.Ubuntu.result }}" "${{ needs.WSL.result }}" "${{ github.ref_name }}"
