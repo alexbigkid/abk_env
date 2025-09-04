@@ -31,8 +31,6 @@
                     "kind": ["command -v kind"],
                     "mplayer": ["command -v mplayer"],
                     "nmap": ["command -v nmap"],
-                    "nodejs": ["command -v node"],
-                    "npm": ["command -v npm"],
                     "nodenv": ["command -v nodenv"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "parallel": ["command -v parallel"],
@@ -89,8 +87,6 @@
                     ],
                     "mplayer": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y mplayer --no-install-recommends"],
                     "nmap": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y nmap --no-install-recommends"],
-                    "nodejs": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs --no-install-recommends"],
-                    "npm": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y npm --no-install-recommends"],
                     "nodenv": [
                         "git clone https://github.com/nodenv/nodenv.git ~/.nodenv",
                         "sudo ln -vs ~/.nodenv/bin/nodenv /usr/local/bin/nodenv",
@@ -98,7 +94,10 @@
                         "mkdir -p $(nodenv root)/plugins",
                         "git clone https://github.com/nodenv/node-build.git $(nodenv root)/plugins/node-build",
                         "git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases",
-                        "(cd unixBin/env && [ ! -L LINK_nodenv.env ] &&ln -s XXX_nodenv.env LINK_nodenv.env || true)"
+                        "export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\"",
+                        "nodenv install 22.18.0",
+                        "nodenv global 22.18.0",
+                        "(cd unixBin/env && [ ! -L LINK_nodenv.env ] && ln -s XXX_nodenv.env LINK_nodenv.env || true)"
                     ],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
@@ -154,8 +153,6 @@
                     "kind": ["sudo rm -f /usr/local/bin/kind"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "nmap": ["sudo apt remove -y nmap"],
-                    "nodejs": ["sudo apt remove -y nodejs"],
-                    "npm": ["sudo apt remove -y npm"],
                     "nodenv": [
                         "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
                         "sudo find /usr/local/bin -type l -name 'nodenv' -delete || true",
