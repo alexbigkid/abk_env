@@ -7,7 +7,13 @@
                 "raspbian": ["11", "12"],
                 "ubuntu": ["22.04", "24.04"]
             },
-            "update_packages": ["sudo DEBIAN_FRONTEND=noninteractive apt update", "sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y", "sudo DEBIAN_FRONTEND=noninteractive apt --fix-broken install -y"],
+            "update_packages": [
+                "sudo rm -f /var/lib/dpkg/lock* /var/cache/apt/archives/lock",
+                "sudo DEBIAN_FRONTEND=noninteractive apt update",
+                "sudo apt-mark hold systemd || true",
+                "sudo DEBIAN_FRONTEND=noninteractive dpkg --configure -a --force-depends || true",
+                "sudo DEBIAN_FRONTEND=noninteractive apt --fix-broken install -y || true"
+            ],
             "tools": {
                 "check": {
                     "aws": ["command -v aws"],
@@ -46,7 +52,12 @@
                         "[ -e ./awscliv2.zip ] && rm -f awscliv2.zip",
                         "(cd unixBin/env && [ ! -L LINK_aws.env ] && ln -s XXX_aws.env LINK_aws.env || true)"
                     ],
-                    "bat": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y bat --no-install-recommends --no-install-suggests"],
+                    "bat": [
+                        "curl -L https://github.com/sharkdp/bat/releases/download/v0.24.0/bat_0.24.0_amd64.deb -o bat.deb",
+                        "sudo DEBIAN_FRONTEND=noninteractive dpkg -i bat.deb --force-depends || true",
+                        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -f -y --no-install-recommends || true",
+                        "rm -f bat.deb"
+                    ],
                     "direnv": [
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y direnv --no-install-recommends",
                         "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
