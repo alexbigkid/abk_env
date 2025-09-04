@@ -119,6 +119,7 @@ __installItem() {
     local LCL_CHECK_INSTRUCTIONS=$4
     local LCL_INSTALL_INSTRUCTIONS=$5
     local LCL_UNINSTALL_INSTRUCTIONS=$6
+    local LCL_DESCRIPTIONS=$7
     local LCL_IS_APP_INSTALLED=1
     local LCL_EXIT_CODE=0
 
@@ -140,6 +141,14 @@ __installItem() {
     done <<< "$LCL_CHECK_INSTRUCTIONS"
 
     if [ $LCL_IS_APP_INSTALLED -eq 1 ]; then
+        # Display tool description if available
+        if [ "$LCL_DESCRIPTIONS" != "" ] && [ "$LCL_DESCRIPTIONS" != "null" ]; then
+            local LCL_TOOL_DESCRIPTION
+            LCL_TOOL_DESCRIPTION=$(echo "$LCL_DESCRIPTIONS" | jq -r ".\"$LCL_ITEM\"" 2>/dev/null)
+            if [ "$LCL_TOOL_DESCRIPTION" != "null" ] && [ "$LCL_TOOL_DESCRIPTION" != "" ]; then
+                PrintTrace "$TRACE_INFO" "${CYN}  $LCL_ITEM: $LCL_TOOL_DESCRIPTION${NC}"
+            fi
+        fi
         PrintTrace "$TRACE_INFO" "${YLW}[$LCL_ITEM installing ...]${NC}"
         while IFS= read -r INSTALL_STEP; do
             eval "$INSTALL_STEP"
@@ -180,6 +189,9 @@ __installItemList() {
     local LCL_UNINSTALL_ITEMS
     LCL_UNINSTALL_ITEMS=$(echo $LCL_INSTRUCTIONS | jq -r ".$LCL_ITEM.uninstall")
     PrintTrace "$TRACE_DEBUG" "LCL_UNINSTALL_ITEMS = $LCL_UNINSTALL_ITEMS"
+    local LCL_DESCRIPTIONS
+    LCL_DESCRIPTIONS=$(echo $LCL_INSTRUCTIONS | jq -r ".$LCL_ITEM.descriptions")
+    PrintTrace "$TRACE_DEBUG" "LCL_DESCRIPTIONS = $LCL_DESCRIPTIONS"
 
     if [ "$LCL_INSTALL_ITEMS" != "" ]; then
         INSTALL_ITEM_LIST=($(echo "$LCL_INSTALL_ITEMS" | jq -r 'keys_unsorted[]'))
@@ -190,7 +202,7 @@ __installItemList() {
             PrintTrace "$TRACE_DEBUG" "${ORG}INSTALL_STEPS = $INSTALL_STEPS${NC}"
             CHECK_STEP=$(echo $LCL_CHECK_ITEMS | jq -r ".\"$INSTALL_ITEM\"[]")
             PrintTrace "$TRACE_DEBUG" "${ORG}CHECK_STEP = $CHECK_STEP${NC}"
-            __installItem "$LCL_JSON_FILE_NAME" "$LCL_INSTALLED_TYPE" "$INSTALL_ITEM" "$CHECK_STEP" "$INSTALL_STEPS" "$LCL_UNINSTALL_ITEMS" || PrintTrace "$TRACE_ERROR" "${RED}ERROR: $INSTALL_ITEM installation failed${NC}"
+            __installItem "$LCL_JSON_FILE_NAME" "$LCL_INSTALLED_TYPE" "$INSTALL_ITEM" "$CHECK_STEP" "$INSTALL_STEPS" "$LCL_UNINSTALL_ITEMS" "$LCL_DESCRIPTIONS" || PrintTrace "$TRACE_ERROR" "${RED}ERROR: $INSTALL_ITEM installation failed${NC}"
         done
     fi
 
