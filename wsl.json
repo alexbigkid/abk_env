@@ -73,7 +73,13 @@
                     "pass": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y pass --no-install-recommends"],
                     "gpg": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y gnupg --no-install-recommends"],
                     "jq": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y jq --no-install-recommends"],
-                    "just": ["sudo snap install just"],
+                    "just": [
+                        "curl -L https://github.com/casey/just/releases/download/1.36.0/just-1.36.0-x86_64-unknown-linux-musl.tar.gz -o just.tar.gz",
+                        "tar -xzf just.tar.gz",
+                        "sudo mv just /usr/local/bin/just",
+                        "sudo chmod +x /usr/local/bin/just",
+                        "rm -f just.tar.gz"
+                    ],
                     "kind": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y kind --no-install-recommends"],
                     "mplayer": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y mplayer --no-install-recommends"],
                     "nmap": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y nmap --no-install-recommends"],
@@ -106,7 +112,11 @@
                         "(cd unixBin/env && [ ! -L LINK_uv.env ] && ln -s XXX_uv.env LINK_uv.env || true)"
                     ],
                     "wget": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y wget --no-install-recommends"],
-                    "yq": ["sudo snap install yq"],
+                    "yq": [
+                        "curl -L https://github.com/mikefarah/yq/releases/download/v4.44.5/yq_linux_amd64 -o yq",
+                        "sudo mv yq /usr/local/bin/yq",
+                        "sudo chmod +x /usr/local/bin/yq"
+                    ],
                     "xclip": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y xclip --no-install-recommends"]
                 },
                 "uninstall": {
@@ -132,7 +142,7 @@
                     "pass": ["sudo apt remove -y pass"],
                     "gpg": ["sudo apt remove -y gnupg"],
                     "jq": ["sudo apt remove -y jq"],
-                    "just": ["sudo snap remove just"],
+                    "just": ["sudo rm -f /usr/local/bin/just"],
                     "kind": ["sudo apt remove -y kind"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "nmap": ["sudo apt remove -y nmap"],
@@ -163,7 +173,7 @@
                         "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
                     ],
                     "wget": ["sudo apt remove -y wget"],
-                    "yq": ["sudo snap remove yq"],
+                    "yq": ["sudo rm -f /usr/local/bin/yq"],
                     "xclip": ["sudo apt remove -y xclip"]
                 }
             },
