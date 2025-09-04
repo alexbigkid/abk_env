@@ -1,0 +1,9 @@
+{
+  "installed_tools": {
+    "pyenv": [
+        "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
+        "sudo find /usr/local/bin -type l -name 'pyenv' -delete",
+        "rm -Rf ~/.pyenv"
+    ]
+  }
+}
