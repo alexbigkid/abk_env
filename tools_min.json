@@ -111,7 +111,7 @@
                 "raspbian": ["11", "12"],
                 "ubuntu": ["22.04", "24.04"]
             },
-            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y", "sudo apt install -y snapd"],
             "tools": {
                 "descriptions": {
                     "ffmpeg": "Complete multimedia framework for recording, converting and streaming audio/video",
