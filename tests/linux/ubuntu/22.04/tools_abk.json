@@ -18,7 +18,7 @@
       "sudo apt remove -y fzf"
     ],
     "just": [
-      "sudo snap remove just"
+      "sudo rm -f /usr/local/bin/just"
     ],
     "mplayer": [
       "sudo apt remove -y mplayer"
@@ -68,7 +68,9 @@
       "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
       "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
       "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-      "sudo snap remove code"
+      "sudo apt remove -y code",
+      "sudo rm -f /etc/apt/sources.list.d/vscode.list",
+      "sudo rm -f /etc/apt/trusted.gpg.d/packages.microsoft.gpg"
     ]
   },
   "installed_fonts": {
