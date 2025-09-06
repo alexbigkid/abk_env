@@ -310,7 +310,7 @@
                 "raspbian": ["11", "12"],
                 "ubuntu": ["22.04", "24.04"]
             },
-            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y", "sudo apt install -y snapd"],
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "check": {
                     "aws": ["command -v aws"],
@@ -355,7 +355,11 @@
                     "pass": ["sudo apt install -y pass"],
                     "gpg": ["sudo apt install -y gnupg"],
                     "jq": ["sudo apt install -y jq"],
-                    "kind": ["sudo apt install -y kind"],
+                    "kind": [
+                        "curl -L https://kind.sigs.k8s.io/dl/v0.26.0/kind-linux-amd64 -o kind",
+                        "sudo mv kind /usr/local/bin/kind",
+                        "sudo chmod +x /usr/local/bin/kind"
+                    ],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "nmap": ["sudo apt install -y nmap"],
                     "nodenv": [
@@ -387,7 +391,7 @@
                         "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
-                    "yq": ["sudo snap install yq"],
+                    "yq": ["sudo apt install -y yq"],
                     "xclip": ["sudo apt install -y xclip"],
                     "zsh-autosuggestions": [
                         "sudo apt install -y zsh-autosuggestions",
@@ -414,7 +418,7 @@
                     "pass": ["sudo apt remove -y pass"],
                     "gpg": ["sudo apt remove -y gnupg"],
                     "jq": ["sudo apt remove -y jq"],
-                    "kind": ["sudo apt remove -y kind"],
+                    "kind": ["sudo rm -f /usr/local/bin/kind"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "nmap": ["sudo apt remove -y nmap"],
                     "nodenv": [
@@ -444,7 +448,7 @@
                         "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
                     ],
                     "wget": ["sudo apt remove -y wget"],
-                    "yq": ["sudo snap remove yq"],
+                    "yq": ["sudo apt remove -y yq"],
                     "xclip": ["sudo apt remove -y xclip"],
                     "zsh-autosuggestions": [
                         "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",
@@ -462,7 +466,12 @@
                 },
                 "install":{
                     "visual-studio-code": [
-                        "sudo snap install --classic code",
+                        "wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg",
+                        "sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/",
+                        "echo \"deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main\" | sudo tee /etc/apt/sources.list.d/vscode.list",
+                        "rm packages.microsoft.gpg",
+                        "sudo apt update",
+                        "sudo apt install -y code",
                         "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
                         "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
                         "mkdir -p \"$ABK_VSCODE_USER_CONFIG_DIR\"",
@@ -480,7 +489,9 @@
                         "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/.config/Code/User\"",
                         "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
                         "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
-                        "sudo snap remove code"
+                        "sudo apt remove -y code",
+                        "sudo rm -f /etc/apt/sources.list.d/vscode.list",
+                        "sudo rm -f /etc/apt/trusted.gpg.d/packages.microsoft.gpg"
                     ]
                 }
             },

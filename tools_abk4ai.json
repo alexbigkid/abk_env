@@ -101,7 +101,7 @@
                 "raspbian": ["11", "12"],
                 "ubuntu": ["22.04", "24.04"]
             },
-            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y", "sudo apt install -y snapd"],
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "check": {
                     "claude": ["command -v claude"],
@@ -126,7 +126,7 @@
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
-                    "yq": ["sudo snap install yq"],
+                    "yq": ["sudo apt install -y yq"],
                     "xclip": ["sudo apt install -y xclip"],
                     "zsh-autosuggestions": [
                         "sudo apt install -y zsh-autosuggestions",
@@ -147,7 +147,7 @@
                         "rm -f ./unixBin/oh-my-posh"
                     ],
                     "wget": ["sudo apt remove -y wget"],
-                    "yq": ["sudo snap remove yq"],
+                    "yq": ["sudo apt remove -y yq"],
                     "xclip": ["sudo apt remove -y xclip"],
                     "zsh-autosuggestions": [
                         "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete",

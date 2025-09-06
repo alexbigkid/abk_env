@@ -82,7 +82,7 @@
                 "raspbian": ["11", "12"],
                 "ubuntu": ["22.04", "24.04"]
             },
-            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y", "sudo apt install -y snapd"],
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "descriptions": {
                     "git": "Distributed version control system for tracking changes in source code",
@@ -118,7 +118,7 @@
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
-                    "yq": ["sudo snap install yq"]
+                    "yq": ["sudo apt install -y yq"]
                 },
                 "uninstall": {
                     "git": ["sudo apt remove -y git"],
@@ -133,7 +133,7 @@
                         "rm -f ./unixBin/oh-my-posh"
                     ],
                     "wget": ["sudo apt remove -y wget"],
-                    "yq": ["sudo snap remove yq"]
+                    "yq": ["sudo apt remove -y yq"]
                 }
             },
             "apps": {

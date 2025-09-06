@@ -99,7 +99,7 @@
                 "raspbian": ["11", "12"],
                 "ubuntu": ["22.04", "24.04"]
             },
-            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y", "sudo apt install -y snapd"],
+            "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
                 "check": {
                     "direnv": ["command -v direnv"],
@@ -130,7 +130,7 @@
                         "(cd unixBin/env && ln -s XXX_uv.env LINK_uv.env)"
                     ],
                     "wget": ["sudo apt install -y wget"],
-                    "yq": ["sudo snap install yq"]
+                    "yq": ["sudo apt install -y yq"]
                 },
                 "uninstall": {
                     "direnv": [
@@ -153,7 +153,7 @@
                         "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
                     ],
                     "wget": ["sudo apt remove -y wget"],
-                    "yq": ["sudo snap remove yq"]
+                    "yq": ["sudo apt remove -y yq"]
                 }
             },
             "apps": {
