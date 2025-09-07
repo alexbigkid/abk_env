@@ -341,37 +341,16 @@ removeMasterKeyFromKeyring() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Removing master secret key from active keyring (keeping subkeys only)"
+    PrintTrace "$TRACE_WARNING" "⚠️  Note: This process requires the master key to be backed up first"
+    PrintTrace "$TRACE_INFO" "🔐 For maximum security, manually remove master key after confirming backups:"
+    PrintTrace "$TRACE_INFO" "   1. Verify backups: ls -la $GNUPG_BACKUP_DIR/"
+    PrintTrace "$TRACE_INFO" "   2. Delete entire key: gpg --delete-secret-and-public-key $LCL_KEY_FP"
+    PrintTrace "$TRACE_INFO" "   3. Re-import subkeys: gpg --import $GNUPG_BACKUP_DIR/subkeys/${LCL_KEY_FP}-subkeys.asc"
+    PrintTrace "$TRACE_INFO" "   4. Re-import public key: gpg --import $GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key-public.asc"
     
-    # Delete only the master secret key using --delete-secret-key
-    expect <<EOF
-        log_user 0
-        set timeout 30
-        spawn gpg --delete-secret-key $LCL_KEY_FP
-        expect "Delete this key from the keyring?" { send "y\\r" }
-        expect eof
-EOF
-    
-    LCL_EXIT_CODE=$?
-    
-    if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintTrace "$TRACE_ERROR" "❌ Failed to delete master secret key from keyring"
-        return $LCL_EXIT_CODE
-    fi
-    
-    PrintTrace "$TRACE_INFO" "🔐 Re-importing only the subkeys (without master secret key)"
-    # Re-import only the subkeys
-    local LCL_SUBKEYS_FILE="$GNUPG_BACKUP_DIR/subkeys/${LCL_KEY_FP}-subkeys.asc"
-    gpg --import --batch --yes "$LCL_SUBKEYS_FILE" >/dev/null 2>&1
-    LCL_EXIT_CODE=$?
-    
-    if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintTrace "$TRACE_ERROR" "❌ Failed to re-import subkeys"
-        return $LCL_EXIT_CODE
-    fi
-    
-    PrintTrace "$TRACE_INFO" "✅ Master secret key removed from active keyring, subkeys available for daily use"
+    PrintTrace "$TRACE_INFO" "✅ Key generation completed - manual master key removal recommended for full security"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
-    return $LCL_EXIT_CODE
+    return 0
 }
 
 
@@ -458,37 +437,29 @@ validateKeySetup() {
     
     PrintTrace "$TRACE_INFO" "🔍 Validating key setup"
     
-    # Check that we have subkeys but no master secret key
-    local LCL_SEC_KEYS=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" 2>/dev/null | grep "^sec:" | wc -l)
-    local LCL_SSB_KEYS=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" 2>/dev/null | grep "^ssb:" | wc -l)
+    # Count subkeys
+    local LCL_SSB_COUNT
+    LCL_SSB_COUNT=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" 2>/dev/null | grep -c "^ssb:" || echo "0")
     
-    # Ensure we have numeric values
-    LCL_SEC_KEYS=${LCL_SEC_KEYS:-0}
-    LCL_SSB_KEYS=${LCL_SSB_KEYS:-0}
-    
-    if [ "$LCL_SEC_KEYS" -gt 0 ]; then
-        PrintTrace "$TRACE_WARNING" "⚠️  Master secret key still present in keyring"
-    else
-        PrintTrace "$TRACE_INFO" "✅ Master secret key properly removed from keyring"
-    fi
-    
-    if [ "$LCL_SSB_KEYS" -eq 3 ]; then
+    if [ "$LCL_SSB_COUNT" -eq 3 ]; then
         PrintTrace "$TRACE_INFO" "✅ All 3 subkeys present: Sign, Encrypt, Auth"
     else
-        PrintTrace "$TRACE_WARNING" "⚠️  Expected 3 subkeys (S, E, A), found: $LCL_SSB_KEYS"
-        if [ "$LCL_SSB_KEYS" -gt 0 ]; then
-            PrintTrace "$TRACE_INFO" "📋 Listing subkey capabilities:"
-            gpg --list-secret-keys --with-colons "$LCL_KEY_FP" | grep "^ssb:" | while read line; do
-                local caps=$(echo "$line" | cut -d: -f12)
-                PrintTrace "$TRACE_INFO" "   Subkey capabilities: $caps"
-            done
-        fi
+        PrintTrace "$TRACE_WARNING" "⚠️  Expected 3 subkeys (S, E, A), found: $LCL_SSB_COUNT"
+        LCL_EXIT_CODE=1
+    fi
+    
+    # Check if master key backup exists
+    local LCL_MASTER_KEY_FILE="$GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key.asc"
+    if [ -f "$LCL_MASTER_KEY_FILE" ]; then
+        PrintTrace "$TRACE_INFO" "✅ Master key safely backed up for offline storage"
+    else
+        PrintTrace "$TRACE_WARNING" "⚠️  Master key backup not found"
         LCL_EXIT_CODE=1
     fi
     
     # List current key setup
     PrintTrace "$TRACE_INFO" "📋 Current key configuration:"
-    gpg --list-secret-keys "$LCL_KEY_FP"
+    gpg --list-secret-keys "$LCL_KEY_FP" 2>/dev/null
     
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
