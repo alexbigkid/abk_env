@@ -171,11 +171,20 @@ getGpgFingerprint() {
     local LCL_USER_EMAIL="$2"
     local LCL_EXIT_CODE=0
     
-    # Get the master key fingerprint using the email
-    local LCL_KEY_FP=$(gpg --list-secret-keys --with-colons "$LCL_USER_EMAIL" | awk -F: '/^sec:/ {getline; if($1=="fpr") print $10; exit}')
+    # Get the master key fingerprint using the email (if provided) or get the most recent key
+    local LCL_KEY_FP
+    if [ -n "$LCL_USER_EMAIL" ]; then
+        LCL_KEY_FP=$(gpg --list-secret-keys --with-colons "$LCL_USER_EMAIL" | awk -F: '/^sec:/ {getline; if($1=="fpr") print $10; exit}')
+    fi
+    
+    # If email lookup failed or no email provided, get the most recent secret key
+    if [ -z "$LCL_KEY_FP" ]; then
+        PrintTrace "$TRACE_INFO" "Getting most recent secret key fingerprint"
+        LCL_KEY_FP=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/ {getline; if($1=="fpr") print $10; exit}')
+    fi
     
     if [ -z "$LCL_KEY_FP" ]; then
-        PrintUsageAndExitWithCode 1 "${RED}❌ Failed to extract fingerprint for $LCL_USER_EMAIL${NC}"
+        PrintUsageAndExitWithCode 1 "${RED}❌ Failed to extract fingerprint${NC}"
     fi
     
     PrintTrace "$TRACE_INFO" "✅ Master key fingerprint: $LCL_KEY_FP"
@@ -603,7 +612,7 @@ setupSecureDirectories
 generateGpgKeyPair
 
 # Get the master key fingerprint and user email for subsequent operations
-USER_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
+USER_EMAIL=$(git config user.email 2>/dev/null || git config --global user.email 2>/dev/null || echo "")
 getGpgFingerprint KEY_FP "$USER_EMAIL"
 
 # Add the additional subkeys
