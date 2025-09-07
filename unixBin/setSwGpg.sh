@@ -131,21 +131,14 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     local LCL_GPG_BATCH_FILE="$GNUPG_DIR/gpg-batch-config.tmp"
     
     cat > "$LCL_GPG_BATCH_FILE" <<EOF
-%echo Generating GPG master key with all subkeys...
+%echo Generating GPG master key with signing subkey...
 Key-Type: eddsa
 Key-Curve: ed25519
 Key-Usage: cert
+Expire-Date: $GPG_EXPIRY
 Subkey-Type: eddsa
 Subkey-Curve: ed25519
 Subkey-Usage: sign
-Expire-Date: $GPG_EXPIRY
-Subkey-Type: ecdh
-Subkey-Curve: cv25519
-Subkey-Usage: encrypt
-Expire-Date: $GPG_EXPIRY
-Subkey-Type: eddsa
-Subkey-Curve: ed25519
-Subkey-Usage: auth
 Expire-Date: $GPG_EXPIRY
 Name-Real: $LCL_USER_NAME
 Name-Email: $LCL_USER_EMAIL
@@ -156,7 +149,7 @@ EOF
 
     chmod 600 "$LCL_GPG_BATCH_FILE"
     
-    PrintTrace "$TRACE_INFO" "🔐 Generating master key with all subkeys (Sign, Encrypt, Auth)..."
+    PrintTrace "$TRACE_INFO" "🔐 Generating master key with signing subkey..."
     gpg --batch --generate-key "$LCL_GPG_BATCH_FILE"
     LCL_EXIT_CODE=$?
     
@@ -164,10 +157,50 @@ EOF
     shred -u "$LCL_GPG_BATCH_FILE" 2>/dev/null || rm -f "$LCL_GPG_BATCH_FILE"
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to generate GPG key set. Aborting.${NC}"
+        PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to generate GPG master key. Aborting.${NC}"
     fi
     
-    PrintTrace "$TRACE_INFO" "✅ GPG master key with all subkeys generated successfully"
+    PrintTrace "$TRACE_INFO" "✅ GPG master key with signing subkey generated successfully"
+    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+addEncryptionSubkey() {
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
+    local LCL_KEY_FP="$1"
+    local LCL_EXIT_CODE=0
+    
+    PrintTrace "$TRACE_INFO" "🔐 Adding encryption subkey using gpg --quick-add-key"
+    gpg --quick-add-key "$LCL_KEY_FP" cv25519 encr "$GPG_EXPIRY"
+    LCL_EXIT_CODE=$?
+    
+    if [ $LCL_EXIT_CODE -ne 0 ]; then
+        PrintTrace "$TRACE_ERROR" "❌ Failed to add encryption subkey"
+    else
+        PrintTrace "$TRACE_INFO" "✅ Encryption subkey added successfully"
+    fi
+    
+    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
+    return $LCL_EXIT_CODE
+}
+
+
+addAuthenticationSubkey() {
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
+    local LCL_KEY_FP="$1"
+    local LCL_EXIT_CODE=0
+    
+    PrintTrace "$TRACE_INFO" "🔐 Adding authentication subkey using gpg --quick-add-key"
+    gpg --quick-add-key "$LCL_KEY_FP" ed25519 auth "$GPG_EXPIRY"
+    LCL_EXIT_CODE=$?
+    
+    if [ $LCL_EXIT_CODE -ne 0 ]; then
+        PrintTrace "$TRACE_ERROR" "❌ Failed to add authentication subkey"
+    else
+        PrintTrace "$TRACE_INFO" "✅ Authentication subkey added successfully"
+    fi
+    
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
 }
@@ -556,12 +589,16 @@ set -e
 checkPrerequisiteToolsAreInstalled
 setupSecureDirectories
 
-# Generate the master key with all subkeys (Sign, Encrypt, Auth)
+# Generate the master key with signing subkey
 generateGpgKeyPair
 
 # Get the master key fingerprint and user email for subsequent operations
 USER_EMAIL=$(git config user.email 2>/dev/null || git config --global user.email 2>/dev/null || echo "")
 getGpgFingerprint KEY_FP "$USER_EMAIL"
+
+# Add the additional subkeys
+addEncryptionSubkey "$KEY_FP"
+addAuthenticationSubkey "$KEY_FP"
 
 # Generate revocation certificate
 generateRevocationCertificate "$KEY_FP"
