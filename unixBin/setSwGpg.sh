@@ -374,11 +374,12 @@ removeMasterKeyFromKeyring() {
     
     PrintTrace "$TRACE_INFO" "🔐 Removing master key from active keyring (keeping subkeys only)"
     
-    # Delete the master secret key, keeping subkeys
+    # Delete the entire key first
     expect <<EOF
         log_user 1
         set timeout 30
-        spawn gpg --delete-secret-key $LCL_KEY_FP
+        spawn gpg --delete-secret-and-public-key $LCL_KEY_FP
+        expect "Delete this key from the keyring?" { send "y\\r" }
         expect "Delete this key from the keyring?" { send "y\\r" }
         expect eof
 EOF
@@ -386,11 +387,16 @@ EOF
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintTrace "$TRACE_ERROR" "❌ Failed to remove master key from keyring"
+        PrintTrace "$TRACE_ERROR" "❌ Failed to delete key from keyring"
         return $LCL_EXIT_CODE
     fi
     
-    # Re-import only the subkeys
+    PrintTrace "$TRACE_INFO" "🔐 Re-importing only the subkeys (without master key)"
+    # Re-import the public key first
+    local LCL_MASTER_KEY_PUB_FILE="$GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key-public.asc"
+    gpg --import "$LCL_MASTER_KEY_PUB_FILE"
+    
+    # Then re-import only the subkeys
     local LCL_SUBKEYS_FILE="$GNUPG_BACKUP_DIR/subkeys/${LCL_KEY_FP}-subkeys.asc"
     gpg --import "$LCL_SUBKEYS_FILE"
     LCL_EXIT_CODE=$?
