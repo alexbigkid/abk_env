@@ -100,19 +100,31 @@ generateGpgKeyPair() {
     local LCL_USER_NAME
     local LCL_USER_EMAIL
     
+    # Check for environment variables first
     if [ -n "$GIT_USER_NAME" ] && [ -n "$GIT_USER_EMAIL" ]; then
         LCL_USER_NAME="$GIT_USER_NAME"
         LCL_USER_EMAIL="$GIT_USER_EMAIL"
-        PrintTrace "$TRACE_INFO" "Using Git configuration: $LCL_USER_NAME <$LCL_USER_EMAIL>"
+        PrintTrace "$TRACE_INFO" "Using environment variables: $LCL_USER_NAME <$LCL_USER_EMAIL>"
     else
-        LCL_USER_NAME=$(git config --global user.name 2>/dev/null || echo "")
-        LCL_USER_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
+        # Try local Git config first, then fallback to global
+        LCL_USER_NAME=$(git config user.name 2>/dev/null || git config --global user.name 2>/dev/null || echo "")
+        LCL_USER_EMAIL=$(git config user.email 2>/dev/null || git config --global user.email 2>/dev/null || echo "")
         
         if [ -z "$LCL_USER_NAME" ] || [ -z "$LCL_USER_EMAIL" ]; then
-            PrintUsageAndExitWithCode 1 "${RED}❌ Git user.name and user.email must be configured. Run 'git config --global user.name \"Your Name\"' and 'git config --global user.email \"your.email@example.com\"'${NC}"
+            PrintUsageAndExitWithCode 1 "${RED}❌ Git user.name and user.email must be configured.${NC}
+${RED}Configure locally: git config user.name \"Your Name\" && git config user.email \"your.email@example.com\"${NC}
+${RED}Or globally: git config --global user.name \"Your Name\" && git config --global user.email \"your.email@example.com\"${NC}"
         fi
         
-        PrintTrace "$TRACE_INFO" "Using Git global configuration: $LCL_USER_NAME <$LCL_USER_EMAIL>"
+        # Determine which config was used for logging
+        local LCL_LOCAL_NAME=$(git config user.name 2>/dev/null || echo "")
+        local LCL_LOCAL_EMAIL=$(git config user.email 2>/dev/null || echo "")
+        
+        if [ -n "$LCL_LOCAL_NAME" ] && [ -n "$LCL_LOCAL_EMAIL" ]; then
+            PrintTrace "$TRACE_INFO" "Using local Git repository configuration: $LCL_USER_NAME <$LCL_USER_EMAIL>"
+        else
+            PrintTrace "$TRACE_INFO" "Using global Git configuration: $LCL_USER_NAME <$LCL_USER_EMAIL>"
+        fi
     fi
     
     # Create GPG batch configuration for automated key generation
