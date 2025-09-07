@@ -19,6 +19,7 @@
                     "aws": "Amazon Web Services CLI - command line interface for AWS services and resources",
                     "bat": "A cat clone with syntax highlighting, Git integration, and automatic paging",
                     "direnv": "Environment variable manager that automatically loads/unloads variables based on directory",
+                    "expect": "Tool for automating interactive applications - essential for GPG key automation",
                     "eza": "Modern replacement for ls with colors, icons, and Git status (successor to exa)",
                     "ffmpeg": "Complete multimedia framework for recording, converting and streaming audio/video",
                     "fzf": "Command-line fuzzy finder for files, command history, processes, and more",
@@ -47,6 +48,7 @@
                     "aws": ["command -v aws"],
                     "bat": ["command -v bat"],
                     "direnv": ["command -v direnv"],
+                    "expect": ["command -v expect"],
                     "ffmpeg": ["command -v ffmpeg"],
                     "fzf": ["command -v fzf"],
                     "gh": ["command -v gh"],
@@ -89,6 +91,7 @@
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y direnv --no-install-recommends",
                         "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
                     ],
+                    "expect": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y expect --no-install-recommends"],
                     "ffmpeg": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y ffmpeg --no-install-recommends"],
                     "fzf": [
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y fzf --no-install-recommends",
@@ -169,6 +172,7 @@
                         "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
                         "sudo apt remove -y direnv"
                     ],
+                    "expect": ["sudo apt remove -y expect"],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
                     "fzf": [
                         "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",

@@ -13,6 +13,9 @@
       "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
       "sudo apt remove -y direnv"
     ],
+    "expect": [
+      "sudo apt remove -y expect"
+    ],
     "ffmpeg": [
       "sudo apt remove -y ffmpeg"
     ],
