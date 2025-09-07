@@ -131,19 +131,20 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     local LCL_GPG_BATCH_FILE="$GNUPG_DIR/gpg-batch-config.tmp"
     
     # Create the batch file line by line to avoid any hidden characters
-    echo "Key-Type: RSA" > "$LCL_GPG_BATCH_FILE"
-    echo "Key-Length: 4096" >> "$LCL_GPG_BATCH_FILE"
+    echo "Key-Type: eddsa" > "$LCL_GPG_BATCH_FILE"
+    echo "Key-Curve: ed25519" >> "$LCL_GPG_BATCH_FILE"
     echo "Key-Usage: cert" >> "$LCL_GPG_BATCH_FILE"
     echo "Expire-Date: $GPG_EXPIRY" >> "$LCL_GPG_BATCH_FILE"
     echo "Name-Real: $LCL_USER_NAME" >> "$LCL_GPG_BATCH_FILE"
     echo "Name-Email: $LCL_USER_EMAIL" >> "$LCL_GPG_BATCH_FILE"
+    echo "Passphrase:" >> "$LCL_GPG_BATCH_FILE"
     echo "%no-protection" >> "$LCL_GPG_BATCH_FILE"
     echo "%commit" >> "$LCL_GPG_BATCH_FILE"
 
     chmod 600 "$LCL_GPG_BATCH_FILE"
     
-    PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
-    cat -n "$LCL_GPG_BATCH_FILE" >&2
+    # PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
+    # cat -n "$LCL_GPG_BATCH_FILE" >&2
     
     PrintTrace "$TRACE_INFO" "🔐 Generating master key with signing subkey..."
     gpg --batch --generate-key "$LCL_GPG_BATCH_FILE"
@@ -168,7 +169,7 @@ addEncryptionSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding encryption subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" rsa4096 encr "$GPG_EXPIRY"
+    gpg --quick-add-key "$LCL_KEY_FP" cv25519 encr "$GPG_EXPIRY" --batch --passphrase ""
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -188,7 +189,7 @@ addAuthenticationSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding authentication subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" rsa4096 auth "$GPG_EXPIRY"
+    gpg --quick-add-key "$LCL_KEY_FP" ed25519 auth "$GPG_EXPIRY" --batch --passphrase ""
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -242,7 +243,17 @@ generateRevocationCertificate() {
     
     local LCL_REVOKE_FILE="$GNUPG_BACKUP_DIR/revocation/${LCL_KEY_FP}-revocation.asc"
     
-    gpg --batch --yes --output "$LCL_REVOKE_FILE" --gen-revoke "$LCL_KEY_FP"
+    # Use expect for revocation certificate since --batch doesn't work with --gen-revoke
+    expect <<EOF
+        log_user 0
+        set timeout 30
+        spawn gpg --output "$LCL_REVOKE_FILE" --gen-revoke "$LCL_KEY_FP"
+        expect "Create a revocation certificate for this key?" { send "y\\r" }
+        expect "Your decision?" { send "0\\r" }
+        expect "Enter an optional description" { send "\\r" }
+        expect "Is this okay?" { send "y\\r" }
+        expect eof
+EOF
     
     LCL_EXIT_CODE=$?
     
@@ -587,7 +598,7 @@ getGpgFingerprint KEY_FP "$USER_EMAIL"
 
 # Add all three subkeys (since batch only created master key)
 PrintTrace "$TRACE_INFO" "🔐 Adding signing subkey"
-gpg --quick-add-key "$KEY_FP" rsa4096 sign "$GPG_EXPIRY"
+gpg --quick-add-key "$KEY_FP" ed25519 sign "$GPG_EXPIRY" --batch --passphrase ""
 
 addEncryptionSubkey "$KEY_FP"
 addAuthenticationSubkey "$KEY_FP"
