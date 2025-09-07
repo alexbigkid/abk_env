@@ -131,20 +131,17 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     local LCL_GPG_BATCH_FILE="$GNUPG_DIR/gpg-batch-config.tmp"
     
     cat > "$LCL_GPG_BATCH_FILE" <<EOF
-%echo Generating GPG master key with signing subkey...
-Key-Type: eddsa
-Key-Curve: ed25519
+Key-Type: RSA
+Key-Length: 4096
 Key-Usage: cert
 Expire-Date: $GPG_EXPIRY
-Subkey-Type: eddsa
-Subkey-Curve: ed25519
+Subkey-Type: RSA
+Subkey-Length: 4096
 Subkey-Usage: sign
-Expire-Date: $GPG_EXPIRY
 Name-Real: $LCL_USER_NAME
 Name-Email: $LCL_USER_EMAIL
 %no-protection
 %commit
-%echo Done
 EOF
 
     chmod 600 "$LCL_GPG_BATCH_FILE"
@@ -172,7 +169,7 @@ addEncryptionSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding encryption subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" cv25519 encr "$GPG_EXPIRY"
+    gpg --quick-add-key "$LCL_KEY_FP" rsa4096 encr "$GPG_EXPIRY"
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -192,7 +189,7 @@ addAuthenticationSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding authentication subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" ed25519 auth "$GPG_EXPIRY"
+    gpg --quick-add-key "$LCL_KEY_FP" rsa4096 auth "$GPG_EXPIRY"
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
