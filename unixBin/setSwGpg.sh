@@ -130,21 +130,20 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     # Create GPG batch configuration for automated key generation
     local LCL_GPG_BATCH_FILE="$GNUPG_DIR/gpg-batch-config.tmp"
     
-    cat > "$LCL_GPG_BATCH_FILE" <<EOF
-Key-Type: RSA
-Key-Length: 4096
-Key-Usage: cert
-Expire-Date: $GPG_EXPIRY
-Subkey-Type: RSA
-Subkey-Length: 4096
-Subkey-Usage: sign
-Name-Real: $LCL_USER_NAME
-Name-Email: $LCL_USER_EMAIL
-%no-protection
-%commit
-EOF
+    # Create the batch file line by line to avoid any hidden characters
+    echo "Key-Type: RSA" > "$LCL_GPG_BATCH_FILE"
+    echo "Key-Length: 4096" >> "$LCL_GPG_BATCH_FILE"
+    echo "Key-Usage: cert" >> "$LCL_GPG_BATCH_FILE"
+    echo "Expire-Date: $GPG_EXPIRY" >> "$LCL_GPG_BATCH_FILE"
+    echo "Name-Real: $LCL_USER_NAME" >> "$LCL_GPG_BATCH_FILE"
+    echo "Name-Email: $LCL_USER_EMAIL" >> "$LCL_GPG_BATCH_FILE"
+    echo "%no-protection" >> "$LCL_GPG_BATCH_FILE"
+    echo "%commit" >> "$LCL_GPG_BATCH_FILE"
 
     chmod 600 "$LCL_GPG_BATCH_FILE"
+    
+    PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
+    cat -n "$LCL_GPG_BATCH_FILE" >&2
     
     PrintTrace "$TRACE_INFO" "🔐 Generating master key with signing subkey..."
     gpg --batch --generate-key "$LCL_GPG_BATCH_FILE"
