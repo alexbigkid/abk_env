@@ -168,7 +168,7 @@ addEncryptionSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding encryption subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" cv25519 encr "$GPG_EXPIRY" --batch --passphrase ""
+    gpg --quick-add-key "$LCL_KEY_FP" cv25519 encr "$GPG_EXPIRY"
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -188,7 +188,7 @@ addAuthenticationSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding authentication subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" ed25519 auth "$GPG_EXPIRY" --batch --passphrase ""
+    gpg --quick-add-key "$LCL_KEY_FP" ed25519 auth "$GPG_EXPIRY"
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -597,7 +597,7 @@ getGpgFingerprint KEY_FP "$USER_EMAIL"
 
 # Add all three subkeys (since batch only created master key)
 PrintTrace "$TRACE_INFO" "🔐 Adding signing subkey"
-gpg --quick-add-key "$KEY_FP" ed25519 sign "$GPG_EXPIRY" --batch --passphrase ""
+gpg --quick-add-key "$KEY_FP" ed25519 sign "$GPG_EXPIRY"
 
 addEncryptionSubkey "$KEY_FP"
 addAuthenticationSubkey "$KEY_FP"
