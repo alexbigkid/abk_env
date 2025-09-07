@@ -142,8 +142,8 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
 
     chmod 600 "$LCL_GPG_BATCH_FILE"
     
-    PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
-    cat -n "$LCL_GPG_BATCH_FILE" >&2
+    # PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
+    # cat -n "$LCL_GPG_BATCH_FILE" >&2
     
     PrintTrace "$TRACE_INFO" "🔐 Generating master key with signing subkey..."
     gpg --batch --generate-key "$LCL_GPG_BATCH_FILE"
@@ -340,14 +340,13 @@ removeMasterKeyFromKeyring() {
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
     
-    PrintTrace "$TRACE_INFO" "🔐 Removing master key from active keyring (keeping subkeys only)"
+    PrintTrace "$TRACE_INFO" "🔐 Removing master secret key from active keyring (keeping subkeys only)"
     
-    # Delete the entire key first
+    # Delete only the master secret key using --delete-secret-key
     expect <<EOF
-        log_user 1
+        log_user 0
         set timeout 30
-        spawn gpg --delete-secret-and-public-key $LCL_KEY_FP
-        expect "Delete this key from the keyring?" { send "y\\r" }
+        spawn gpg --delete-secret-key $LCL_KEY_FP
         expect "Delete this key from the keyring?" { send "y\\r" }
         expect eof
 EOF
@@ -355,18 +354,14 @@ EOF
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintTrace "$TRACE_ERROR" "❌ Failed to delete key from keyring"
+        PrintTrace "$TRACE_ERROR" "❌ Failed to delete master secret key from keyring"
         return $LCL_EXIT_CODE
     fi
     
-    PrintTrace "$TRACE_INFO" "🔐 Re-importing only the subkeys (without master key)"
-    # Re-import the public key first
-    local LCL_MASTER_KEY_PUB_FILE="$GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key-public.asc"
-    gpg --import "$LCL_MASTER_KEY_PUB_FILE"
-    
-    # Then re-import only the subkeys
+    PrintTrace "$TRACE_INFO" "🔐 Re-importing only the subkeys (without master secret key)"
+    # Re-import only the subkeys
     local LCL_SUBKEYS_FILE="$GNUPG_BACKUP_DIR/subkeys/${LCL_KEY_FP}-subkeys.asc"
-    gpg --import "$LCL_SUBKEYS_FILE"
+    gpg --import --batch --yes "$LCL_SUBKEYS_FILE" >/dev/null 2>&1
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -374,7 +369,7 @@ EOF
         return $LCL_EXIT_CODE
     fi
     
-    PrintTrace "$TRACE_INFO" "✅ Master key removed from active keyring, subkeys available for daily use"
+    PrintTrace "$TRACE_INFO" "✅ Master secret key removed from active keyring, subkeys available for daily use"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
 }
@@ -464,8 +459,12 @@ validateKeySetup() {
     PrintTrace "$TRACE_INFO" "🔍 Validating key setup"
     
     # Check that we have subkeys but no master secret key
-    local LCL_SEC_KEYS=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" | grep "^sec:" | wc -l)
-    local LCL_SSB_KEYS=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" | grep "^ssb:" | wc -l)
+    local LCL_SEC_KEYS=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" 2>/dev/null | grep "^sec:" | wc -l)
+    local LCL_SSB_KEYS=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" 2>/dev/null | grep "^ssb:" | wc -l)
+    
+    # Ensure we have numeric values
+    LCL_SEC_KEYS=${LCL_SEC_KEYS:-0}
+    LCL_SSB_KEYS=${LCL_SSB_KEYS:-0}
     
     if [ "$LCL_SEC_KEYS" -gt 0 ]; then
         PrintTrace "$TRACE_WARNING" "⚠️  Master secret key still present in keyring"
