@@ -137,14 +137,13 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     echo "Expire-Date: $GPG_EXPIRY" >> "$LCL_GPG_BATCH_FILE"
     echo "Name-Real: $LCL_USER_NAME" >> "$LCL_GPG_BATCH_FILE"
     echo "Name-Email: $LCL_USER_EMAIL" >> "$LCL_GPG_BATCH_FILE"
-    echo "Passphrase:" >> "$LCL_GPG_BATCH_FILE"
     echo "%no-protection" >> "$LCL_GPG_BATCH_FILE"
     echo "%commit" >> "$LCL_GPG_BATCH_FILE"
 
     chmod 600 "$LCL_GPG_BATCH_FILE"
     
-    # PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
-    # cat -n "$LCL_GPG_BATCH_FILE" >&2
+    PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
+    cat -n "$LCL_GPG_BATCH_FILE" >&2
     
     PrintTrace "$TRACE_INFO" "🔐 Generating master key with signing subkey..."
     gpg --batch --generate-key "$LCL_GPG_BATCH_FILE"
