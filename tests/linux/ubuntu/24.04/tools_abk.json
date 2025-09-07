@@ -21,7 +21,8 @@
       "sudo apt remove -y pass"
     ],
     "just": [
-      "sudo rm -f /usr/local/bin/just"
+      "sudo rm -f /usr/local/bin/just",
+      "cargo uninstall just"
     ],
     "mplayer": [
       "sudo apt remove -y mplayer"
