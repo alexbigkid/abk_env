@@ -131,13 +131,21 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     local LCL_GPG_BATCH_FILE="$GNUPG_DIR/gpg-batch-config.tmp"
     
     cat > "$LCL_GPG_BATCH_FILE" <<EOF
-%echo Generating GPG master key with subkeys...
+%echo Generating GPG master key with all subkeys...
 Key-Type: eddsa
 Key-Curve: ed25519
 Key-Usage: cert
 Subkey-Type: eddsa
 Subkey-Curve: ed25519
 Subkey-Usage: sign
+Expire-Date: $GPG_EXPIRY
+Subkey-Type: ecdh
+Subkey-Curve: cv25519
+Subkey-Usage: encrypt
+Expire-Date: $GPG_EXPIRY
+Subkey-Type: eddsa
+Subkey-Curve: ed25519
+Subkey-Usage: auth
 Expire-Date: $GPG_EXPIRY
 Name-Real: $LCL_USER_NAME
 Name-Email: $LCL_USER_EMAIL
@@ -148,7 +156,7 @@ EOF
 
     chmod 600 "$LCL_GPG_BATCH_FILE"
     
-    PrintTrace "$TRACE_INFO" "🔐 Generating master key and signature subkey..."
+    PrintTrace "$TRACE_INFO" "🔐 Generating master key with all subkeys (Sign, Encrypt, Auth)..."
     gpg --batch --generate-key "$LCL_GPG_BATCH_FILE"
     LCL_EXIT_CODE=$?
     
@@ -156,10 +164,10 @@ EOF
     shred -u "$LCL_GPG_BATCH_FILE" 2>/dev/null || rm -f "$LCL_GPG_BATCH_FILE"
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to generate GPG key pair. Aborting.${NC}"
+        PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to generate GPG key set. Aborting.${NC}"
     fi
     
-    PrintTrace "$TRACE_INFO" "✅ GPG master key and signature subkey generated successfully"
+    PrintTrace "$TRACE_INFO" "✅ GPG master key with all subkeys generated successfully"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
 }
@@ -194,79 +202,6 @@ getGpgFingerprint() {
 }
 
 
-addEncryptionSubkey() {
-    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
-    local LCL_KEY_FP="$1"
-    local LCL_EXIT_CODE=0
-    
-    PrintTrace "$TRACE_INFO" "🔐 Adding encryption subkey"
-    
-    expect <<EOF
-        log_user 1
-        set timeout 60
-        spawn gpg --edit-key $LCL_KEY_FP
-        expect "gpg>" { send "addkey\\r" }
-        expect "Your selection?" { send "12\\r" }  # ECC (encrypt only)
-        expect "Your selection?" { send "1\\r" }   # Curve 25519
-        expect "Key is valid for?" { send "$GPG_EXPIRY\\r" }
-        expect "Is this correct?" { send "y\\r" }
-        expect "gpg>" { send "save\\r" }
-        expect eof
-EOF
-    
-    LCL_EXIT_CODE=$?
-    
-    if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintTrace "$TRACE_ERROR" "❌ Failed to add encryption subkey"
-    else
-        PrintTrace "$TRACE_INFO" "✅ Encryption subkey added successfully"
-    fi
-    
-    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
-    return $LCL_EXIT_CODE
-}
-
-
-addAuthenticationSubkey() {
-    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
-    local LCL_KEY_FP="$1"
-    local LCL_EXIT_CODE=0
-    
-    PrintTrace "$TRACE_INFO" "🔐 Adding authentication subkey"
-    
-    expect <<EOF
-        log_user 1
-        set timeout 60
-        spawn gpg --edit-key $LCL_KEY_FP
-        expect "gpg>" { send "addkey\\r" }
-        expect "Your selection?" { send "11\\r" }  # ECC (set your own capabilities)
-        expect "Your selection?" { send "1\\r" }   # Curve 25519
-        expect "Possible actions" { 
-            send "s\\r"  # Toggle sign capability (remove it)
-        }
-        expect "Possible actions" { 
-            send "a\\r"  # Toggle authenticate capability (add it)
-        }
-        expect "Possible actions" { 
-            send "q\\r"  # Finished setting capabilities
-        }
-        expect "Key is valid for?" { send "$GPG_EXPIRY\\r" }
-        expect "Is this correct?" { send "y\\r" }
-        expect "gpg>" { send "save\\r" }
-        expect eof
-EOF
-    
-    LCL_EXIT_CODE=$?
-    
-    if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintTrace "$TRACE_ERROR" "❌ Failed to add authentication subkey"
-    else
-        PrintTrace "$TRACE_INFO" "✅ Authentication subkey added successfully"
-    fi
-    
-    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
-    return $LCL_EXIT_CODE
-}
 
 
 generateRevocationCertificate() {
@@ -506,10 +441,17 @@ validateKeySetup() {
         PrintTrace "$TRACE_INFO" "✅ Master secret key properly removed from keyring"
     fi
     
-    if [ "$LCL_SSB_KEYS" -ge 3 ]; then
-        PrintTrace "$TRACE_INFO" "✅ All subkeys present: $LCL_SSB_KEYS subkeys found"
+    if [ "$LCL_SSB_KEYS" -eq 3 ]; then
+        PrintTrace "$TRACE_INFO" "✅ All 3 subkeys present: Sign, Encrypt, Auth"
     else
-        PrintTrace "$TRACE_WARNING" "⚠️  Expected 3 subkeys, found: $LCL_SSB_KEYS"
+        PrintTrace "$TRACE_WARNING" "⚠️  Expected 3 subkeys (S, E, A), found: $LCL_SSB_KEYS"
+        if [ "$LCL_SSB_KEYS" -gt 0 ]; then
+            PrintTrace "$TRACE_INFO" "📋 Listing subkey capabilities:"
+            gpg --list-secret-keys --with-colons "$LCL_KEY_FP" | grep "^ssb:" | while read line; do
+                local caps=$(echo "$line" | cut -d: -f12)
+                PrintTrace "$TRACE_INFO" "   Subkey capabilities: $caps"
+            done
+        fi
         LCL_EXIT_CODE=1
     fi
     
@@ -614,16 +556,12 @@ set -e
 checkPrerequisiteToolsAreInstalled
 setupSecureDirectories
 
-# Generate the master key and first subkey (signature)
+# Generate the master key with all subkeys (Sign, Encrypt, Auth)
 generateGpgKeyPair
 
 # Get the master key fingerprint and user email for subsequent operations
 USER_EMAIL=$(git config user.email 2>/dev/null || git config --global user.email 2>/dev/null || echo "")
 getGpgFingerprint KEY_FP "$USER_EMAIL"
-
-# Add the additional subkeys
-addEncryptionSubkey "$KEY_FP"
-addAuthenticationSubkey "$KEY_FP"
 
 # Generate revocation certificate
 generateRevocationCertificate "$KEY_FP"
