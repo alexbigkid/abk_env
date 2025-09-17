@@ -1,1 +1,7 @@
-{}
+{
+  "installed_tools": {
+    "typescript": [
+      "brew uninstall typescript"
+    ]
+  }
+}
