@@ -5,6 +5,12 @@
       "brew uninstall pyenv-virtualenv",
       "brew uninstall pyenv",
       "rm -Rf ~/.pyenv"
+    ],
+    "serverless": [
+      "brew uninstall serverless"
+    ],
+    "typescript": [
+      "brew uninstall typescript"
     ]
   },
   "installed_apps": {
