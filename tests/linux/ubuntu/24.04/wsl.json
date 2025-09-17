@@ -30,8 +30,10 @@
       "sudo apt remove -y pass"
     ],
     "just": [
+      "cargo uninstall just",
       "sudo rm -f /usr/local/bin/just",
-      "cargo uninstall just"
+      "rustup self uninstall",
+      "rm -Rf ~/.cargo/bin/just"
     ],
     "kind": [
       "sudo rm -f /usr/local/bin/kind"
