@@ -389,7 +389,7 @@
                     "gpg": ["sudo apt install -y gnupg"],
                     "jq": ["sudo apt install -y jq"],
                     "just": [
-                        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y",
+                        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal",
                         "source ~/.cargo/env",
                         "cargo install just",
                         "sudo ln -sf ~/.cargo/bin/just /usr/local/bin/just"

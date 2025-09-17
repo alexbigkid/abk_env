@@ -103,7 +103,7 @@
                     "gpg": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y gnupg --no-install-recommends"],
                     "jq": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y jq --no-install-recommends"],
                     "just": [
-                        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y",
+                        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal",
                         "source ~/.cargo/env",
                         "cargo install just",
                         "sudo ln -sf ~/.cargo/bin/just /usr/local/bin/just"
