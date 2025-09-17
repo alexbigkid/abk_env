@@ -183,8 +183,10 @@
                     "gpg": ["sudo apt remove -y gnupg"],
                     "jq": ["sudo apt remove -y jq"],
                     "just": [
+                        "cargo uninstall just",
                         "sudo rm -f /usr/local/bin/just",
-                        "cargo uninstall just"
+                        "rustup self uninstall",
+                        "rm -Rf ~/.cargo/bin/just"
                     ],
                     "kind": ["sudo rm -f /usr/local/bin/kind"],
                     "mplayer": ["sudo apt remove -y mplayer"],
