@@ -1,0 +1,129 @@
+{
+  "installed_tools": {
+    "bat": [
+      "brew uninstall bat"
+    ],
+    "diff-so-fancy": [
+      "brew uninstall diff-so-fancy"
+    ],
+    "direnv": [
+      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
+      "brew uninstall direnv"
+    ],
+    "exiftool": [
+      "brew uninstall exiftool"
+    ],
+    "eza": [
+      "brew uninstall eza"
+    ],
+    "fzf": [
+      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
+      "brew uninstall fzf"
+    ],
+    "helm": [
+      "brew uninstall helm"
+    ],
+    "pass": [
+      "brew uninstall pass"
+    ],
+    "just": [
+      "brew uninstall just"
+    ],
+    "kind": [
+      "brew uninstall kind"
+    ],
+    "nmap": [
+      "brew uninstall nmap"
+    ],
+    "nodenv": [
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
+      "brew uninstall nodenv",
+      "rm -Rf ~/.nodenv"
+    ],
+    "oh-my-posh": [
+      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
+      "brew uninstall oh-my-posh"
+    ],
+    "parallel": [
+      "brew uninstall parallel"
+    ],
+    "ruff": [
+      "brew uninstall ruff"
+    ],
+    "serverless": [
+      "brew uninstall serverless"
+    ],
+    "shellcheck": [
+      "brew uninstall shellcheck"
+    ],
+    "tfenv": [
+      "brew uninstall tfenv",
+      "rm -Rf ~/.tfenv"
+    ],
+    "typescript": [
+      "brew uninstall typescript"
+    ],
+    "uv": [
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
+      "brew uninstall uv"
+    ],
+    "zsh-autocomplete": [
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
+      "brew uninstall zsh-autocomplete"
+    ],
+    "zsh-autosuggestions": [
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
+      "brew uninstall zsh-autosuggestions"
+    ],
+    "zsh-syntax-highlighting": [
+      "find ./unixBin/env -type l -name 'LINK_zsh_plugins.env' -delete || true",
+      "brew uninstall zsh-syntax-highlighting"
+    ]
+  },
+  "installed_apps": {
+    "adobe-dng-converter": [
+      "brew uninstall --cask adobe-dng-converter"
+    ],
+    "brave-browser": [
+      "brew uninstall --cask brave-browser"
+    ],
+    "docker": [
+      "brew uninstall --cask docker"
+    ],
+    "flycut": [
+      "brew uninstall --cask flycut"
+    ],
+    "onedrive": [
+      "brew uninstall --cask onedrive"
+    ],
+    "visual-studio-code": [
+      "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
+      "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",
+      "[ -f \"$ABK_VSCODE_USER_CONFIG_SETTING\" ] && chmod 600 \"$ABK_VSCODE_USER_CONFIG_SETTING\" && rm -f \"$ABK_VSCODE_USER_CONFIG_SETTING\"",
+      "brew uninstall --cask visual-studio-code"
+    ]
+  },
+  "installed_fonts": {
+    "font-agave-nerd-font": [
+      "brew uninstall --cask font-agave-nerd-font"
+    ],
+    "font-comic-shanns-mono-nerd-font": [
+      "brew uninstall --cask font-comic-shanns-mono-nerd-font"
+    ],
+    "font-droid-sans-mono-nerd-font": [
+      "brew uninstall --cask font-droid-sans-mono-nerd-font"
+    ],
+    "font-cascadia-code": [
+      "brew uninstall --cask font-cascadia-code"
+    ],
+    "font-cascadia-code-pl": [
+      "brew uninstall --cask font-cascadia-code-pl"
+    ],
+    "font-caskaydia-cove-nerd-font": [
+      "brew uninstall --cask font-caskaydia-cove-nerd-font"
+    ],
+    "font-hack-nerd-font": [
+      "brew uninstall --cask font-hack-nerd-font"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "installed_tools": {
+    "detekt": [
+      "brew uninstall detekt"
+    ],
+    "ktlint": [
+      "brew uninstall ktlint"
+    ],
+    "jenv": [
+      "find ./unixBin/env -type l -name 'LINK_mobile.env' -delete",
+      "brew uninstall jenv",
+      "rm -rf ~/.jenv"
+    ],
+    "rbenv": [
+      "find ./unixBin/env -type l -name 'LINK_rbenv.env' -delete || true",
+      "brew uninstall rbenv",
+      "rm -Rf ~/.rbenv"
+    ]
+  },
+  "installed_apps": {
+    "android-studio": [
+      "find ./unixBin/env -type l -name 'LINK_mobile.env' -delete || true",
+      "brew uninstall --cask android-studio"
+    ]
+  }
+}
