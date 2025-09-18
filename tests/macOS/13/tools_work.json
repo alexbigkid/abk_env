@@ -1,4 +1,12 @@
 {
+  "installed_tools": {
+    "serverless": [
+      "brew uninstall serverless"
+    ],
+    "typescript": [
+      "brew uninstall typescript"
+    ]
+  },
   "installed_apps": {
     "balenaetcher": [
       "brew uninstall --cask balenaetcher"
