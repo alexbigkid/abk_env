@@ -105,8 +105,12 @@
                     "type": "python"
                 },
                 {
+                    "background_templates": [
+                        "{{if contains \"dev\" .Profile}}#FFA400{{end}}",
+                        "{{if contains \"qa\" .Profile}}#FFA400{{end}}",
+                        "{{if contains \"prod\" .Profile}}#f1184c{{end}}"
+                    ],
                     "foreground": "#100e23",
-                    "background": "#ffa400",
                     "invert_powerline": true,
                     "powerline_symbol": "\ue0b2",
                     "properties": {
