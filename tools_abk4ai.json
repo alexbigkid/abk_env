@@ -8,9 +8,12 @@
         "tools": {
             "descriptions": {
                 "claude": "Claude Code CLI - Anthropic's official command-line interface for Claude AI",
+                "cline": "Cline - An AI model switcher, can interact with Claude, Ollama, ...",
                 "git": "Distributed version control system for tracking changes in source code",
                 "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                "kilocode": "Kilo Code CLI - AI orchestration tool in the CLI",
                 "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                "ollama": "Local free LLM. Create, run, and share large language models (LLMs)",
                 "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
                 "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
                 "zsh-autocomplete": "Real-time type-ahead autocompletion for Zsh with intelligent suggestions",
@@ -19,9 +22,12 @@
             },
             "check": {
                 "claude": ["command -v claude"],
+                "cline": ["command -v cline"],
                 "git": ["command -v git"],
                 "jq": ["command -v jq"],
+                "kilocode": ["command -v kilocode"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
+                "ollama": ["command -v ollama"],
                 "wget": ["command -v wget"],
                 "yq": ["command -v yq"],
                 "zsh-autocomplete": ["brew list | grep zsh-autocomplete"],
@@ -30,12 +36,18 @@
             },
             "install": {
                 "claude": ["npm install -g @anthropic-ai/claude-code"],
+                "cline": ["npm install -g cline"],
                 "git": ["brew install git"],
                 "jq": ["brew install jq"],
+                "kilocode": ["npm install -g @kilocode/cli"],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
                     "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
+                ],
+                "ollama": [
+                    "brew install ollama",
+                    "brew services start ollama"
                 ],
                 "wget": ["brew install wget"],
                 "yq": ["brew install yq"],
@@ -54,11 +66,17 @@
             },
             "uninstall": {
                 "claude": ["npm uninstall -g @anthropic-ai/claude-code"],
+                "cline": ["npm uninstall -g cline"],
                 "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
+                "kilocode": ["npm uninstall -g @kilocode/cli"],
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                     "brew uninstall oh-my-posh"
+                ],
+                "ollama": [
+                    "brew services stop ollama",
+                    "brew uninstall ollama"
                 ],
                 "wget": ["brew uninstall wget"],
                 "yq": ["brew uninstall yq"],
@@ -103,12 +121,29 @@
             },
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
+                "descriptions": {
+                    "claude": "Claude Code CLI - Anthropic's official command-line interface for Claude AI",
+                    "cline": "Cline - An AI model switcher, can interact with Claude, Ollama, ...",
+                    "git": "Distributed version control system for tracking changes in source code",
+                    "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                    "kilocode": "Kilo Code CLI - AI orchestration tool in the CLI",
+                    "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                    "ollama": "Local free LLM. Create, run, and share large language models (LLMs)",
+                    "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
+                    "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
+                    "xclip": "Multi copy clipboard",
+                    "zsh-autosuggestions": "Fish-like autosuggestions for Zsh based on command history",
+                    "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
+                },
                 "check": {
                     "claude": ["command -v claude"],
+                    "cline": ["command -v cline"],
                     "git": ["command -v git"],
                     "jq": ["command -v jq"],
+                    "kilocode": ["command -v kilocode"],
                     "mplayer": ["command -v mplayer"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
+                    "ollama": ["command -v ollama"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
@@ -117,13 +152,20 @@
                 },
                 "install": {
                     "claude": ["npm install -g @anthropic-ai/claude-code"],
+                    "cline": ["npm install -g cline"],
                     "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
+                    "kilocode": ["npm install -g @kilocode/cli"],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
                         "./unixBin/oh-my-posh init $ABK_SHELL",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
+                    ],
+                    "ollama": [
+                        "curl -fsSL https://ollama.com/install.sh | sh",
+                        "sudo systemctl start ollama",
+                        "sudo systemctl status ollama"
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo apt install -y yq"],
@@ -139,12 +181,22 @@
                 },
                 "uninstall": {
                     "claude": ["npm uninstall -g @anthropic-ai/claude-code"],
+                    "cline": ["npm uninstall -g cline"],
                     "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],
+                    "kilocode": ["npm uninstall -g @kilocode/cli"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                         "rm -f ./unixBin/oh-my-posh"
+                    ],
+                    "ollama": [
+                        "sudo systemctl stop ollama",
+                        "sudo systemctl disable ollama",
+                        "sudo rm -rf /etc/systemd/system/ollama.service",
+                        "sudo rm -rf /etc/systemd/system/ollama.service.d",
+                        "sudo rm -rf /etc/ollama",
+                        "sudo rm -rf /var/lib/ollama"
                     ],
                     "wget": ["sudo apt remove -y wget"],
                     "yq": ["sudo apt remove -y yq"],
