@@ -2,6 +2,16 @@
   "installed_tools": {
     "claude": [
       "npm uninstall -g @anthropic-ai/claude-code"
+    ],
+    "cline": [
+      "npm uninstall -g cline"
+    ],
+    "kilocode": [
+      "npm uninstall -g @kilocode/cli"
+    ],
+    "ollama": [
+      "brew services stop ollama",
+      "brew uninstall ollama"
     ]
   }
 }
