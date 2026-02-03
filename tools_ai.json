@@ -7,7 +7,6 @@
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
             "descriptions": {
-                "claude": "Claude Code CLI - Anthropic's official command-line interface for Claude AI",
                 "git": "Distributed version control system for tracking changes in source code",
                 "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
                 "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
@@ -18,7 +17,6 @@
                 "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
             },
             "check": {
-                "claude": ["command -v claude"],
                 "git": ["command -v git"],
                 "jq": ["command -v jq"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
@@ -29,7 +27,6 @@
                 "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
-                "claude": ["npm install -g @anthropic-ai/claude-code"],
                 "git": ["brew install git"],
                 "jq": ["brew install jq"],
                 "oh-my-posh": [
@@ -53,7 +50,6 @@
                 ]
             },
             "uninstall": {
-                "claude": ["npm uninstall -g @anthropic-ai/claude-code"],
                 "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
                 "oh-my-posh": [
@@ -77,7 +73,13 @@
             }
         },
         "apps": {
+            "descriptions": {
+                "claude-code": "Claude Code - Anthropic's official for Claude AI"
+            },
             "check": {
+                "claude-code": [
+                    "brew list --cask | grep ^claude-code$"
+                ],
                 "flycut": [
                     "brew list --cask | grep ^flycut$",
                     "ls \"/Applications/Flycut.app\"",
@@ -90,10 +92,12 @@
                 ]
             },
             "install": {
+                "claude-code": ["brew install --cask claude-code"],
                 "flycut": ["brew install --cask flycut"],
                 "windsurf": ["brew install --cask windsurf"]
             },
             "uninstall": {
+                "claude-code": ["brew uninstall --cask claude-code"],
                 "flycut": ["brew uninstall --cask flycut"],
                 "windsurf": ["brew uninstall --cask windsurf"]
             }
@@ -117,6 +121,19 @@
             },
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {
+                "descriptions": {
+                    "claude": "Claude Code CLI - Anthropic's official command-line interface for Claude AI",
+                    "ffmpeg": "FFmpeg - A complete, cross-platform solution to record, convert and stream audio and video",
+                    "git": "Distributed version control system for tracking changes in source code",
+                    "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
+                    "mplayer": "MPlayer - A movie player which runs on many systems and supports many formats",
+                    "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
+                    "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
+                    "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
+                    "xclip": "Multi copy clipboard",
+                    "zsh-autosuggestions": "Fish-like autosuggestions for Zsh based on command history",
+                    "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
+                },
                 "check": {
                     "claude": ["command -v claude"],
                     "ffmpeg": ["command -v ffmpeg"],
@@ -131,7 +148,7 @@
                     "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
-                    "claude": ["npm install -g @anthropic-ai/claude-code"],
+                    "claude": ["curl -fsSL https://claude.ai/install.sh | bash"],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
                     "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
@@ -154,7 +171,12 @@
                     ]
                 },
                 "uninstall": {
-                    "claude": ["npm uninstall -g @anthropic-ai/claude-code"],
+                    "claude": [
+                        "rm -f ~/.local/bin/claude",
+                        "rm -rf ~/.local/share/claude",
+                        "rm -rf ~/.claude",
+                        "rm -f ~/.claude.json"
+                    ],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
                     "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],

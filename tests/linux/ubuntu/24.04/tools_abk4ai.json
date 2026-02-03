@@ -1,7 +1,10 @@
 {
   "installed_tools": {
     "claude": [
-      "npm uninstall -g @anthropic-ai/claude-code"
+      "rm -f ~/.local/bin/claude",
+      "rm -rf ~/.local/share/claude",
+      "rm -rf ~/.claude",
+      "rm -f ~/.claude.json"
     ],
     "cline": [
       "npm uninstall -g cline"

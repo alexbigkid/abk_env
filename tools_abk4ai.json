@@ -7,7 +7,6 @@
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
             "descriptions": {
-                "claude": "Claude Code CLI - Anthropic's official command-line interface for Claude AI",
                 "cline": "Cline - An AI model switcher, can interact with Claude, Ollama, ...",
                 "git": "Distributed version control system for tracking changes in source code",
                 "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
@@ -21,7 +20,6 @@
                 "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
             },
             "check": {
-                "claude": ["command -v claude"],
                 "cline": ["command -v cline"],
                 "git": ["command -v git"],
                 "jq": ["command -v jq"],
@@ -35,7 +33,6 @@
                 "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
-                "claude": ["npm install -g @anthropic-ai/claude-code"],
                 "cline": ["npm install -g cline"],
                 "git": ["brew install git"],
                 "jq": ["brew install jq"],
@@ -65,7 +62,6 @@
                 ]
             },
             "uninstall": {
-                "claude": ["npm uninstall -g @anthropic-ai/claude-code"],
                 "cline": ["npm uninstall -g cline"],
                 "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
@@ -95,11 +91,17 @@
             }
         },
         "apps": {
+            "descriptions": {
+                "claude-code": "Claude Code - Anthropic's official for Claude AI"
+            },
             "check": {
+                "claude-code": ["brew list --cask | grep ^claude-code$"]
             },
             "install": {
+                "claude-code": ["brew install --cask claude-code"]
             },
             "uninstall": {
+                "claude-code": ["brew uninstall --cask claude-code"]
             }
         },
         "fonts": {
@@ -151,7 +153,7 @@
                     "zsh-syntax-highlighting": ["apt list --installed | grep zsh-syntax-highlighting"]
                 },
                 "install": {
-                    "claude": ["npm install -g @anthropic-ai/claude-code"],
+                    "claude": ["curl -fsSL https://claude.ai/install.sh | bash"],
                     "cline": ["npm install -g cline"],
                     "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
@@ -180,7 +182,12 @@
                     ]
                 },
                 "uninstall": {
-                    "claude": ["npm uninstall -g @anthropic-ai/claude-code"],
+                    "claude": [
+                        "rm -f ~/.local/bin/claude",
+                        "rm -rf ~/.local/share/claude",
+                        "rm -rf ~/.claude",
+                        "rm -f ~/.claude.json"
+                    ],
                     "cline": ["npm uninstall -g cline"],
                     "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],
