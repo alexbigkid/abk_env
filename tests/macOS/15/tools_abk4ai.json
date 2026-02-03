@@ -1,8 +1,5 @@
 {
   "installed_tools": {
-    "claude-code": [
-      ["brew uninstall --cask claude-code"]
-    ],
     "cline": [
       "npm uninstall -g cline"
     ],
@@ -12,6 +9,11 @@
     "ollama": [
       "brew services stop ollama",
       "brew uninstall ollama"
+    ]
+  },
+  "installed_apps": {
+    "claude-code": [
+      "brew uninstall --cask claude-code"
     ]
   }
 }

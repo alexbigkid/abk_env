@@ -7,10 +7,10 @@
       "rm -f ~/.claude.json"
     ],
     "cline": [
-      "npm uninstall -g cline"
+      "sudo npm uninstall -g cline"
     ],
     "kilocode": [
-      "npm uninstall -g @kilocode/cli"
+      "sudo npm uninstall -g @kilocode/cli"
     ],
     "ollama": [
       "sudo systemctl stop ollama",

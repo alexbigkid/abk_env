@@ -154,10 +154,10 @@
                 },
                 "install": {
                     "claude": ["curl -fsSL https://claude.ai/install.sh | bash"],
-                    "cline": ["npm install -g cline"],
+                    "cline": ["sudo npm install -g cline"],
                     "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
-                    "kilocode": ["npm install -g @kilocode/cli"],
+                    "kilocode": ["sudo npm install -g @kilocode/cli"],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
@@ -188,10 +188,10 @@
                         "rm -rf ~/.claude",
                         "rm -f ~/.claude.json"
                     ],
-                    "cline": ["npm uninstall -g cline"],
+                    "cline": ["sudo npm uninstall -g cline"],
                     "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],
-                    "kilocode": ["npm uninstall -g @kilocode/cli"],
+                    "kilocode": ["sudo npm uninstall -g @kilocode/cli"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
