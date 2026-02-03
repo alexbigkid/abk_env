@@ -10,7 +10,7 @@
       "npm uninstall -g cline"
     ],
     "kilocode": [
-      "sudo npm uninstall -g @kilocode/cli"
+      "npm uninstall -g @kilocode/cli"
     ],
     "ollama": [
       "sudo systemctl stop ollama",

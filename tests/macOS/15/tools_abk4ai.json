@@ -1,7 +1,7 @@
 {
   "installed_tools": {
-    "claude": [
-      "npm uninstall -g @anthropic-ai/claude-code"
+    "claude-code": [
+      ["brew uninstall --cask claude-code"]
     ],
     "cline": [
       "npm uninstall -g cline"
