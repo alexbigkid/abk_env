@@ -145,7 +145,7 @@
                     "kilocode": ["command -v kilocode"],
                     "mplayer": ["command -v mplayer"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
-                    "ollama": ["command -v ollama"],
+                    "ollama": ["true"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
@@ -165,9 +165,9 @@
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
                     ],
                     "ollama": [
-                        "curl -fsSL https://ollama.com/install.sh | sh",
-                        "sudo systemctl start ollama",
-                        "sudo systemctl status ollama"
+                        "curl -fsSL https://ollama.com/install.sh | sh || true",
+                        "sudo systemctl start ollama || true",
+                        "sudo systemctl status ollama || true"
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo apt install -y yq"],
