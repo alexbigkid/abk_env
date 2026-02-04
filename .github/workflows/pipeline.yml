@@ -25,7 +25,7 @@ jobs:
         runs-on: macos-${{ matrix.version }}
         strategy:
             matrix:
-                version: [13, 14, 15, 26]
+                version: [14, 15, 26]
         steps:
             - name: checkout repo
               uses: actions/checkout@v4
