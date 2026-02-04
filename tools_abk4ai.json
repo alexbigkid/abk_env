@@ -130,7 +130,6 @@
                     "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
                     "kilocode": "Kilo Code CLI - AI orchestration tool in the CLI",
                     "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
-                    "ollama": "Local free LLM. Create, run, and share large language models (LLMs)",
                     "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
                     "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
                     "xclip": "Multi copy clipboard",
@@ -145,7 +144,6 @@
                     "kilocode": ["command -v kilocode"],
                     "mplayer": ["command -v mplayer"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
-                    "ollama": ["command -v ollama"],
                     "wget": ["command -v wget"],
                     "yq": ["command -v yq"],
                     "xclip": ["command -v xclip"],
@@ -163,11 +161,6 @@
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
                         "./unixBin/oh-my-posh init $ABK_SHELL",
                         "(cd unixBin/env && ln -s XXX_oh-my-posh.env LINK_oh-my-posh.env)"
-                    ],
-                    "ollama": [
-                        "curl -fsSL https://ollama.com/install.sh | sh",
-                        "sudo systemctl start ollama",
-                        "sudo systemctl status ollama"
                     ],
                     "wget": ["sudo apt install -y wget"],
                     "yq": ["sudo apt install -y yq"],
@@ -196,14 +189,6 @@
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                         "rm -f ./unixBin/oh-my-posh"
-                    ],
-                    "ollama": [
-                        "sudo systemctl stop ollama",
-                        "sudo systemctl disable ollama",
-                        "sudo rm -rf /etc/systemd/system/ollama.service",
-                        "sudo rm -rf /etc/systemd/system/ollama.service.d",
-                        "sudo rm -rf /etc/ollama",
-                        "sudo rm -rf /var/lib/ollama"
                     ],
                     "wget": ["sudo apt remove -y wget"],
                     "yq": ["sudo apt remove -y yq"],
