@@ -11,6 +11,14 @@
     ],
     "kilocode": [
       "sudo npm uninstall -g @kilocode/cli"
+    ],
+    "ollama": [
+      "sudo systemctl stop ollama",
+      "sudo systemctl disable ollama",
+      "sudo rm -rf /etc/systemd/system/ollama.service",
+      "sudo rm -rf /etc/systemd/system/ollama.service.d",
+      "sudo rm -rf /etc/ollama",
+      "sudo rm -rf /var/lib/ollama"
     ]
   }
 }
