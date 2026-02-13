@@ -92,15 +92,19 @@
         },
         "apps": {
             "descriptions": {
+                "claude": "Claude - Anthropic's official Claude Desktop app.",
                 "claude-code": "Claude Code - Anthropic's official for Claude AI"
             },
             "check": {
+                "claude": ["brew list --cask | grep ^claude$"],
                 "claude-code": ["brew list --cask | grep ^claude-code$"]
             },
             "install": {
+                "claude": ["brew install --cask claude"],
                 "claude-code": ["brew install --cask claude-code"]
             },
             "uninstall": {
+                "claude": ["brew uninstall --cask claude"],
                 "claude-code": ["brew uninstall --cask claude-code"]
             }
         },

@@ -74,12 +74,12 @@
         },
         "apps": {
             "descriptions": {
-                "claude-code": "Claude Code - Anthropic's official for Claude AI"
+                "claude": "Claude - Anthropic's official for Claude Desktop app.",
+                "claude-code": "Claude Code - Anthropic's official for claude-code AI"
             },
             "check": {
-                "claude-code": [
-                    "brew list --cask | grep ^claude-code$"
-                ],
+                "claude": ["brew list --cask | grep ^claude$"],
+                "claude-code": ["brew list --cask | grep ^claude-code$"],
                 "flycut": [
                     "brew list --cask | grep ^flycut$",
                     "ls \"/Applications/Flycut.app\"",
@@ -92,11 +92,13 @@
                 ]
             },
             "install": {
+                "claude": ["brew install --cask claude"],
                 "claude-code": ["brew install --cask claude-code"],
                 "flycut": ["brew install --cask flycut"],
                 "windsurf": ["brew install --cask windsurf"]
             },
             "uninstall": {
+                "claude": ["brew uninstall --cask claude"],
                 "claude-code": ["brew uninstall --cask claude-code"],
                 "flycut": ["brew uninstall --cask flycut"],
                 "windsurf": ["brew uninstall --cask windsurf"]

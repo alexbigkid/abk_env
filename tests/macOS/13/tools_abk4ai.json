@@ -12,6 +12,9 @@
     ]
   },
   "installed_apps": {
+    "claude": [
+      "brew uninstall --cask claude"
+    ],
     "claude-code": [
       "brew uninstall --cask claude-code"
     ]
