@@ -39,9 +39,6 @@
       "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
       "rm -f ./unixBin/oh-my-posh"
     ],
-    "serverless": [
-      "sudo npm uninstall -g serverless"
-    ],
     "tfenv": [
       "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete || true",
       "sudo find /usr/local/bin -type l -name 'tfenv' -delete || true",

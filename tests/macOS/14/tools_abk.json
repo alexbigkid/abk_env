@@ -20,17 +20,11 @@
       "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
       "brew uninstall fzf"
     ],
-    "helm": [
-      "brew uninstall helm"
-    ],
     "pass": [
       "brew uninstall pass"
     ],
     "just": [
       "brew uninstall just"
-    ],
-    "kind": [
-      "brew uninstall kind"
     ],
     "nmap": [
       "brew uninstall nmap"
@@ -49,9 +43,6 @@
     ],
     "ruff": [
       "brew uninstall ruff"
-    ],
-    "serverless": [
-      "brew uninstall serverless"
     ],
     "shellcheck": [
       "brew uninstall shellcheck"
