@@ -230,7 +230,7 @@
                 "flycut": ["brew install --cask flycut"],
                 "microsoft-teams": [
                     "brew install --cask microsoft-teams",
-                    "brew uninstall --cask microsoft-auto-update"
+                    "brew uninstall --cask microsoft-auto-update || true"
                 ],
                 "mqttx": ["brew install --cask mqttx"],
                 "onedrive": ["brew install --cask onedrive"],
