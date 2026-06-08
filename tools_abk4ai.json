@@ -93,19 +93,23 @@
         "apps": {
             "descriptions": {
                 "claude": "Claude - Anthropic's official Claude Desktop app.",
-                "claude-code": "Claude Code - Anthropic's official for Claude AI"
+                "claude-code": "Claude Code - Anthropic's official for Claude AI",
+                "wispr-flow": "Wispr Flow - AI translated voice to text"
             },
             "check": {
                 "claude": ["brew list --cask | grep ^claude$"],
-                "claude-code": ["brew list --cask | grep ^claude-code$"]
+                "claude-code": ["brew list --cask | grep ^claude-code$"],
+                "wispr-flow": ["brew list --cask | grep ^wispr-flow$"]
             },
             "install": {
                 "claude": ["brew install --cask claude"],
-                "claude-code": ["brew install --cask claude-code"]
+                "claude-code": ["brew install --cask claude-code"],
+                "wispr-flow": ["brew install --cask wispr-flow"]
             },
             "uninstall": {
                 "claude": ["brew uninstall --cask claude"],
-                "claude-code": ["brew uninstall --cask claude-code"]
+                "claude-code": ["brew uninstall --cask claude-code"],
+                "wispr-flow": ["brew uninstall --cask wispr-flow"]
             }
         },
         "fonts": {

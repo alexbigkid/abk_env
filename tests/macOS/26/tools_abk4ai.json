@@ -17,6 +17,9 @@
     ],
     "claude-code": [
       "brew uninstall --cask claude-code"
+    ],
+    "wispr-flow": [
+      "brew uninstall --cask wispr-flow"
     ]
   }
 }
