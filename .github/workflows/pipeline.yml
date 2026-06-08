@@ -28,7 +28,7 @@ jobs:
                 version: [14, 15, 26]
         steps:
             - name: checkout repo
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Check runner
               run: .github/scripts/AgentInfo.sh
@@ -76,7 +76,7 @@ jobs:
                 version: [22.04, 24.04]
         steps:
             - name: checkout repo
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Check runner
               run: .github/scripts/AgentInfo.sh
@@ -134,12 +134,12 @@ jobs:
                 version: [22.04, 24.04]
         steps:
             - name: checkout repo
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                 core.autocrlf: false
 
             - name: Setup WSL
-              uses: Vampire/setup-wsl@v3
+              uses: Vampire/setup-wsl@v7
               with:
                 distribution: Ubuntu-${{ matrix.version }}
                 wsl-version: 2
@@ -188,7 +188,7 @@ jobs:
         if: always() && !cancelled()  # Run whether tests pass or fail, but not if cancelled due to concurrency
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                 fetch-depth: 0
                 token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
