@@ -1,0 +1,6 @@
+- don't overcomplicate things. Simple solution is usually a better solution
+- never place example code in src directory. The example code should always be in the docs folder or docs subfolder in md documentation files
+- When Writing docstrings please put the function description always in the first line and finish the sentence with a .
+- When creating unit Python/TS/JS test files: please use always the same way as the production code with test_ prefix. This way I know what is testing what.
+- When creating Kotlin unit test files: please use always the same way as the production code with *Test postfix. This way I know what is testing what.
+- don't use git add and git commit commands. I will that myself

@@ -36,11 +36,13 @@ The `test_install.sh` script validates:
 - `git rel-major` - Trigger major version release pipeline
 
 ### Claude Environment Setup
-- `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands, configs, templates, and workspaces
+- `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands, configs, templates, workspaces, skills, and global CLAUDE.md
 - `./unixBin/resetClaudeEnv.sh` - Reset Claude environment to original state
 - **Commands**: `unixBin/env/claude/commands/` → `~/.claude/commands` (symlinked)
 - **Templates**: `unixBin/env/claude/templates/` → `~/.claude/templates` (symlinked) 
 - **Workspaces**: `unixBin/env/claude/workspaces/` → `~/.claude/workspaces` (symlinked)
+- **Skills**: `unixBin/env/claude/skills/` → `~/.claude/skills` (symlinked)
+- **Global CLAUDE.md**: `unixBin/env/claude/CLAUDE.md` → `~/.claude/CLAUDE.md` (symlinked)
 - **Config**: `unixBin/env/claude/config/*.template.*` → `~/.claude/config/*.json` (generated with env vars)
 
 ## Architecture
@@ -74,8 +76,9 @@ The `test_install.sh` script validates:
 - `unixBin/env/claude/commands/` - Git-controlled Claude commands directory (symlinked)
 - `unixBin/env/claude/templates/` - Git-controlled code templates and snippets (symlinked)
 - `unixBin/env/claude/workspaces/` - Git-controlled workspace configurations (symlinked)
+- `unixBin/env/claude/skills/` - Git-controlled Claude skills directory (symlinked)
+- `unixBin/env/claude/CLAUDE.md` - Git-controlled user-global Claude instructions (symlinked)
 - `unixBin/env/claude/config/` - Template configuration files with environment variable placeholders
-- `unixBin/env/claude_backup/` - Temporary backup during setup/reset operations
 - `unixBin/setClaudeEnv.sh` - Setup script for centralized environment management
 - `unixBin/resetClaudeEnv.sh` - Reset script to restore original environment
 
@@ -151,6 +154,11 @@ The repository provides comprehensive centralized management for Claude developm
 - Project relationships and shared configurations
 - Symlinked from `unixBin/env/claude/workspaces/`
 
+**Skills** (`~/.claude/skills/`)
+- Git-controlled skill packages (each skill is a subdirectory containing `SKILL.md`)
+- Symlinked from `unixBin/env/claude/skills/`
+- Preserved and merged during setup
+
 **Configuration** (`~/.claude/config/`)
 - Secure configuration with environment variable substitution
 - API keys loaded from environment variables or password managers
@@ -160,18 +168,75 @@ The repository provides comprehensive centralized management for Claude developm
 ### Setup Process
 1. **Run Setup**: `./unixBin/setClaudeEnv.sh`
    - **Prerequisites**: Installs required tools (`rsync`, `envsubst`)
-   - **Commands**: Backs up and symlinks `~/.claude/commands` → `unixBin/env/claude/commands/`
-   - **Templates**: Symlinks `~/.claude/templates` → `unixBin/env/claude/templates/`
-   - **Workspaces**: Symlinks `~/.claude/workspaces` → `unixBin/env/claude/workspaces/`
-   - **Configuration**: Processes templates with `envsubst` to generate secure config files
-   - **Backup**: Existing files preserved in `unixBin/env/claude_backup/`
+   - **Subdirectories**: For each of `commands`, `templates`, `workspaces`, `skills`:
+     - If `~/.claude/<subdir>/` is a real directory, any files not already in the git repo are merged in (git repo wins on conflicts), then the original is removed
+     - A symlink is created from `~/.claude/<subdir>` → `unixBin/env/claude/<subdir>/`
+   - **Global CLAUDE.md**: `~/.claude/CLAUDE.md` is symlinked to `unixBin/env/claude/CLAUDE.md`. On first setup, if a local file exists and the git copy does not, the local file is copied into the repo to preserve user content
+   - **Configuration**: Processes `*.template.*` files with `envsubst` to generate secure config files in `~/.claude/config/` (no symlink — secrets stay outside the git repo)
 
 ### Reset Process
 1. **Run Reset**: `./unixBin/resetClaudeEnv.sh`
-   - **Cleanup Order**: Removes workspaces, templates, config, and commands (reverse order)
-   - **Restoration**: Restores original files from backup directories
-   - **Security**: Removes generated configuration files containing secrets
-   - **Git Safety**: Keeps git repo contents intact for future use
+   - **Cleanup Order**: Removes the CLAUDE.md, skills, workspaces, templates, and commands symlinks (reverse of setup order)
+   - **Symlinks Only**: Each symlink is removed; the git-controlled files at `unixBin/env/claude/` are never touched
+   - **User Data Preserved**: If `~/.claude/<subdir>/` or `~/.claude/CLAUDE.md` exists as a real file/directory (not a symlink), it is left alone
+   - **Config Security**: Only files generated from `*.template.*` are removed from `~/.claude/config/`; anything you added by hand is preserved
+
+### Replicating This Environment On A New Machine
+
+Everything that lives in `unixBin/env/claude/` (commands, templates, workspaces, skills, global `CLAUDE.md`) follows you to any new Mac by cloning this repo and running `setClaudeEnv.sh`.
+
+**Steps:**
+
+1. **Install Homebrew** (Apple's prerequisite for everything else):
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. **Clone this repo** to its expected location:
+   ```bash
+   mkdir -p ~/dev/git && cd ~/dev/git
+   git clone <your-abk_env-remote-url> abk_env
+   cd abk_env
+   ```
+
+3. **Install Claude and the AI tool set** (also installs `cline`, `kilocode`, Claude Desktop, Wispr Flow):
+   ```bash
+   ./install.sh tools_ai.json
+   ```
+
+4. **Export the environment variables that the config templates expect**, in your `~/.zshrc` or via a password manager such as `pass`:
+   ```bash
+   export ANTHROPIC_API_KEY=...
+   export OPENAI_API_KEY=...          # optional
+   export GITHUB_TOKEN=...
+   export POSTGRES_CONNECTION_STRING=...  # optional, for MCP postgres
+   export BRAVE_API_KEY=...               # optional, for MCP brave search
+   export TESTING_FRAMEWORK=...           # optional, populates claude-settings.json
+   export FRONTEND_FRAMEWORK=...          # optional
+   export BACKEND_FRAMEWORK=...           # optional
+   export DATABASE_TYPE=...               # optional
+   export GIT_BRANCH_PATTERN=...          # optional
+   export DEV_ENVIRONMENT=...             # optional
+   ```
+   Missing variables become empty strings in the generated config — not a fatal error.
+
+5. **Wire up the symlinks**:
+   ```bash
+   ./unixBin/setClaudeEnv.sh
+   ```
+   This creates the five symlinks (`commands`, `templates`, `workspaces`, `skills`, `CLAUDE.md` → git repo) and generates `~/.claude/config/*.json` from templates with mode `600`.
+
+After step 5: all your git-tracked slash commands, code templates, workspace defs, skills, and global Claude instructions are live on the new machine.
+
+**What does NOT transfer (not in this repo):**
+
+| Item | Why | What to do |
+|---|---|---|
+| `~/.claude/settings.json` | Per-machine harness config | Copy from old Mac, or let `/config` recreate |
+| `~/.claude/plugins/` | Installed via `/plugins` | Reinstall via `/plugins` on new machine |
+| `~/.claude/projects/`, `sessions/`, `history.jsonl` | Per-machine conversation/history state | Skip — fresh start is fine |
+| `~/.claude/backups/`, `cache/`, `file-history/`, `paste-cache/`, `shell-snapshots/` | Caches | Skip — regenerated on demand |
+| `mcp-needs-auth-cache.json` and MCP OAuth tokens | Per-machine auth state | Re-authenticate each MCP server |
 
 ### Security Model
 - **Templates Only in Git**: Only `.template.*` files are version controlled
