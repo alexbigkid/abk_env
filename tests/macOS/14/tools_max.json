@@ -1,10 +1,19 @@
 {
   "installed_tools": {
+    "helm": [
+      "brew uninstall helm"
+    ],
+    "kind": [
+      "brew uninstall kind"
+    ],
     "pyenv": [
       "find ./unixBin/env -type l -name 'LINK_pyenv.env' -delete",
       "brew uninstall pyenv-virtualenv || true",
       "brew uninstall pyenv",
       "rm -Rf ~/.pyenv"
+    ],
+    "serverless": [
+      "brew uninstall serverless"
     ]
   },
   "installed_apps": {
