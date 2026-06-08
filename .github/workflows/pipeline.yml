@@ -135,8 +135,6 @@ jobs:
         steps:
             - name: checkout repo
               uses: actions/checkout@v6
-              with:
-                core.autocrlf: false
 
             - name: Setup WSL
               uses: Vampire/setup-wsl@v7
