@@ -168,7 +168,7 @@
             "supported_versions": {
                 "debian": ["11", "12", "13"],
                 "raspbian": ["11", "12", "13"],
-                "ubuntu": ["22.04", "24.04"]
+                "ubuntu": ["22.04", "24.04", "26.04"]
             },
             "update_packages": ["sudo apt update", "sudo apt upgrade -y", "sudo apt dist-upgrade -y"],
             "tools": {

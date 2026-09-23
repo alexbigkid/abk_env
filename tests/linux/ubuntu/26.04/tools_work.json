@@ -1,0 +1,7 @@
+{
+  "installed_fonts": {
+    "font_installation_cleanup": [
+      "fc-cache -fv"
+    ]
+  }
+}
