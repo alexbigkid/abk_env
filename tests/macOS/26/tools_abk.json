@@ -26,6 +26,10 @@
     "just": [
       "brew uninstall just"
     ],
+    "mise": [
+      "find ./unixBin/env -type l -name 'LINK_mise.env' -delete || true",
+      "brew uninstall mise"
+    ],
     "nmap": [
       "brew uninstall nmap"
     ],

@@ -125,7 +125,7 @@ ValidateLinksCreated() {
                     if [ -f "$LCL_LINKS_DIR/$link_file" ]; then
                         LCL_LINKS_FILES+=("$link_file")
                     fi
-                done < <(jq -r '.linux.debian.tools.install | keys[]' "$package_file" 2>/dev/null | grep -E "(direnv|fzf|nodenv|oh-my-posh|pyenv|uv|zsh_plugins|aws|rbenv|tfenv)")
+                done < <(jq -r '.linux.debian.tools.install | keys[]' "$package_file" 2>/dev/null | grep -E "(direnv|fzf|nodenv|oh-my-posh|pyenv|uv|zsh_plugins|aws|rbenv|tfenv|mise)")
             fi
         done
     fi

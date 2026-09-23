@@ -24,6 +24,12 @@
       "sudo rm -f /usr/local/bin/just",
       "cargo uninstall just"
     ],
+    "mise": [
+      "find ./unixBin/env -type l -name 'LINK_mise.env' -delete || true",
+      "sudo apt remove -y mise",
+      "sudo rm -f /etc/apt/sources.list.d/mise.list",
+      "sudo rm -f /etc/apt/keyrings/mise-archive-keyring.gpg"
+    ],
     "mplayer": [
       "sudo apt remove -y mplayer"
     ],

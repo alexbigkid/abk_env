@@ -20,6 +20,7 @@
                 "gpg": "GNU Privacy Guard - encryption and signing tool for secure communication",
                 "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
                 "just": "Command runner and build tool - a simpler, more modern alternative to make",
+                "mise": "Polyglot runtime version manager (asdf-compatible) for managing per-project tool/language versions",
                 "nmap": "Network discovery and security auditing tool for port scanning and network mapping",
                 "nodenv": "Node.js version manager that allows easy switching between Node.js versions",
                 "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
@@ -50,6 +51,7 @@
                 "gpg": ["command -v gpg"],
                 "jq": ["command -v jq"],
                 "just": ["command -v just"],
+                "mise": ["command -v mise"],
                 "nmap": ["command -v nmap"],
                 "nodenv": ["command -v nodenv"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
@@ -89,6 +91,10 @@
                 "gpg": ["brew install gnupg"],
                 "jq": ["brew install jq"],
                 "just": ["brew install just"],
+                "mise": [
+                    "brew install mise",
+                    "(cd unixBin/env && [ ! -L LINK_mise.env ] && ln -s XXX_mise.env LINK_mise.env || true)"
+                ],
                 "nmap": ["brew install nmap"],
                 "nodenv": [
                     "brew install nodenv",
@@ -147,6 +153,10 @@
                 "gpg": ["brew uninstall gnupg"],
                 "jq": ["brew uninstall jq"],
                 "just": ["brew uninstall just"],
+                "mise": [
+                    "find ./unixBin/env -type l -name 'LINK_mise.env' -delete || true",
+                    "brew uninstall mise"
+                ],
                 "nmap": ["brew uninstall nmap"],
                 "nodenv": [
                     "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
@@ -306,6 +316,7 @@
                     "gpg": "GNU Privacy Guard - encryption and signing tool for secure communication",
                     "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
                     "just": "Command runner and build tool - a simpler, more modern alternative to make",
+                    "mise": "Polyglot runtime version manager (asdf-compatible) for managing per-project tool/language versions",
                     "mplayer": "Cross-platform multimedia player that supports a wide variety of audio/video formats",
                     "nmap": "Network discovery and security auditing tool for port scanning and network mapping",
                     "nodenv": "Node.js version manager that allows easy switching between Node.js versions",
@@ -332,6 +343,7 @@
                     "gpg": ["command -v gpg"],
                     "jq": ["command -v jq"],
                     "just": ["command -v just"],
+                    "mise": ["command -v mise"],
                     "mplayer": ["command -v mplayer"],
                     "nmap": ["command -v nmap"],
                     "nodenv": ["command -v nodenv"],
@@ -377,6 +389,14 @@
                         "source ~/.cargo/env",
                         "cargo install just",
                         "sudo ln -sf ~/.cargo/bin/just /usr/local/bin/just"
+                    ],
+                    "mise": [
+                        "sudo install -dm 755 /etc/apt/keyrings",
+                        "wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg > /dev/null",
+                        "echo \"deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main\" | sudo tee /etc/apt/sources.list.d/mise.list",
+                        "sudo apt update",
+                        "sudo apt install -y mise",
+                        "(cd unixBin/env && [ ! -L LINK_mise.env ] && ln -s XXX_mise.env LINK_mise.env || true)"
                     ],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "nmap": ["sudo apt install -y nmap"],
@@ -445,6 +465,12 @@
                     "just": [
                         "sudo rm -f /usr/local/bin/just",
                         "cargo uninstall just"
+                    ],
+                    "mise": [
+                        "find ./unixBin/env -type l -name 'LINK_mise.env' -delete || true",
+                        "sudo apt remove -y mise",
+                        "sudo rm -f /etc/apt/sources.list.d/mise.list",
+                        "sudo rm -f /etc/apt/keyrings/mise-archive-keyring.gpg"
                     ],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "nmap": ["sudo apt remove -y nmap"],
