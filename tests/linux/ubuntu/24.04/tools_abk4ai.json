@@ -5,12 +5,6 @@
       "rm -rf ~/.local/share/claude",
       "rm -rf ~/.claude",
       "rm -f ~/.claude.json"
-    ],
-    "cline": [
-      "sudo npm uninstall -g cline"
-    ],
-    "kilocode": [
-      "sudo npm uninstall -g @kilocode/cli"
     ]
   }
 }

@@ -7,10 +7,8 @@
         "update_packages": ["brew update", "brew upgrade", "brew cleanup", "brew missing"],
         "tools": {
             "descriptions": {
-                "cline": "Cline - An AI model switcher, can interact with Claude, Ollama, ...",
                 "git": "Distributed version control system for tracking changes in source code",
                 "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
-                "kilocode": "Kilo Code CLI - AI orchestration tool in the CLI",
                 "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
                 "ollama": "Local free LLM. Create, run, and share large language models (LLMs)",
                 "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
@@ -20,10 +18,8 @@
                 "zsh-syntax-highlighting": "Fish shell-like syntax highlighting for Zsh commands as you type"
             },
             "check": {
-                "cline": ["command -v cline"],
                 "git": ["command -v git"],
                 "jq": ["command -v jq"],
-                "kilocode": ["command -v kilocode"],
                 "oh-my-posh": ["brew list | grep oh-my-posh"],
                 "ollama": ["command -v ollama"],
                 "wget": ["command -v wget"],
@@ -33,10 +29,8 @@
                 "zsh-syntax-highlighting": ["brew list | grep zsh-syntax-highlighting"]
             },
             "install": {
-                "cline": ["npm install -g cline"],
                 "git": ["brew install git"],
                 "jq": ["brew install jq"],
-                "kilocode": ["npm install -g @kilocode/cli"],
                 "oh-my-posh": [
                     "brew install oh-my-posh",
                     "oh-my-posh init $ABK_SHELL",
@@ -62,10 +56,8 @@
                 ]
             },
             "uninstall": {
-                "cline": ["npm uninstall -g cline"],
                 "git": ["brew uninstall git"],
                 "jq": ["brew uninstall jq"],
-                "kilocode": ["npm uninstall -g @kilocode/cli"],
                 "oh-my-posh": [
                     "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",
                     "brew uninstall oh-my-posh"
@@ -133,10 +125,8 @@
             "tools": {
                 "descriptions": {
                     "claude": "Claude Code CLI - Anthropic's official command-line interface for Claude AI",
-                    "cline": "Cline - An AI model switcher, can interact with Claude, Ollama, ...",
                     "git": "Distributed version control system for tracking changes in source code",
                     "jq": "Command-line JSON processor for parsing, filtering and transforming JSON data",
-                    "kilocode": "Kilo Code CLI - AI orchestration tool in the CLI",
                     "oh-my-posh": "Cross-platform prompt theme engine for any shell with customizable themes",
                     "wget": "Command-line utility for downloading files from web servers via HTTP/HTTPS/FTP",
                     "yq": "Command-line YAML processor - the YAML equivalent of jq for parsing and manipulating YAML",
@@ -146,10 +136,8 @@
                 },
                 "check": {
                     "claude": ["command -v claude"],
-                    "cline": ["command -v cline"],
                     "git": ["command -v git"],
                     "jq": ["command -v jq"],
-                    "kilocode": ["command -v kilocode"],
                     "mplayer": ["command -v mplayer"],
                     "oh-my-posh": ["command -v ./unixBin/oh-my-posh"],
                     "wget": ["command -v wget"],
@@ -160,10 +148,8 @@
                 },
                 "install": {
                     "claude": ["curl -fsSL https://claude.ai/install.sh | bash"],
-                    "cline": ["sudo npm install -g cline"],
                     "git": ["sudo apt install -y git"],
                     "jq": ["sudo apt install -y jq"],
-                    "kilocode": ["sudo npm install -g @kilocode/cli"],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "oh-my-posh": [
                         "curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ./unixBin",
@@ -189,10 +175,8 @@
                         "rm -rf ~/.claude",
                         "rm -f ~/.claude.json"
                     ],
-                    "cline": ["sudo npm uninstall -g cline"],
                     "git": ["sudo apt remove -y git"],
                     "jq": ["sudo apt remove -y jq"],
-                    "kilocode": ["sudo npm uninstall -g @kilocode/cli"],
                     "mplayer": ["sudo apt remove -y mplayer"],
                     "oh-my-posh": [
                         "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete",

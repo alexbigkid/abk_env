@@ -1,11 +1,5 @@
 {
   "installed_tools": {
-    "cline": [
-      "npm uninstall -g cline"
-    ],
-    "kilocode": [
-      "npm uninstall -g @kilocode/cli"
-    ],
     "ollama": [
       "brew services stop ollama",
       "brew uninstall ollama"
