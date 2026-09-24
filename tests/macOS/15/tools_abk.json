@@ -27,7 +27,7 @@
       "brew uninstall just"
     ],
     "mise": [
-      "find ./unixBin/env -type l -name 'LINK_mise.env' -delete || true",
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
       "brew uninstall mise"
     ],
     "nmap": [

@@ -93,7 +93,7 @@
                 "just": ["brew install just"],
                 "mise": [
                     "brew install mise",
-                    "(cd unixBin/env && [ ! -L LINK_mise.env ] && ln -s XXX_mise.env LINK_mise.env || true)"
+                    "(cd unixBin/env && [ ! -L LINK_nodenv.env ] && ln -s XXX_nodenv.env LINK_nodenv.env || true)"
                 ],
                 "nmap": ["brew install nmap"],
                 "nodenv": [
@@ -154,7 +154,7 @@
                 "jq": ["brew uninstall jq"],
                 "just": ["brew uninstall just"],
                 "mise": [
-                    "find ./unixBin/env -type l -name 'LINK_mise.env' -delete || true",
+                    "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
                     "brew uninstall mise"
                 ],
                 "nmap": ["brew uninstall nmap"],
@@ -396,7 +396,7 @@
                         "echo \"deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main\" | sudo tee /etc/apt/sources.list.d/mise.list",
                         "sudo apt update",
                         "sudo apt install -y mise",
-                        "(cd unixBin/env && [ ! -L LINK_mise.env ] && ln -s XXX_mise.env LINK_mise.env || true)"
+                        "(cd unixBin/env && [ ! -L LINK_nodenv.env ] &&ln -s XXX_nodenv.env LINK_nodenv.env || true)"
                     ],
                     "mplayer": ["sudo apt install -y mplayer"],
                     "nmap": ["sudo apt install -y nmap"],
@@ -467,7 +467,7 @@
                         "cargo uninstall just"
                     ],
                     "mise": [
-                        "find ./unixBin/env -type l -name 'LINK_mise.env' -delete || true",
+                        "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
                         "sudo apt remove -y mise",
                         "sudo rm -f /etc/apt/sources.list.d/mise.list",
                         "sudo rm -f /etc/apt/keyrings/mise-archive-keyring.gpg"
