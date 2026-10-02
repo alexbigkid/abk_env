@@ -1,0 +1,7 @@
+{
+  "installed_apps": {
+    "windsurf": [
+      "brew uninstall --cask windsurf"
+    ]
+  }
+}

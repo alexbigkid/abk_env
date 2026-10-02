@@ -1,0 +1,19 @@
+{
+  "installed_tools": {
+    "ollama": [
+      "brew services stop ollama",
+      "brew uninstall ollama"
+    ]
+  },
+  "installed_apps": {
+    "claude": [
+      "brew uninstall --cask claude"
+    ],
+    "claude-code": [
+      "brew uninstall --cask claude-code"
+    ],
+    "wispr-flow": [
+      "brew uninstall --cask wispr-flow"
+    ]
+  }
+}

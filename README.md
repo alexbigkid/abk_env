@@ -54,6 +54,8 @@ flowchart LR
   - [x] 13 - Ventura
   - [x] 14 - Sonoma
   - [x] 15 - Sequoia
+  - [x] 26 - Tahoe
+  - [x] 27 - Golden Gate
 - [x] Linux / Debian distro
   - [x] 11 - bullseye
   - [x] 12 - bookworm
@@ -61,6 +63,7 @@ flowchart LR
   - [ ] 20.04 - support removed
   - [x] 22.04
   - [x] 24.04
+  - [x] 26.04
 - [x] Linux / Raspbian distro
   - [x] 11 - bullseye
   - [x] 12 - bookworm
