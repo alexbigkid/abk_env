@@ -1,7 +1,6 @@
 ---
 name: dev-guidelines
 description: Use when planning features, implementing code, refactoring, writing tests, or creating implementation plans. Applies to any software development task that involves writing or modifying code.
-version: 1.0.0
 ---
 
 # Development Guidelines
