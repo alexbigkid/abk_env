@@ -15,3 +15,6 @@ unixBin/env/claude_backup/
 # Personal state directories (if ever copied locally)
 claude-projects/
 claude-todos/
+
+# Claude Code's own synced built-in skills cache (auto-regenerated, not ours)
+unixBin/env/claude/skills/synced/
