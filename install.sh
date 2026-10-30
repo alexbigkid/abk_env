@@ -159,8 +159,10 @@ __installItem() {
             fi
         done <<< "$LCL_INSTALL_INSTRUCTIONS"
 
-        PrintTrace "$TRACE_INFO" "${YLW}[$LCL_ITEM marking uninstalling steps ...]${NC}"
-        AbkLib_WriteUninstallSteps "$LCL_JSON_INSTALLATION_FILE_NAME" "$LCL_INSTALL_TYPE" "$LCL_ITEM" "$LCL_UNINSTALL_INSTRUCTIONS"
+        if [ $LCL_EXIT_CODE -eq 0 ]; then
+            PrintTrace "$TRACE_INFO" "${YLW}[$LCL_ITEM marking uninstalling steps ...]${NC}"
+            AbkLib_WriteUninstallSteps "$LCL_JSON_INSTALLATION_FILE_NAME" "$LCL_INSTALL_TYPE" "$LCL_ITEM" "$LCL_UNINSTALL_INSTRUCTIONS"
+        fi
     else
         PrintTrace "$TRACE_INFO" "${GRN}$LCL_ITEM already installed${NC}"
     fi
