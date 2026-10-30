@@ -147,17 +147,14 @@ resetSshGpgConfig() {
     local LCL_GPG_AGENT_CONF_FILE="$GNUPG_DIR/gpg-agent.conf"
     local LCL_ENV_SCRIPT_NAME="SET_YK_GPG"
 
-    PrintTrace "$TRACE_INFO" "🔐 Resetting SSH key for GPG"
-    AbkLib_RemoveEnvironmentSettings "$LCL_ENV_SCRIPT_NAME" "$HOME/$ABK_USER_CONFIG_FILE_SHELL"
+    local LCL_ENV_DIR
+    LCL_ENV_DIR="$(cd "$SCRIPT_PATH" && pwd)/env"
 
-    PrintTrace "$TRACE_INFO" "🔐 Reloading environment"
-    if [ "$ABK_SHELL" = "zsh" ]; then
-        zsh -c "source $HOME/$ABK_USER_CONFIG_FILE_SHELL"
-    elif [ "$ABK_SHELL" = "bash" ]; then
-        source "$HOME/$ABK_USER_CONFIG_FILE_SHELL"
-    else
-        PrintTrace "$TRACE_ERROR" "${RED}❌ Unsupported shell: $ABK_SHELL${NC}"
-    fi
+    PrintTrace "$TRACE_INFO" "🔐 Resetting SSH key for GPG"
+    # legacy: older setYkGpg.sh versions wrote the gpg shell env directly into the shell config
+    AbkLib_RemoveEnvironmentSettings "$LCL_ENV_SCRIPT_NAME" "$HOME/$ABK_USER_CONFIG_FILE_SHELL"
+    PrintTrace "$TRACE_INFO" "🗑️  Removing $LCL_ENV_DIR/LINK_gpg.env (open a new shell to deactivate)"
+    find "$LCL_ENV_DIR" -type l -name 'LINK_gpg.env' -delete || true
 
     PrintTrace "$TRACE_INFO" "🔐 Disabling SSH support"
     if [ -f "$LCL_GPG_AGENT_CONF_FILE" ]; then

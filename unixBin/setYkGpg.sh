@@ -217,8 +217,9 @@ setGitGpgSigningConfig() {
     git config --global push.gpgsign false
     [ $? -ne 0 ] && PrintTrace "$TRACE_ERROR" "${RED}❌ git failed to set sign push${NC}"
 
+    # wrapper picks the signing key of whichever YubiKey is plugged in (multiple YubiKeys support)
     local LCL_GPG_PROGRAM_PATH
-    LCL_GPG_PROGRAM_PATH=$(which gpg)
+    LCL_GPG_PROGRAM_PATH="$(cd "$SCRIPT_PATH" && pwd)/gpgYkSign.sh"
     PrintTrace "$TRACE_INFO" "🔐 Setting up gpg.program to $LCL_GPG_PROGRAM_PATH"
     git config --global gpg.program "$LCL_GPG_PROGRAM_PATH"
 
@@ -248,7 +249,8 @@ setSshGpgConfig() {
     local LCL_KEY_FP="$1"
     local LCL_EXIT_CODE=0
     local LCL_GPG_AGENT_CONTENT_ARRAY=()
-    local LCL_SHELL_CONTENT_ARRAY=()
+    local LCL_ENV_DIR
+    LCL_ENV_DIR="$(cd "$SCRIPT_PATH" && pwd)/env"
     local LCL_GPG_AGENT_CONFIG="$GNUPG_DIR/gpg-agent.conf"
     local LCL_ENV_SCRIPT_NAME="SET_YK_GPG"
     local LCL_PIN_ENTRY_PATH
@@ -281,24 +283,13 @@ setSshGpgConfig() {
     gpgconf --launch gpg-agent
     [ $? -eq 0 ] && PrintTrace "$TRACE_INFO" "✅ gpg-agent started" || PrintTrace "$TRACE_ERROR" "${RED}❌ gpg-agent failed to start${NC}"
 
-    PrintTrace "$TRACE_INFO" "🔐 Setting up SSH key for GPG"
-    grep -q 'export GPG_TTY=$(tty)' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('export GPG_TTY=$(tty)')
-    grep -q 'export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)')
-    grep -q 'gpgconf --kill gpg-agent' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('gpgconf --kill gpg-agent')
-    grep -q 'gpgconf --launch gpg-agent' "$HOME/$ABK_USER_CONFIG_FILE_SHELL" || LCL_SHELL_CONTENT_ARRAY+=('gpgconf --launch gpg-agent')
-    [ ${#LCL_SHELL_CONTENT_ARRAY[@]} -ne 0 ] && AbkLib_AddEnvironmentSettings "$LCL_ENV_SCRIPT_NAME" "$HOME/$ABK_USER_CONFIG_FILE_SHELL" "${LCL_SHELL_CONTENT_ARRAY[@]}"
-
-    PrintTrace "$TRACE_INFO" "🔐 Reloading environment"
-    if [ "$ABK_SHELL" = "zsh" ]; then
-        zsh -c "source $HOME/$ABK_USER_CONFIG_FILE_SHELL"
-    elif [ "$ABK_SHELL" = "bash" ]; then
-        source "$HOME/$ABK_USER_CONFIG_FILE_SHELL"
-    else
-        PrintTrace "$TRACE_ERROR" "${RED}❌ Unsupported shell: $ABK_SHELL${NC}"
-    fi
+    # shell env (GPG_TTY, SSH_AUTH_SOCK, gpg-agent launch) lives in env/XXX_gpg.env, enabled via LINK_gpg.env
+    PrintTrace "$TRACE_INFO" "🔐 Setting up SSH key for GPG: $LCL_ENV_DIR/LINK_gpg.env"
+    (cd "$LCL_ENV_DIR" && [ ! -L LINK_gpg.env ] && ln -s XXX_gpg.env LINK_gpg.env || true)
+    [ -L "$LCL_ENV_DIR/LINK_gpg.env" ] && PrintTrace "$TRACE_INFO" "✅ LINK_gpg.env in place (open a new shell to activate)" || PrintTrace "$TRACE_ERROR" "${RED}❌ Failed to create LINK_gpg.env${NC}"
 
     PrintTrace "$TRACE_INFO" "🔐 Available SSH keys:"
-    ssh-add -L | grep cardno: || PrintTrace "$TRACE_INFO" "${YLW}⚠️  No GPG-based SSH key found.${NC}"
+    SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket) ssh-add -L | grep cardno: || PrintTrace "$TRACE_INFO" "${YLW}⚠️  No GPG-based SSH key found.${NC}"
 
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
