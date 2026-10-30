@@ -88,7 +88,10 @@
                 "gh": ["brew install gh"],
                 "git": ["brew install git"],
                 "pass": ["brew install pass"],
-                "gpg": ["brew install gnupg"],
+                "gpg": [
+                    "brew install gnupg",
+                    "(cd unixBin/env && [ ! -L LINK_gpg.env ] && ln -s XXX_gpg.env LINK_gpg.env || true)"
+                ],
                 "jq": ["brew install jq"],
                 "just": ["brew install just"],
                 "mise": [
@@ -150,7 +153,10 @@
                 "gh": ["brew uninstall gh"],
                 "git": ["brew uninstall git"],
                 "pass": ["brew uninstall pass"],
-                "gpg": ["brew uninstall gnupg"],
+                "gpg": [
+                    "find ./unixBin/env -type l -name 'LINK_gpg.env' -delete || true",
+                    "brew uninstall gnupg"
+                ],
                 "jq": ["brew uninstall jq"],
                 "just": ["brew uninstall just"],
                 "mise": [
