@@ -345,6 +345,10 @@ AbkLib_CheckPreRequisites_linux() {
     if ! command -v unzip >/dev/null 2>&1; then
         sudo apt install -y unzip || LCL_EXIT_CODE=$?
     fi
+    # install C compiler and build tools, needed for tools built from source (e.g. cargo install)
+    if ! command -v cc >/dev/null 2>&1; then
+        sudo apt install -y build-essential || LCL_EXIT_CODE=$?
+    fi
 
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE)"
     return $LCL_EXIT_CODE

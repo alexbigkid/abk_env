@@ -49,6 +49,7 @@
                     "bat": ["command -v bat"],
                     "direnv": ["command -v direnv"],
                     "expect": ["command -v expect"],
+                    "eza": ["command -v eza"],
                     "ffmpeg": ["command -v ffmpeg"],
                     "fzf": ["command -v fzf"],
                     "gh": ["command -v gh"],
@@ -92,6 +93,15 @@
                         "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
                     ],
                     "expect": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y expect --no-install-recommends"],
+                    "eza": [
+                        "command -v gpg >/dev/null 2>&1 || sudo DEBIAN_FRONTEND=noninteractive apt install -y gnupg --no-install-recommends",
+                        "sudo mkdir -p /etc/apt/keyrings",
+                        "curl -fsSL https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/gierens.gpg",
+                        "echo 'deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main' | sudo tee /etc/apt/sources.list.d/gierens.list",
+                        "sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list",
+                        "sudo DEBIAN_FRONTEND=noninteractive apt update",
+                        "sudo DEBIAN_FRONTEND=noninteractive apt install -y eza --no-install-recommends"
+                    ],
                     "ffmpeg": ["sudo DEBIAN_FRONTEND=noninteractive apt install -y ffmpeg --no-install-recommends"],
                     "fzf": [
                         "sudo DEBIAN_FRONTEND=noninteractive apt install -y fzf --no-install-recommends",
@@ -172,6 +182,10 @@
                         "sudo apt remove -y direnv"
                     ],
                     "expect": ["sudo apt remove -y expect"],
+                    "eza": [
+                        "sudo apt remove -y eza",
+                        "sudo rm -f /etc/apt/sources.list.d/gierens.list /etc/apt/keyrings/gierens.gpg"
+                    ],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
                     "fzf": [
                         "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",

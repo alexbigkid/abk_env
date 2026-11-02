@@ -16,6 +16,10 @@
     "expect": [
       "sudo apt remove -y expect"
     ],
+    "eza": [
+      "sudo apt remove -y eza",
+      "sudo rm -f /etc/apt/sources.list.d/gierens.list /etc/apt/keyrings/gierens.gpg"
+    ],
     "ffmpeg": [
       "sudo apt remove -y ffmpeg"
     ],

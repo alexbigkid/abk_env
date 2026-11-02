@@ -314,7 +314,7 @@
                     "bat": "A cat clone with syntax highlighting, Git integration, and automatic paging",
                     "direnv": "Environment variable manager that automatically loads/unloads variables based on directory",
                     "ffmpeg": "Complete multimedia framework for recording, converting and streaming audio/video",
-                    "exa": "Modern replacement for ls with colors, icons, and Git status",
+                    "eza": "Modern replacement for ls with colors, icons, and Git status (successor to exa)",
                     "fzf": "Command-line fuzzy finder for files, command history, processes, and more",
                     "gh": "GitHub CLI - official command line tool for GitHub operations and workflows",
                     "git": "Distributed version control system for tracking changes in source code",
@@ -341,7 +341,7 @@
                     "bat": ["command -v bat"],
                     "direnv": ["command -v direnv"],
                     "ffmpeg": ["command -v ffmpeg"],
-                    "exa": ["command -v exa"],
+                    "eza": ["command -v eza"],
                     "fzf": ["command -v fzf"],
                     "gh": ["command -v gh"],
                     "git": ["command -v git"],
@@ -379,7 +379,15 @@
                         "sudo apt install -y direnv",
                         "(cd unixBin/env && [ ! -L LINK_direnv.env ] && ln -s XXX_direnv.env LINK_direnv.env || true)"
                     ],
-                    "exa": ["sudo apt install -y exa"],
+                    "eza": [
+                        "command -v gpg >/dev/null 2>&1 || sudo apt install -y gnupg",
+                        "sudo mkdir -p /etc/apt/keyrings",
+                        "curl -fsSL https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/gierens.gpg",
+                        "echo 'deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main' | sudo tee /etc/apt/sources.list.d/gierens.list",
+                        "sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list",
+                        "sudo apt update",
+                        "sudo apt install -y eza"
+                    ],
                     "ffmpeg": ["sudo apt install -y ffmpeg"],
                     "fzf": [
                         "sudo apt install -y fzf",
@@ -457,7 +465,10 @@
                         "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
                         "sudo apt remove -y direnv"
                     ],
-                    "exa": ["sudo apt remove -y exa"],
+                    "eza": [
+                        "sudo apt remove -y eza",
+                        "sudo rm -f /etc/apt/sources.list.d/gierens.list /etc/apt/keyrings/gierens.gpg"
+                    ],
                     "ffmpeg": ["sudo apt remove -y ffmpeg"],
                     "fzf": [
                         "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",

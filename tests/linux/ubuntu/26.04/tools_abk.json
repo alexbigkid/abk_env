@@ -7,8 +7,9 @@
       "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
       "sudo apt remove -y direnv"
     ],
-    "exa": [
-      "sudo apt remove -y exa"
+    "eza": [
+      "sudo apt remove -y eza",
+      "sudo rm -f /etc/apt/sources.list.d/gierens.list /etc/apt/keyrings/gierens.gpg"
     ],
     "ffmpeg": [
       "sudo apt remove -y ffmpeg"
