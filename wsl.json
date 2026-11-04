@@ -5,7 +5,7 @@
             "supported_versions": {
                 "debian": ["11", "12"],
                 "raspbian": ["11", "12"],
-                "ubuntu": ["22.04", "24.04"]
+                "ubuntu": ["22.04", "24.04", "26.04"]
             },
             "update_packages": [
                 "sudo rm -f /var/lib/dpkg/lock* /var/cache/apt/archives/lock",

@@ -1,0 +1,110 @@
+{
+  "installed_tools": {
+    "aws": [
+      "find ./unixBin/env -type l -name 'LINK_aws.env' -delete || true",
+      "sudo find /usr/local/bin -type l -name 'aws' -delete || true",
+      "sudo find /usr/local/bin -type l -name 'aws_completer' -delete || true",
+      "[ -d /usr/local/aws-cli ] && sudo rm -Rf /usr/local/aws-cli"
+    ],
+    "bat": [
+      "sudo apt remove -y bat"
+    ],
+    "direnv": [
+      "find ./unixBin/env -type l -name 'LINK_direnv.env' -delete || true",
+      "sudo apt remove -y direnv"
+    ],
+    "expect": [
+      "sudo apt remove -y expect"
+    ],
+    "eza": [
+      "sudo apt remove -y eza",
+      "sudo rm -f /etc/apt/sources.list.d/gierens.list /etc/apt/keyrings/gierens.gpg"
+    ],
+    "ffmpeg": [
+      "sudo apt remove -y ffmpeg"
+    ],
+    "fzf": [
+      "find ./unixBin/env -type l -name 'LINK_fzf.env' -delete || true",
+      "sudo apt remove -y fzf"
+    ],
+    "gh": [
+      "sudo apt remove -y gh"
+    ],
+    "pass": [
+      "sudo apt remove -y pass"
+    ],
+    "just": [
+      "source ~/.cargo/env 2>/dev/null || true",
+      "cargo uninstall just 2>/dev/null || sudo rm -f ~/.cargo/bin/just",
+      "sudo rm -f /usr/local/bin/just",
+      "source ~/.cargo/env 2>/dev/null && rustup self uninstall 2>/dev/null || rm -Rf ~/.cargo ~/.rustup"
+    ],
+    "kind": [
+      "sudo rm -f /usr/local/bin/kind"
+    ],
+    "mplayer": [
+      "sudo apt remove -y mplayer"
+    ],
+    "nmap": [
+      "sudo apt remove -y nmap"
+    ],
+    "nodenv": [
+      "find ./unixBin/env -type l -name 'LINK_nodenv.env' -delete || true",
+      "sudo find /usr/local/bin -type l -name 'nodenv' -delete || true",
+      "rm -Rf ~/.nodenv"
+    ],
+    "oh-my-posh": [
+      "find ./unixBin/env -type l -name 'LINK_oh-my-posh.env' -delete || true",
+      "rm -f ./unixBin/oh-my-posh"
+    ],
+    "parallel": [
+      "sudo apt remove -y parallel"
+    ],
+    "serverless": [
+      "if command -v nodenv >/dev/null 2>&1; then export PATH=\"$HOME/.nodenv/bin:$PATH\" && eval \"$(nodenv init -)\" 2>/dev/null || true; fi",
+      "if command -v npm >/dev/null 2>&1; then npm uninstall -g serverless 2>/dev/null || echo 'serverless uninstall failed, but continuing'; else echo 'npm not found, skipping serverless uninstall'; fi"
+    ],
+    "shellcheck": [
+      "sudo apt remove -y shellcheck"
+    ],
+    "tfenv": [
+      "find ./unixBin/env -type l -name 'LINK_tfenv.env' -delete || true",
+      "sudo find /usr/local/bin -type l -name 'tfenv' -delete || true",
+      "rm -Rf ~/.tfenv"
+    ],
+    "uv": [
+      "find ./unixBin/env -type l -name 'LINK_uv.env' -delete || true",
+      "if command -v uv >/dev/null 2>&1; then uv tool uninstall ruff 2>/dev/null || true; fi",
+      "if command -v uv >/dev/null 2>&1; then uv cache clean 2>/dev/null || true; fi",
+      "if command -v uv >/dev/null 2>&1; then rm -rf \"$(uv python dir)\" 2>/dev/null || true; fi",
+      "if command -v uv >/dev/null 2>&1; then rm -rf \"$(uv tool dir)\" 2>/dev/null || true; fi",
+      "rm -f ~/.local/bin/uv ~/.local/bin/uvx"
+    ],
+    "yq": [
+      "sudo rm -f /usr/local/bin/yq"
+    ],
+    "xclip": [
+      "sudo apt remove -y xclip"
+    ]
+  },
+  "installed_fonts": {
+    "font-agave-nerd-font": [
+      "rm -f ~/.fonts/AgaveNerdFont*"
+    ],
+    "font-comic-shanns-mono-nerd-font": [
+      "rm -f ~/.fonts/ComicShannsMonoNerdFont*"
+    ],
+    "font-droid-sans-mono-nerd-font": [
+      "rm -f ~/.fonts/DroidSansMNerdFont*"
+    ],
+    "font-cascadia-code": [
+      "rm -f ~/.fonts/CaskaydiaCoveNerdFont*"
+    ],
+    "font-hack-nerd-font": [
+      "rm -f ~/.fonts/Hack*"
+    ],
+    "font_installation_cleanup": [
+      "fc-cache -fv"
+    ]
+  }
+}
