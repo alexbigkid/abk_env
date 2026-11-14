@@ -359,7 +359,7 @@ printMasterKeyRemovalSteps() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
 
-    PrintTrace "$TRACE_WARNING" "⚠️  The master secret key is STILL in your keyring and in $GNUPG_BACKUP_DIR (no passphrase)."
+    PrintTrace "$TRACE_INFO" "⚠️  The master secret key is STILL in your keyring and in $GNUPG_BACKUP_DIR (no passphrase)."
     PrintTrace "$TRACE_INFO" "🔐 To keep only the subkeys on this machine, do these steps manually:"
     PrintTrace "$TRACE_INFO" "   1. Verify backups:          ls -laR $GNUPG_BACKUP_DIR/"
     PrintTrace "$TRACE_INFO" "   2. Copy backups offline:    copy $GNUPG_BACKUP_DIR to offline media (USB drive, paper)"
@@ -454,7 +454,7 @@ validateKeySetup() {
     if [ "$LCL_SSB_COUNT" -eq 3 ]; then
         PrintTrace "$TRACE_INFO" "✅ All 3 subkeys present: Sign, Encrypt, Auth"
     else
-        PrintTrace "$TRACE_WARNING" "⚠️  Expected 3 subkeys (S, E, A), found: $LCL_SSB_COUNT"
+        PrintTrace "$TRACE_INFO" "⚠️  Expected 3 subkeys (S, E, A), found: $LCL_SSB_COUNT"
         LCL_EXIT_CODE=1
     fi
     
@@ -463,7 +463,7 @@ validateKeySetup() {
     if [ -f "$LCL_MASTER_KEY_FILE" ]; then
         PrintTrace "$TRACE_INFO" "✅ Master key backup exists (move it to offline media)"
     else
-        PrintTrace "$TRACE_WARNING" "⚠️  Master key backup not found"
+        PrintTrace "$TRACE_INFO" "⚠️  Master key backup not found"
         LCL_EXIT_CODE=1
     fi
     

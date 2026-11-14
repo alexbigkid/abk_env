@@ -173,7 +173,7 @@ deleteSshPubKeyFile() {
         PrintTrace "$TRACE_INFO" "✅ SSH key unloaded"
     else
         # not loaded in the agent is fine - the key is removed from sshcontrol anyway
-        PrintTrace "$TRACE_WARNING" "${YLW}⚠️  SSH key was not loaded in gpg-agent - skipping unload${NC}"
+        PrintTrace "$TRACE_INFO" "${YLW}⚠️  SSH key was not loaded in gpg-agent - skipping unload${NC}"
     fi
 
     PrintTrace "$TRACE_INFO" "🗑️  Deleting SSH public key: $LCL_SSH_PUB_KEY_FILE"

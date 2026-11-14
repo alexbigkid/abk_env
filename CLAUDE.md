@@ -35,6 +35,10 @@ The `test_install.sh` script validates:
 - `git rel-minor` - Trigger minor version release pipeline
 - `git rel-major` - Trigger major version release pipeline
 
+### Password Stores (pass)
+- `./unixBin/setPass.sh` - Clone/update pass stores (`passabk` → `~/.psws_abk/secrets` from repo `psws_abk`, `passta` → `~/.psws_ta/secrets` from repo `psws_ta`), create/allow each store's `.envrc`, check `.gpg-id` recipients, link `~/.envrc_common` → `unixBin/env/envrc_common` (store functions for direnv `source_env`). Store list: `PASS_STORES` in both set/reset scripts
+- `./unixBin/resetPass.sh` - Undo `setPass.sh`; deletes a clone only if it has no uncommitted, stashed or unpushed changes
+
 ### GPG Keys
 - `./unixBin/setYkGpg.sh` - Use the plugged-in YubiKey's GPG key for git signing (global git config, `gpg.program` = `unixBin/gpgYkSign.sh`, which signs with whichever YubiKey is plugged in) and SSH via gpg-agent (`gpg-agent.conf`, `env/LINK_gpg.env`; `sshcontrol` intentionally not used); exports `~/.ssh/<FP>.ssh.pub`
 - `./unixBin/resetYkGpg.sh [FINGERPRINT]` - Undo `setYkGpg.sh`; without an argument the YubiKey must be plugged in. Removes one key per run (public key + card stubs, `.ssh.pub`); shared setup (gpg-agent SSH, `LINK_gpg.env`, git signing) only when no other secret key (YubiKey or software) remains, otherwise `user.signingkey` is switched to a remaining key. Best effort and re-runnable; refuses to delete a real secret key

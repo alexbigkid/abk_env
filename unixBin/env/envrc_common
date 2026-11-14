@@ -1,0 +1,18 @@
+# shellcheck shell=bash
+#------------------------------------------------------------------------------
+# envrc_common - shared direnv helpers, linked to ~/.envrc_common by setPass.sh
+#
+# Use in a project's .envrc:
+#   source_env "$HOME/.envrc_common"
+#   export AWS_ACCESS_KEY_ID=$(passta aws/aws_access_key_id)
+#   export AWS_SECRET_ACCESS_KEY=$(passta aws/aws_secret_access_key)
+#
+# These are functions, not aliases: direnv runs .envrc in a non-interactive
+# bash, where shell aliases (e.g. from 002_aliases.env) do not exist.
+#------------------------------------------------------------------------------
+
+# personal password store - git@github.com:alexbigkid/psws_abk.git
+passabk() { PASSWORD_STORE_DIR="$HOME/.psws_abk/secrets" pass "$@"; }
+
+# TradeAgent password store - git@github.com:alexbigkid/psws_ta.git
+passta() { PASSWORD_STORE_DIR="$HOME/.psws_ta/secrets" pass "$@"; }

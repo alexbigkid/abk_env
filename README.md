@@ -267,6 +267,33 @@ Notes:
 * <code>resetYkGpg.sh</code> is safe to re-run: steps with nothing to do are skipped, and a failing step doesn't stop the others.
 
 
+## Password stores (pass)
+Run <code>./unixBin/setPass.sh</code> to clone your [pass](https://www.passwordstore.org/) password stores and set them up for the shell and [direnv](https://direnv.net/). Undo with <code>./unixBin/resetPass.sh</code>. Requires <code>pass</code>, <code>gpg</code>, <code>git</code>, <code>direnv</code> and working YubiKey SSH (<code>setYkGpg.sh</code>) for cloning.
+
+| command  | store                  | git repo   |
+| :------- | :--------------------- | :--------- |
+| <code>passabk</code> | <code>~/.psws_abk/secrets</code> | <code>psws_abk</code> (whole <code>~/.psws_abk</code> folder) |
+| <code>passta</code> | <code>~/.psws_ta/secrets</code> | <code>psws_ta</code> (the store itself) |
+
+What <code>setPass.sh</code> does:
+* clones each store, or updates it with <code>git pull --ff-only</code> when re-run
+* creates <code>~/.psws_&lt;name&gt;/.envrc</code> if missing (sets <code>PASSWORD_STORE_DIR</code>) and runs <code>direnv allow</code>, so <code>cd ~/.psws_ta</code> + plain <code>pass ...</code> uses that store
+* checks each store's <code>.gpg-id</code>: error if none of your keys can decrypt it, warning if public keys of other recipients are missing (reading works, <code>pass insert/edit</code> fails until they are imported)
+* links <code>~/.envrc_common</code> → <code>unixBin/env/envrc_common</code>
+
+Use secrets in a project's <code>.envrc</code>:
+```shell
+source_env "$HOME/.envrc_common"
+export AWS_ACCESS_KEY_ID=$(passta aws/aws_access_key_id)
+export AWS_SECRET_ACCESS_KEY=$(passta aws/aws_secret_access_key)
+```
+In <code>.envrc</code>, <code>passabk</code>/<code>passta</code> come from <code>~/.envrc_common</code> as functions - direnv doesn't see shell aliases. In a terminal they are aliases from <code>unixBin/env/002_aliases.env</code>.
+
+<code>resetPass.sh</code> deletes a clone only if nothing would be lost (no uncommitted, stashed or unpushed changes) - otherwise it keeps it and tells you why. It also removes <code>~/.envrc_common</code>.
+
+To add a store: add it to <code>PASS_STORES</code> in both <code>setPass.sh</code> and <code>resetPass.sh</code>, a function to <code>unixBin/env/envrc_common</code> and an alias to <code>002_aliases.env</code>.
+
+
 ## Software GPG key
 Run <code>./unixBin/setSwGpg.sh</code> to create a GPG key stored on this computer only (no YubiKey). Requires <code>gpg</code>, <code>gpg-agent</code> and <code>expect</code>.
 
