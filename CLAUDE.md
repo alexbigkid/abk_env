@@ -35,6 +35,9 @@ The `test_install.sh` script validates:
 - `git rel-minor` - Trigger minor version release pipeline
 - `git rel-major` - Trigger major version release pipeline
 
+### GPG Keys
+- `./unixBin/setSwGpg.sh` - Create a software-only GPG key (Ed25519 certify-only master + sign/encrypt/auth subkeys, 2y expiry, **no passphrase**); backups in `~/.gnupg-backup/`. Finds the new key by exact fingerprint. Does **not** remove the master key from the keyring; the manual steps are in the script header and README
+
 ### Claude Environment Setup
 - `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands, configs, templates, workspaces, skills, and global CLAUDE.md
 - `./unixBin/resetClaudeEnv.sh` - Unlink `~/.claude` from this repo (removes symlinks and generated config; does not restore pre-setup local files)

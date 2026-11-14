@@ -235,6 +235,27 @@ If at some point you'd like to uninstall installed packages, you can run <code>.
 * <code>./uninstall.sh tools_min.json tools_node.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code> and <code>tools_node.json</code>
 
 
+## Software GPG key
+Run <code>./unixBin/setSwGpg.sh</code> to create a GPG key stored on this computer only (no YubiKey). Requires <code>gpg</code>, <code>gpg-agent</code> and <code>expect</code>.
+
+* Master key: Ed25519, certify-only. Subkeys: sign, encrypt, auth (usable for SSH). All expire in 2 years.
+* Name and email come from <code>GIT_USER_NAME</code>/<code>GIT_USER_EMAIL</code>, or from your git config.
+* Backups go to <code>~/.gnupg-backup/</code>: master secret and public key, subkeys, revocation certificate and a <code>README-IMPORTANT-&lt;fingerprint&gt;.txt</code> with recovery and rotation steps.
+* <b>The keys have no passphrase.</b> Anyone who gets these files can use the key.
+* The new key is found by its exact fingerprint, so existing keys with the same email are left alone.
+* It does not set up git signing, gpg-agent or SSH to use the key.
+
+<b>The master key is not removed by the script.</b> Once the backups are safe, do it manually (the script prints these commands with your fingerprint):
+```shell
+ls -laR ~/.gnupg-backup/                                   # 1. verify backups
+# 2. copy ~/.gnupg-backup to offline media (USB drive, paper)
+gpg --delete-secret-keys <FP>                              # 3. removes master + subkeys
+gpg --import ~/.gnupg-backup/subkeys/<FP>-subkeys.asc      # 4. re-import subkeys only
+gpg --list-secret-keys <FP>                                # 5. master must show as 'sec#'
+rm -P ~/.gnupg-backup/master-key/<FP>-master-key.asc       # 6. remove master from disk (Linux: shred -u)
+```
+
+
 ## Git aliases
 Run <code>./unixBin/setGitAliases.sh</code> to put the same git aliases on every machine. It writes them to your global git config (<code>~/.gitconfig</code>), overwriting aliases with the same names, and is safe to re-run. List them with <code>git alias</code>.
 

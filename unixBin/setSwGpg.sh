@@ -1,5 +1,41 @@
 #!/usr/bin/env bash
 
+#------------------------------------------------------------------------------
+# setSwGpg.sh - create a software-only GPG key (no YubiKey)
+#
+# Generates a new GPG key that lives on this computer, with backups and
+# recovery instructions in ~/.gnupg-backup/. No parameters.
+#
+# What it creates:
+#   - Master key: Ed25519, certify-only, expires in 2y
+#   - Subkeys (2y): sign (Ed25519), encrypt (Cv25519), auth (Ed25519, e.g. SSH)
+#   - Identity: $GIT_USER_NAME/$GIT_USER_EMAIL if both set, else git
+#     user.name/user.email (local repo config first, then global)
+#   - ~/.gnupg-backup/ (mode 700), all named by key fingerprint:
+#       master-key/<FP>-master-key.asc         master secret key
+#       master-key/<FP>-master-key-public.asc  public key
+#       subkeys/<FP>-subkeys.asc               subkeys for daily use
+#       revocation/<FP>-revocation.asc         revocation certificate
+#       README-IMPORTANT-<FP>.txt              backup/recovery/rotation steps
+#
+# Notes:
+#   - NO passphrase on any key (by design). Anyone with these files can use
+#     the key.
+#   - The new key is found by its exact fingerprint, so existing keys with the
+#     same email (e.g. a YubiKey key) are never touched.
+#   - The master key is NOT removed from the keyring - do it manually once the
+#     backups are safe (the script prints these with your fingerprint):
+#       1. ls -laR ~/.gnupg-backup/                  verify backups
+#       2. copy ~/.gnupg-backup to offline media      USB drive, paper
+#       3. gpg --delete-secret-keys <FP>              removes master + subkeys
+#       4. gpg --import ~/.gnupg-backup/subkeys/<FP>-subkeys.asc
+#       5. gpg --list-secret-keys <FP>                master must show 'sec#'
+#       6. rm -P ~/.gnupg-backup/master-key/<FP>-master-key.asc
+#                                                     (Linux: shred -u)
+#   - Does NOT configure git signing, gpg-agent or SSH to use the key.
+#   - Requires: gpg, gpg-agent, expect
+#------------------------------------------------------------------------------
+
 #---------------------------
 # variables definitions
 #---------------------------
@@ -10,8 +46,6 @@ SCRIPT_PATH=$(dirname $0)
 ABK_LIB_FILE="$SCRIPT_PATH/abkLib.sh"
 GNUPG_DIR="$HOME/.gnupg"
 GNUPG_BACKUP_DIR="$HOME/.gnupg-backup"
-GPG_KEY_TYPE="ed25519"
-GPG_KEY_LENGTH="4096"
 GPG_EXPIRY="2y"
 
 
@@ -25,13 +59,13 @@ PrintUsageAndExitWithCode ()
     echo "usage: $0"
     echo "  $0 --help   - display this info"
     echo ""
-    echo "This script generates a master GPG key with three subkeys:"
+    echo "This script generates a certify-only master GPG key (no passphrase) with three subkeys:"
     echo "  - Signature subkey (2 year expiration)"
     echo "  - Encryption subkey (2 year expiration)"
     echo "  - Authentication subkey (2 year expiration)"
     echo ""
-    echo "The master key will be extracted for safe keeping and removed from active keyring."
-    echo "A revocation certificate will also be generated."
+    echo "Master key, subkeys and a revocation certificate are exported to $GNUPG_BACKUP_DIR."
+    echo "The master key is NOT removed from the keyring - the script prints the manual steps."
     echo ""
     echo "<- PrintUsageAndExitWithCode ($1)"
     echo
@@ -90,8 +124,10 @@ setupSecureDirectories() {
 }
 
 
+# Generates the master key and returns its fingerprint in the variable named by $1.
 generateGpgKeyPair() {
-    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]}"
+    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
+    local LCL_RETURN_VAR=$1
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Generating GPG key pair with Ed25519 algorithm"
@@ -129,6 +165,7 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     
     # Create GPG batch configuration for automated key generation
     local LCL_GPG_BATCH_FILE="$GNUPG_DIR/gpg-batch-config.tmp"
+    local LCL_GPG_STATUS_FILE="$GNUPG_DIR/gpg-status.tmp"
     
     # Create the batch file line by line to avoid any hidden characters
     echo "Key-Type: eddsa" > "$LCL_GPG_BATCH_FILE"
@@ -145,18 +182,30 @@ ${RED}Or globally: git config --global user.name \"Your Name\" && git config --g
     # PrintTrace "$TRACE_DEBUG" "📋 Batch file contents:"
     # cat -n "$LCL_GPG_BATCH_FILE" >&2
     
-    PrintTrace "$TRACE_INFO" "🔐 Generating master key with signing subkey..."
-    gpg --batch --generate-key "$LCL_GPG_BATCH_FILE"
-    LCL_EXIT_CODE=$?
-    
+    PrintTrace "$TRACE_INFO" "🔐 Generating certify-only master key..."
+    gpg --batch --status-file "$LCL_GPG_STATUS_FILE" --generate-key "$LCL_GPG_BATCH_FILE" || LCL_EXIT_CODE=$?
+
     # Securely remove batch file
     shred -u "$LCL_GPG_BATCH_FILE" 2>/dev/null || rm -f "$LCL_GPG_BATCH_FILE"
-    
+
     if [ $LCL_EXIT_CODE -ne 0 ]; then
+        rm -f "$LCL_GPG_STATUS_FILE"
         PrintUsageAndExitWithCode $LCL_EXIT_CODE "${RED}❌ Failed to generate GPG master key. Aborting.${NC}"
     fi
-    
-    PrintTrace "$TRACE_INFO" "✅ GPG master key with signing subkey generated successfully"
+
+    # Take the fingerprint of the key just created from gpg's status output
+    # ("[GNUPG:] KEY_CREATED P <fingerprint>"), so an existing key with the
+    # same email (e.g. a YubiKey key) can never be picked by mistake.
+    local LCL_KEY_FP
+    LCL_KEY_FP=$(awk '$2 == "KEY_CREATED" {print $4; exit}' "$LCL_GPG_STATUS_FILE")
+    rm -f "$LCL_GPG_STATUS_FILE"
+
+    if [ -z "$LCL_KEY_FP" ]; then
+        PrintUsageAndExitWithCode 1 "${RED}❌ Failed to read fingerprint of the new key. Aborting.${NC}"
+    fi
+
+    PrintTrace "$TRACE_INFO" "✅ GPG master key generated, fingerprint: $LCL_KEY_FP"
+    eval "$LCL_RETURN_VAR=\$LCL_KEY_FP"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
 }
@@ -168,7 +217,7 @@ addEncryptionSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding encryption subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" cv25519 encr "$GPG_EXPIRY"
+    gpg --batch --pinentry-mode loopback --passphrase "" --quick-add-key "$LCL_KEY_FP" cv25519 encr "$GPG_EXPIRY"
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -188,7 +237,7 @@ addAuthenticationSubkey() {
     local LCL_EXIT_CODE=0
     
     PrintTrace "$TRACE_INFO" "🔐 Adding authentication subkey using gpg --quick-add-key"
-    gpg --quick-add-key "$LCL_KEY_FP" ed25519 auth "$GPG_EXPIRY"
+    gpg --batch --pinentry-mode loopback --passphrase "" --quick-add-key "$LCL_KEY_FP" ed25519 auth "$GPG_EXPIRY"
     LCL_EXIT_CODE=$?
     
     if [ $LCL_EXIT_CODE -ne 0 ]; then
@@ -200,37 +249,6 @@ addAuthenticationSubkey() {
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
 }
-
-
-getGpgFingerprint() {
-    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
-    local LCL_RETURN_VAR=$1
-    local LCL_USER_EMAIL="$2"
-    local LCL_EXIT_CODE=0
-    
-    # Get the master key fingerprint using the email (if provided) or get the most recent key
-    local LCL_KEY_FP
-    if [ -n "$LCL_USER_EMAIL" ]; then
-        LCL_KEY_FP=$(gpg --list-secret-keys --with-colons "$LCL_USER_EMAIL" | awk -F: '/^sec:/ {getline; if($1=="fpr") print $10; exit}')
-    fi
-    
-    # If email lookup failed or no email provided, get the most recent secret key
-    if [ -z "$LCL_KEY_FP" ]; then
-        PrintTrace "$TRACE_INFO" "Getting most recent secret key fingerprint"
-        LCL_KEY_FP=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/ {getline; if($1=="fpr") print $10; exit}')
-    fi
-    
-    if [ -z "$LCL_KEY_FP" ]; then
-        PrintUsageAndExitWithCode 1 "${RED}❌ Failed to extract fingerprint${NC}"
-    fi
-    
-    PrintTrace "$TRACE_INFO" "✅ Master key fingerprint: $LCL_KEY_FP"
-    eval $LCL_RETURN_VAR=\$LCL_KEY_FP
-    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
-    return $LCL_EXIT_CODE
-}
-
-
 
 
 generateRevocationCertificate() {
@@ -335,20 +353,21 @@ exportSubkeys() {
 }
 
 
-removeMasterKeyFromKeyring() {
+# The master key is intentionally NOT removed by this script. This only prints
+# the manual steps to do it once the backups are confirmed.
+printMasterKeyRemovalSteps() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
     local LCL_KEY_FP="$1"
-    local LCL_EXIT_CODE=0
-    
-    PrintTrace "$TRACE_INFO" "🔐 Removing master secret key from active keyring (keeping subkeys only)"
-    PrintTrace "$TRACE_WARNING" "⚠️  Note: This process requires the master key to be backed up first"
-    PrintTrace "$TRACE_INFO" "🔐 For maximum security, manually remove master key after confirming backups:"
-    PrintTrace "$TRACE_INFO" "   1. Verify backups: ls -la $GNUPG_BACKUP_DIR/"
-    PrintTrace "$TRACE_INFO" "   2. Delete entire key: gpg --delete-secret-and-public-key $LCL_KEY_FP"
-    PrintTrace "$TRACE_INFO" "   3. Re-import subkeys: gpg --import $GNUPG_BACKUP_DIR/subkeys/${LCL_KEY_FP}-subkeys.asc"
-    PrintTrace "$TRACE_INFO" "   4. Re-import public key: gpg --import $GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key-public.asc"
-    
-    PrintTrace "$TRACE_INFO" "✅ Key generation completed - manual master key removal recommended for full security"
+
+    PrintTrace "$TRACE_WARNING" "⚠️  The master secret key is STILL in your keyring and in $GNUPG_BACKUP_DIR (no passphrase)."
+    PrintTrace "$TRACE_INFO" "🔐 To keep only the subkeys on this machine, do these steps manually:"
+    PrintTrace "$TRACE_INFO" "   1. Verify backups:          ls -laR $GNUPG_BACKUP_DIR/"
+    PrintTrace "$TRACE_INFO" "   2. Copy backups offline:    copy $GNUPG_BACKUP_DIR to offline media (USB drive, paper)"
+    PrintTrace "$TRACE_INFO" "   3. Delete all secret keys:  gpg --delete-secret-keys $LCL_KEY_FP"
+    PrintTrace "$TRACE_INFO" "   4. Re-import subkeys only:  gpg --import $GNUPG_BACKUP_DIR/subkeys/${LCL_KEY_FP}-subkeys.asc"
+    PrintTrace "$TRACE_INFO" "   5. Check result:            gpg --list-secret-keys $LCL_KEY_FP   (master must show as 'sec#')"
+    PrintTrace "$TRACE_INFO" "   6. Remove master from disk: rm -P $GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key.asc  (Linux: shred -u)"
+
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return 0
 }
@@ -415,15 +434,6 @@ performSecureCleanup() {
         fi
     done
     
-    # Clear any temporary variables that might contain sensitive data
-    unset GPG_BATCH_FILE
-    unset LCL_GPG_BATCH_FILE
-    unset USER_EMAIL
-    unset KEY_FP
-    
-    # Clear bash history of this session (if possible)
-    history -c 2>/dev/null || true
-    
     PrintTrace "$TRACE_INFO" "✅ Secure cleanup completed"
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
     return $LCL_EXIT_CODE
@@ -439,7 +449,7 @@ validateKeySetup() {
     
     # Count subkeys
     local LCL_SSB_COUNT
-    LCL_SSB_COUNT=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" 2>/dev/null | grep -c "^ssb:" || echo "0")
+    LCL_SSB_COUNT=$(gpg --list-secret-keys --with-colons "$LCL_KEY_FP" 2>/dev/null | grep -c "^ssb:" || true)
     
     if [ "$LCL_SSB_COUNT" -eq 3 ]; then
         PrintTrace "$TRACE_INFO" "✅ All 3 subkeys present: Sign, Encrypt, Auth"
@@ -451,7 +461,7 @@ validateKeySetup() {
     # Check if master key backup exists
     local LCL_MASTER_KEY_FILE="$GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key.asc"
     if [ -f "$LCL_MASTER_KEY_FILE" ]; then
-        PrintTrace "$TRACE_INFO" "✅ Master key safely backed up for offline storage"
+        PrintTrace "$TRACE_INFO" "✅ Master key backup exists (move it to offline media)"
     else
         PrintTrace "$TRACE_WARNING" "⚠️  Master key backup not found"
         LCL_EXIT_CODE=1
@@ -513,12 +523,25 @@ Keys expire in 2 years. Before expiration:
 2. Extend expiration dates: gpg --edit-key $LCL_KEY_FP
 3. Use 'expire' command for each key
 4. Export updated subkeys
-5. Remove master key from keyring again
+5. Remove master key from keyring again (see steps below)
+
+REMOVING THE MASTER KEY FROM THIS MACHINE (manual - NOT done by setSwGpg.sh):
+------------------------------------------------------------------------
+The master secret key is still in your keyring and in master-key/ without a
+passphrase. Once the backups are confirmed:
+1. Verify backups:          ls -laR $GNUPG_BACKUP_DIR/
+2. Copy backups offline:    copy $GNUPG_BACKUP_DIR to offline media (USB drive, paper)
+3. Delete all secret keys:  gpg --delete-secret-keys $LCL_KEY_FP
+4. Re-import subkeys only:  gpg --import $GNUPG_BACKUP_DIR/subkeys/${LCL_KEY_FP}-subkeys.asc
+5. Check result:            gpg --list-secret-keys $LCL_KEY_FP
+                            (master must show as 'sec#' = secret part not present)
+6. Remove master from disk: rm -P $GNUPG_BACKUP_DIR/master-key/${LCL_KEY_FP}-master-key.asc
+                            (Linux: shred -u ...)
 
 SECURITY NOTES:
 --------------
-- The master key has been removed from your daily keyring for security
-- Only subkeys remain for signing, encryption, and authentication
+- Keys have NO passphrase - anyone with these files can use them
+- Until the steps above are done, the master key is on this machine
 - Never store the master key on a networked computer
 - Regularly test your backup recovery procedures
 
@@ -551,6 +574,7 @@ PrintTrace "$TRACE_DEBUG" "SCRIPT_NAME = $SCRIPT_NAME"
 PrintTrace "$TRACE_DEBUG" "SCRIPT_PATH = $SCRIPT_PATH"
 PrintTrace "$TRACE_DEBUG" "ABK_LIB_FILE = $ABK_LIB_FILE"
 
+[ "$#" -eq 1 ] && [ "$1" == "--help" ] && PrintUsageAndExitWithCode 0
 [ "$#" -ne $EXPECTED_NUMBER_OF_PARAMETERS ] && PrintUsageAndExitWithCode 1 "ERROR: invalid number of parameters, expected: $EXPECTED_NUMBER_OF_PARAMETERS"
 set -e
 
@@ -558,16 +582,12 @@ set -e
 checkPrerequisiteToolsAreInstalled
 setupSecureDirectories
 
-# Generate the master key with signing subkey
-generateGpgKeyPair
-
-# Get the master key fingerprint and user email for subsequent operations
-USER_EMAIL=$(git config user.email 2>/dev/null || git config --global user.email 2>/dev/null || echo "")
-getGpgFingerprint KEY_FP "$USER_EMAIL"
+# Generate the certify-only master key and get its exact fingerprint
+generateGpgKeyPair KEY_FP
 
 # Add all three subkeys (since batch only created master key)
 PrintTrace "$TRACE_INFO" "🔐 Adding signing subkey"
-gpg --quick-add-key "$KEY_FP" ed25519 sign "$GPG_EXPIRY"
+gpg --batch --pinentry-mode loopback --passphrase "" --quick-add-key "$KEY_FP" ed25519 sign "$GPG_EXPIRY"
 
 addEncryptionSubkey "$KEY_FP"
 addAuthenticationSubkey "$KEY_FP"
@@ -582,8 +602,8 @@ exportSubkeys "$KEY_FP"
 # Verify backup integrity before removing master key
 verifyBackupIntegrity "$KEY_FP"
 
-# Remove master key from active keyring, keep only subkeys
-removeMasterKeyFromKeyring "$KEY_FP"
+# Master key is NOT removed - print the manual steps instead
+printMasterKeyRemovalSteps "$KEY_FP"
 
 # Validate the final setup
 validateKeySetup "$KEY_FP"
@@ -596,7 +616,7 @@ performSecureCleanup
 
 PrintTrace "$TRACE_INFO" "🎉 Software GPG key generation completed successfully!"
 PrintTrace "$TRACE_INFO" "📁 Backup files located in: $GNUPG_BACKUP_DIR"
-PrintTrace "$TRACE_INFO" "🔐 Master key safely stored offline, subkeys ready for daily use"
+PrintTrace "$TRACE_INFO" "🔐 Subkeys ready for daily use. Master key is still on this machine - see removal steps above"
 PrintTrace "$TRACE_INFO" "📖 Read the backup instructions in: $GNUPG_BACKUP_DIR/README-IMPORTANT-${KEY_FP}.txt"
 
 PrintTrace "$TRACE_FUNCTION" "<- $0 ($EXIT_CODE)"
