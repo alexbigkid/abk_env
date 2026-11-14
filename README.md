@@ -55,7 +55,7 @@ flowchart LR
   - [x] 14 - Sonoma
   - [x] 15 - Sequoia
   - [x] 26 - Tahoe
-  - [x] 27 - Golden Gate
+  - [ ] 27 - Golden Gate - could work, not tested (no GitHub runner yet)
 - [x] Linux / Debian distro
   - [x] 11 - bullseye
   - [x] 12 - bookworm
