@@ -36,6 +36,8 @@ The `test_install.sh` script validates:
 - `git rel-major` - Trigger major version release pipeline
 
 ### GPG Keys
+- `./unixBin/setYkGpg.sh` - Use the plugged-in YubiKey's GPG key for git signing (global git config, `gpg.program` = `unixBin/gpgYkSign.sh`, which signs with whichever YubiKey is plugged in) and SSH via gpg-agent (`gpg-agent.conf`, `env/LINK_gpg.env`; `sshcontrol` intentionally not used); exports `~/.ssh/<FP>.ssh.pub`
+- `./unixBin/resetYkGpg.sh [FINGERPRINT]` - Undo `setYkGpg.sh`; without an argument the YubiKey must be plugged in. Removes one key per run (public key + card stubs, `.ssh.pub`); shared setup (gpg-agent SSH, `LINK_gpg.env`, git signing) only when no other secret key (YubiKey or software) remains, otherwise `user.signingkey` is switched to a remaining key. Best effort and re-runnable; refuses to delete a real secret key
 - `./unixBin/setSwGpg.sh` - Create a software-only GPG key (Ed25519 certify-only master + sign/encrypt/auth subkeys, 2y expiry, **no passphrase**); backups in `~/.gnupg-backup/`. Finds the new key by exact fingerprint. Does **not** remove the master key from the keyring; the manual steps are in the script header and README
 
 ### Claude Environment Setup

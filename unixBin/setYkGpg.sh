@@ -1,5 +1,38 @@
 #!/usr/bin/env bash
 
+#------------------------------------------------------------------------------
+# setYkGpg.sh - use the GPG key on your YubiKey for git signing and SSH
+#
+# Configures this machine to use the YubiKey that is plugged in. No parameters.
+# Undo with: ./unixBin/resetYkGpg.sh
+#
+# What it does:
+#   1. Checks tools (gpg, gpg-agent, yq, ykman, pinentry-mac / pinentry) and
+#      that a YubiKey is present
+#   2. Fetches the public key from the card's "URL of public key" (gpg
+#      --card-edit -> fetch, up to 4 attempts). The fingerprint is taken from
+#      that URL's file name, so it must be named <FP>.pub.asc
+#   3. Sets the key's trust to ultimate
+#   4. Global git config: user.signingkey=<FP>, commit.gpgsign=true,
+#      tag.gpgsign=true, push.gpgsign=false, gpg.program=unixBin/gpgYkSign.sh
+#      (signs with whichever YubiKey is plugged in -> several YubiKeys work)
+#   5. SSH via gpg-agent:
+#      - adds enable-ssh-support, cache TTLs (600/7200) and pinentry-program
+#        to ~/.gnupg/gpg-agent.conf (marked block SET_YK_GPG), restarts agent
+#      - links unixBin/env/LINK_gpg.env -> XXX_gpg.env so new shells set
+#        GPG_TTY and SSH_AUTH_SOCK to the gpg-agent socket
+#      - sshcontrol is NOT used: gpg-agent always offers the plugged-in
+#        card's SSH keys (incl. PIV). Listing card keys there only adds
+#        placeholder keys for cards that are not plugged in.
+#   6. Exports the SSH public key to ~/.ssh/<FP>.ssh.pub (add it to GitHub
+#      or servers)
+#
+# Notes:
+#   - Needs network access for the public key fetch.
+#   - gpg.program points into this repo - keep the repo where it is.
+#   - Open a new shell afterwards so SSH uses gpg-agent.
+#------------------------------------------------------------------------------
+
 #---------------------------
 # variables definitions
 #---------------------------
@@ -228,21 +261,6 @@ setGitGpgSigningConfig() {
 }
 
 
-extractGpgAuthKey() {
-    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
-    local LCL_RETURN_VAR=$1
-    local LCL_KEY_FP="$2"
-    local LCL_EXIT_CODE=0
-
-    local LCL_AUTH_KEYGRIPS
-    LCL_AUTH_KEYGRIPS=$(gpg --with-keygrip -K "$LCL_KEY_FP" | awk '/^ssb/ { t=0 } /\[A\]/ { t=1 } t && /Keygrip/ { print $3 }')
-    [ -z "$LCL_AUTH_KEYGRIPS" ] && LCL_EXIT_CODE=1
-
-    eval $LCL_RETURN_VAR=\$LCL_AUTH_KEYGRIPS
-    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_EXIT_CODE $LCL_AUTH_KEYGRIPS)"
-    return $LCL_EXIT_CODE
-}
-
 
 setSshGpgConfig() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
@@ -296,32 +314,6 @@ setSshGpgConfig() {
 }
 
 
-addGpgAuthKeyToSshControl() {
-    PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
-    local LCL_AUTH_KEYGRIP="$1"
-    local LCL_SSHCONTROL_FILE="$GNUPG_DIR/sshcontrol"
-    local LCL_EXIT_CODE=0
-
-    touch "$LCL_SSHCONTROL_FILE"
-    chmod 600 "$LCL_SSHCONTROL_FILE"
-    local LCL_CONTENT_TO_ADD_ARRAY=(
-        "$LCL_AUTH_KEYGRIP"
-    )
-
-    PrintTrace "$TRACE_INFO" "🔐 Adding GPG auth key to $LCL_SSHCONTROL_FILE"
-    AbkLib_AddEnvironmentSettings "$LCL_AUTH_KEYGRIP" "$LCL_SSHCONTROL_FILE" "${LCL_CONTENT_TO_ADD_ARRAY[@]}"
-    LCL_EXIT_CODE=$?
-
-    if [ $LCL_EXIT_CODE -ne 0 ]; then
-        PrintTrace "$TRACE_ERROR" "❌ Failed to add GPG key to $LCL_SSHCONTROL_FILE"
-    else
-        PrintTrace "$TRACE_INFO" "✅ GPG key added to $LCL_SSHCONTROL_FILE"
-    fi
-
-    PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]}"
-    return $LCL_EXIT_CODE
-}
-
 
 exportSshPubKeyFromYubikey() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} ($*)"
@@ -365,6 +357,7 @@ PrintTrace "$TRACE_DEBUG" "SCRIPT_NAME = $SCRIPT_NAME"
 PrintTrace "$TRACE_DEBUG" "SCRIPT_PATH = $SCRIPT_PATH"
 PrintTrace "$TRACE_DEBUG" "ABK_LIB_FILE = $ABK_LIB_FILE"
 
+[ "$#" -eq 1 ] && [ "$1" == "--help" ] && PrintUsageAndExitWithCode 0
 [ "$#" -ne $EXPECTED_NUMBER_OF_PARAMETERS ] && PrintUsageAndExitWithCode 1 "ERROR: invalid number of parameters, expected: $EXPECTED_NUMBER_OF_PARAMETERS"
 set -e
 
@@ -377,7 +370,6 @@ getGpgFingerprint KEY_FP
 setGpgKeyTrustToUltimate "$KEY_FP"
 setGitGpgSigningConfig "$KEY_FP"
 setSshGpgConfig "$KEY_FP"
-extractGpgAuthKey AUTH_SUB_KEY_FP "$KEY_FP" && addGpgAuthKeyToSshControl "$AUTH_SUB_KEY_FP"
 exportSshPubKeyFromYubikey "$KEY_FP"
 
 PrintTrace "$TRACE_FUNCTION" "<- $0 ($EXIT_CODE)"

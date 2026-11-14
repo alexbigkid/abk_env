@@ -235,6 +235,32 @@ If at some point you'd like to uninstall installed packages, you can run <code>.
 * <code>./uninstall.sh tools_min.json tools_node.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code> and <code>tools_node.json</code>
 
 
+## YubiKey GPG for git signing and SSH
+With your YubiKey plugged in, run <code>./unixBin/setYkGpg.sh</code> to use its GPG key for signing git commits/tags and for SSH. Undo with <code>./unixBin/resetYkGpg.sh</code> (YubiKey plugged in), or <code>./unixBin/resetYkGpg.sh &lt;fingerprint&gt;</code> if the YubiKey is not available (fingerprint: see <code>gpg -K</code>). Requires <code>gpg</code>, <code>gpg-agent</code>, <code>yq</code>, <code>ykman</code> and <code>pinentry-mac</code> (Linux: <code>pinentry</code>).
+
+What <code>setYkGpg.sh</code> sets up:
+
+| what                      | how                                                                                                     |
+| :------------------------ | :------------------------------------------------------------------------------------------------------ |
+| public key                | fetched from the card's public key URL (file must be named <code>&lt;fingerprint&gt;.pub.asc</code>), trust set to ultimate |
+| git signing (global)      | <code>user.signingkey</code>, <code>commit.gpgsign=true</code>, <code>tag.gpgsign=true</code>, <code>push.gpgsign=false</code> |
+| <code>gpg.program</code>  | <code>unixBin/gpgYkSign.sh</code> - signs with whichever YubiKey is plugged in, so several YubiKeys work with one config |
+| gpg-agent                 | <code>enable-ssh-support</code>, cache TTLs and pinentry added to <code>~/.gnupg/gpg-agent.conf</code>  |
+| SSH                       | <code>unixBin/env/LINK_gpg.env</code> makes new shells use gpg-agent as ssh-agent; it offers the SSH keys of whichever YubiKey is plugged in (incl. PIV keys) |
+| SSH public key            | exported to <code>~/.ssh/&lt;fingerprint&gt;.ssh.pub</code> - add it to GitHub / servers               |
+
+Notes:
+* Open a new shell afterwards so SSH uses (or, after reset, stops using) gpg-agent.
+* <code>gpg.program</code> points into this repo, so keep the repo where it is.
+* Multiple YubiKeys: run <code>setYkGpg.sh</code> once per YubiKey (one plugged in at a time).
+* <code>resetYkGpg.sh</code> removes <b>one</b> key per run: its public key + YubiKey card stubs and its <code>~/.ssh/&lt;fingerprint&gt;.ssh.pub</code>. The shared setup (gpg-agent SSH support, <code>LINK_gpg.env</code>, git signing) is removed only when no other secret key is left:
+  * another YubiKey remains: everything keeps working with it; <code>user.signingkey</code> is switched to it if it pointed to the removed key
+  * only a software key (<code>setSwGpg.sh</code>) remains: setup is kept and <code>user.signingkey</code> is switched to the software key if needed, so commits stay signed
+  * nothing remains: the whole GPG/SSH/git signing setup is removed
+* <code>resetYkGpg.sh</code> refuses to delete a real secret key, so a master key in the keyring is never lost. Nothing on the YubiKey itself is changed.
+* <code>resetYkGpg.sh</code> is safe to re-run: steps with nothing to do are skipped, and a failing step doesn't stop the others.
+
+
 ## Software GPG key
 Run <code>./unixBin/setSwGpg.sh</code> to create a GPG key stored on this computer only (no YubiKey). Requires <code>gpg</code>, <code>gpg-agent</code> and <code>expect</code>.
 
