@@ -324,7 +324,7 @@ The repository uses semantic versioning (major.minor.patch) with automated relea
 2. **Automated Pipeline Process**:
    - Git aliases push temporary tag (`rel-patch`, `rel-minor`, `rel-major`)
    - GitHub Actions detects tag and triggers testing pipeline
-   - **Runs installation tests** on macOS (13, 14, 15) and Ubuntu (22.04, 24.04)
+   - **Runs installation tests** on macOS (15, 26), Ubuntu (22.04, 24.04, 26.04) and WSL Ubuntu (22.04, 24.04, 26.04)
    - Tests both bash and zsh shells with install/uninstall validation
    - **If tests pass**: `handle_release_tags.sh` bumps version, updates `VERSION` file
    - Commits version change to main branch

@@ -51,23 +51,29 @@ flowchart LR
 - [x] MacOS
   - [ ] 11 - Big Sur - could work, not tested
   - [ ] 12 - Monterey - could work, not tested
-  - [x] 13 - Ventura
-  - [x] 14 - Sonoma
+  - [ ] 13 - Ventura - supported, not tested in CI
+  - [ ] 14 - Sonoma - supported, not tested in CI
   - [x] 15 - Sequoia
   - [x] 26 - Tahoe
-  - [ ] 27 - Golden Gate - could work, not tested (no GitHub runner yet)
+  - [ ] 27 - Golden Gate - supported, not tested in CI (no GitHub runner yet)
 - [x] Linux / Debian distro
-  - [x] 11 - bullseye
-  - [x] 12 - bookworm
+  - [ ] 11 - bullseye - supported, not tested in CI
+  - [ ] 12 - bookworm - supported, not tested in CI
+  - [ ] 13 - trixie - supported, not tested in CI
 - [x] Linux / Ubuntu distro
   - [ ] 20.04 - support removed
   - [x] 22.04
   - [x] 24.04
   - [x] 26.04
 - [x] Linux / Raspbian distro
-  - [x] 11 - bullseye
-  - [x] 12 - bookworm
-- [ ] Windows
+  - [ ] 11 - bullseye - supported, not tested in CI
+  - [ ] 12 - bookworm - supported, not tested in CI
+  - [ ] 13 - trixie - supported, not tested in CI
+- [ ] Windows (native)
+- [x] Windows / WSL Ubuntu
+  - [x] 22.04
+  - [x] 24.04
+  - [x] 26.04
 
 ### Shells supported
 - [x] /bin/bash
