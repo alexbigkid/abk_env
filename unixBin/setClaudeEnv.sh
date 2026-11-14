@@ -1,5 +1,32 @@
 #!/usr/bin/env bash
 
+#------------------------------------------------------------------------------
+# setClaudeEnv.sh - centralized Claude Code configuration across all machines
+#
+# Sets up ~/.claude on this machine from the settings kept in this repo
+# (unixBin/env/claude/), so every computer shares the same Claude setup.
+#
+# What it does:
+#   - Symlinks ~/.claude/{commands,templates,workspaces,skills} and
+#     ~/.claude/CLAUDE.md to unixBin/env/claude/
+#   - Generates ~/.claude/config/*.json from config/*.template.* using env
+#     vars (envsubst), mode 600 - real files, not symlinks
+#
+# Notes:
+#   - Symlinks, not copies: edits made on any machine change the repo directly.
+#     Commit + pull to sync them to other machines.
+#   - First run merges existing local files into the repo (repo wins on
+#     conflicts), so local content may end up committed.
+#   - NOT covered: ~/.claude/settings.json, plugins, MCP auth, history.
+#     Set those up per machine.
+#   - Secrets stay per machine: configs are built from local env vars,
+#     never stored in git.
+#   - Must be run from the repo root: ./unixBin/setClaudeEnv.sh
+#     (source paths are built from $PWD).
+#
+# Undo with: ./unixBin/resetClaudeEnv.sh
+#------------------------------------------------------------------------------
+
 #---------------------------
 # variables definitions
 #---------------------------

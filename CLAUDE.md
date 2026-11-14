@@ -37,7 +37,7 @@ The `test_install.sh` script validates:
 
 ### Claude Environment Setup
 - `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands, configs, templates, workspaces, skills, and global CLAUDE.md
-- `./unixBin/resetClaudeEnv.sh` - Reset Claude environment to original state
+- `./unixBin/resetClaudeEnv.sh` - Unlink `~/.claude` from this repo (removes symlinks and generated config; does not restore pre-setup local files)
 - **Commands**: `unixBin/env/claude/commands/` → `~/.claude/commands` (symlinked)
 - **Templates**: `unixBin/env/claude/templates/` → `~/.claude/templates` (symlinked) 
 - **Workspaces**: `unixBin/env/claude/workspaces/` → `~/.claude/workspaces` (symlinked)
@@ -80,7 +80,7 @@ The `test_install.sh` script validates:
 - `unixBin/env/claude/CLAUDE.md` - Git-controlled user-global Claude instructions (symlinked)
 - `unixBin/env/claude/config/` - Template configuration files with environment variable placeholders
 - `unixBin/setClaudeEnv.sh` - Setup script for centralized environment management
-- `unixBin/resetClaudeEnv.sh` - Reset script to restore original environment
+- `unixBin/resetClaudeEnv.sh` - Reset script that unlinks `~/.claude` from this repo
 
 ### JSON Configuration Structure
 
@@ -299,7 +299,7 @@ After step 5: all your git-tracked slash commands, code templates, workspace def
 - **Security**: Secrets managed through environment variables and password managers
 - **Consistency**: Standardized project structures and configurations across machines
 - **Non-Destructive**: Existing Claude setup preserved and merged
-- **Reversible**: Complete restoration to original state
+- **Reversible**: Symlinks and generated config can be removed with `resetClaudeEnv.sh` (pre-setup local files stay merged in the repo)
 - **Cross-Machine**: Easy replication of entire development environment
 - **Team Sharing**: Git-controlled templates and workspaces for team consistency
 

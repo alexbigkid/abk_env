@@ -235,6 +235,32 @@ If at some point you'd like to uninstall installed packages, you can run <code>.
 * <code>./uninstall.sh tools_min.json tools_node.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code> and <code>tools_node.json</code>
 
 
+## Claude Code environment
+Centralized Claude Code configuration for all your computers. The settings live in this repo under <code>unixBin/env/claude/</code> and are linked into <code>~/.claude</code> on each machine.
+
+* <code>./unixBin/setClaudeEnv.sh</code> - sets up <code>~/.claude</code> on this machine from the repo
+* <code>./unixBin/resetClaudeEnv.sh</code> - undoes the setup (removes symlinks and generated config only)
+* Run both from the repo root - paths are built from the current directory.
+* Requires <code>claude</code> to be installed, e.g. with <code>./install.sh tools_ai.json</code>
+
+What gets set up:
+
+| in <code>~/.claude</code>                                | how                                                               |
+| :------------------------------------------------------- | :---------------------------------------------------------------- |
+| <code>commands</code>, <code>templates</code>, <code>workspaces</code>, <code>skills</code> | symlinked to <code>unixBin/env/claude/&lt;dir&gt;</code> |
+| <code>CLAUDE.md</code>                                   | symlinked to <code>unixBin/env/claude/CLAUDE.md</code>            |
+| <code>config/*.json</code>                               | generated from <code>config/*.template.*</code> with your env vars (mode 600) |
+
+Things to know:
+* Symlinks, not copies: edits made on any machine change the repo. Commit and pull to sync them to your other machines.
+* On first run, existing local files are merged into the repo (repo wins on conflicts), so they may end up committed.
+* Secrets stay on each machine: config files are built from local environment variables (e.g. <code>ANTHROPIC_API_KEY</code>, <code>GITHUB_TOKEN</code>) and never stored in git.
+* Not covered: <code>~/.claude/settings.json</code>, plugins, MCP auth and history - set those up per machine.
+* Reset does not bring back the original local files - they were merged into the repo during setup and are still there.
+
+More details: see the "Claude Environment Setup" section in [CLAUDE.md](CLAUDE.md).
+
+
 ## Git branch rename from master to main
 ```shell
 git branch -m master main

@@ -1,5 +1,31 @@
 #!/usr/bin/env bash
 
+#------------------------------------------------------------------------------
+# resetClaudeEnv.sh - undo setClaudeEnv.sh on this machine
+#
+# Disconnects ~/.claude from the centralized settings in this repo
+# (unixBin/env/claude/).
+#
+# What it does:
+#   - Removes the ~/.claude/{CLAUDE.md,skills,workspaces,templates,commands}
+#     symlinks (reverse of setup order)
+#   - Removes ~/.claude/config/*.json files generated from config/*.template.*
+#     and the config dir itself if it is left empty
+#
+# Notes:
+#   - Only symlinks are removed: the git-controlled files in
+#     unixBin/env/claude/ are never touched.
+#   - Real files/dirs (not symlinks) at those paths are left alone.
+#   - Config files you added by hand are kept.
+#   - Does NOT restore pre-setup local content: setClaudeEnv.sh merged it into
+#     the repo and deleted the originals, so after a reset those paths are
+#     simply gone. The content still lives in unixBin/env/claude/.
+#   - Must be run from the repo root: ./unixBin/resetClaudeEnv.sh
+#     (template paths are built from $PWD).
+#
+# Re-apply with: ./unixBin/setClaudeEnv.sh
+#------------------------------------------------------------------------------
+
 #---------------------------
 # variables definitions
 #---------------------------
@@ -17,7 +43,7 @@ CLAUDE_DIR="$HOME/.claude"
 PrintUsageAndExitWithCode ()
 {
     echo "-> PrintUsageAndExitWithCode"
-    echo "$0 - resets claude AI agent environment to original state"
+    echo "$0 - unlinks ~/.claude from this repo (removes symlinks and generated config)"
     echo "usage: $0"
     echo "  $0 --help   - display this info"
     echo "<- PrintUsageAndExitWithCode ($1)"
