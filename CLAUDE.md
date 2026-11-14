@@ -30,7 +30,7 @@ The `test_install.sh` script validates:
 - Symbolic links are created properly in `unixBin/env/`
 
 ### Version Management
-- `./unixBin/setGitAliases.sh` - Sets up all git aliases (includes versioning)
+- `./unixBin/setGitAliases.sh` - Writes all git aliases (incl. `rel-*` release triggers) to the global `~/.gitconfig`, overwriting same-named aliases; `git alias` lists them
 - `git rel-patch` - Trigger patch version release pipeline
 - `git rel-minor` - Trigger minor version release pipeline
 - `git rel-major` - Trigger major version release pipeline

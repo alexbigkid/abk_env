@@ -1,5 +1,32 @@
 #!/bin/bash
 
+#------------------------------------------------------------------------------
+# setGitAliases.sh - consistent git aliases on all machines
+#
+# Writes ABK's git aliases into your GLOBAL git config (~/.gitconfig), so
+# every computer gets the same shortcuts. Safe to re-run any time.
+#
+# What it sets:
+#   - Everyday shortcuts: st, co, ci, br, cob, last, hist, logg, unstage, ...
+#   - Log views: today, yesterday, sinceYesterday, sinceDate
+#   - File lists: staged, unstaged, untracked, ignored
+#   - Env tags: adt/rdt (dev), aqt/rqt (qa), art/rrt (release) - add/remove
+#     the tag locally and on origin
+#   - Release triggers: rel-patch, rel-minor, rel-major (main branch only).
+#     Pull + push, then force-push a temporary rel-* tag that starts the
+#     GitHub Actions release pipeline (tests -> version bump -> vX.Y.Z tag).
+#   - core.pager: diff-so-fancy if installed, otherwise the pager is unset
+#
+# Notes:
+#   - Overwrites existing global aliases with the same names.
+#   - $HOME_BIN_DIR (from unixBin/env/001_vars.env) is expanded when THIS
+#     script runs and baked into the rel-* aliases. Run it from a shell where
+#     the ABK env is loaded.
+#   - Colors load only when run from unixBin/ (relative path to
+#     env/000_colors.env); output is just uncolored otherwise.
+#   - List all aliases with: git alias
+#------------------------------------------------------------------------------
+
 ABK_COLOR_FILE="env/000_colors.env"
 [ -f $ABK_COLOR_FILE ] && . $ABK_COLOR_FILE
 
@@ -12,7 +39,7 @@ git config --global alias.br branch
 git config --global alias.brr "!git fetch -p && git branch -r"
 git config --global alias.ci commit
 git config --global alias.co checkout
-git config --global alias.dbr "!git checkout master && git branch -D $1 && git push origin --delete $1"
+git config --global alias.dbr '!f() { git checkout main && git branch -D "$1" && git push origin --delete "$1"; }; f'
 git config --global alias.adt "!git tag dev && git push origin dev"
 git config --global alias.rdt "!git tag --delete dev && git push --delete origin dev"
 git config --global alias.aqt "!git tag qa && git push origin qa"
@@ -36,7 +63,7 @@ git config --global alias.ignored 'ls-files --exclude-standard --others --ignore
 
 git config --global alias.stash-staged '!bash -c "git stash --keep-index; git stash push -m "staged" --keep-index; git stash pop stash@{1}"'
 git config --global alias.move-staged '!bash -c "git stash-staged;git commit -m "temp"; git stash; git reset --hard HEAD^; git stash pop"'
-git config --global alias.sinceDate "!git log --pretty=format:'%Cred%h %Cgreen%cd%Creset | %s%C(auto)%d %Cgreen[%an]%Creset' --date=local --since=\"$1\""
+git config --global alias.sinceDate '!f() { git log --pretty=format:"%Cred%h %Cgreen%cd%Creset | %s%C(auto)%d %Cgreen[%an]%Creset" --date=local --since="$1"; }; f'
 
 git config --global alias.rel-major "!f() { \
   BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \

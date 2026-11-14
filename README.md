@@ -235,6 +235,27 @@ If at some point you'd like to uninstall installed packages, you can run <code>.
 * <code>./uninstall.sh tools_min.json tools_node.json</code> - uninstalls packages previously has installed with <code>tools_min.json</code> and <code>tools_node.json</code>
 
 
+## Git aliases
+Run <code>./unixBin/setGitAliases.sh</code> to put the same git aliases on every machine. It writes them to your global git config (<code>~/.gitconfig</code>), overwriting aliases with the same names, and is safe to re-run. List them with <code>git alias</code>.
+
+| alias                                                       | description                                                        |
+| :---------------------------------------------------------- | :----------------------------------------------------------------- |
+| <code>st</code>, <code>co</code>, <code>ci</code>, <code>br</code>, <code>cob</code> | status, checkout, commit, branch, checkout -b             |
+| <code>hist</code>, <code>logg</code>, <code>last</code>     | compact graph logs, last commit                                    |
+| <code>today</code>, <code>yesterday</code>, <code>sinceYesterday</code> | commits in that time window                            |
+| <code>sinceDate "2026-11-01"</code>                         | commits since the given date                                       |
+| <code>dbr &lt;branch&gt;</code>                             | switch to main, delete the branch locally and on origin            |
+| <code>staged</code>, <code>unstaged</code>, <code>untracked</code>, <code>ignored</code> | list files in that state                  |
+| <code>unstage</code>, <code>rtl</code>                      | unstage files, hard reset to HEAD                                  |
+| <code>adt</code>/<code>rdt</code>, <code>aqt</code>/<code>rqt</code>, <code>art</code>/<code>rrt</code> | add/remove the dev, qa, release tag (local + origin) |
+| <code>rel-patch</code>, <code>rel-minor</code>, <code>rel-major</code> | trigger a release (see [Releases](#releases))           |
+
+It also sets <code>diff-so-fancy</code> as the git pager when it is installed.
+
+### Releases
+On <code>main</code>, run <code>git rel-patch</code>, <code>git rel-minor</code> or <code>git rel-major</code>. The alias pulls, pushes and pushes a temporary <code>rel-*</code> tag. GitHub Actions then runs the install/uninstall tests on macOS and Ubuntu; if they pass, it bumps <code>VERSION</code>, commits it and creates the <code>vX.Y.Z</code> tag. If they fail, no release is made.
+
+
 ## Claude Code environment
 Centralized Claude Code configuration for all your computers. The settings live in this repo under <code>unixBin/env/claude/</code> and are linked into <code>~/.claude</code> on each machine.
 
