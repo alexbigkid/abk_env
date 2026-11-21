@@ -4,3 +4,10 @@
 - When creating unit Python/TS/JS test files: please use always the same way as the production code with test_ prefix. This way I know what is testing what.
 - When creating Kotlin unit test files: please use always the same way as the production code with *Test postfix. This way I know what is testing what.
 - don't use git add and git commit commands. I will that myself
+- Python projects: the virtual environment must always be a real `.venv` subdirectory of the project (never in a cache or elsewhere, never a symlink; don't set `UV_PREVIEW`, `UV_PROJECT_ENVIRONMENT` or similar that move it). `.venv` must be listed in the project's `.gitignore`.
+- Git branch naming convention: `{Type}/{issue_number}/{short-issue-name}`
+  - **B** - Bug fixes (B/{issue_number}/{short-issue-name})
+  - **D** - Documentation (D/{issue_number}/{short-issue-name})
+  - **F** - Features (F/{issue_number}/{short-issue-name})
+  - **R** - Research (R/{issue_number}/{short-issue-name})
+  - **T** - Tests (T/{issue_number}/{short-issue-name})
