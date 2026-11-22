@@ -31,7 +31,7 @@ the coder key and pushes the current branch over HTTPS. It refuses, and leaves n
   - missing coder config, or a signing key that is not in the gpg keyring
   - an index that already has staged changes (they would end up in the commit)
   - nothing to commit, or staged files that look like secrets (.env, *.pem, *.key, id_rsa ...)
-  - any commit not yet on the remote whose signature is not good
+  - any commit that is on no remote ref yet whose signature is not good
 It never force-pushes. Setup: GIT-SETUP.md
 USAGE
 }
@@ -66,26 +66,33 @@ git diff --cached --quiet || die "the index already has staged changes; unstage 
 
 if [ -n "$stage_all" ]; then git add -A; else git add -- "$@"; fi
 if git diff --cached --quiet; then die "nothing staged to commit"; fi
-secret_hits=$(git diff --cached --name-only | grep -E -i "$SECRET_PATTERN" | grep -v -E -i "$SECRET_EXCEPTIONS" || true)
+secret_hits=$(git -c core.quotepath=false diff --cached --name-only | grep -E -i "$SECRET_PATTERN" | grep -v -E -i "$SECRET_EXCEPTIONS" || true)
 if [ -n "$secret_hits" ]; then
     git reset -q
     die "refusing to commit files that look like secrets (unstaged again): $(tr '\n' ' ' <<<"$secret_hits")"
 fi
 
 signing=(-c "user.name=$coder_name" -c "user.email=$coder_email" -c "user.signingkey=$signing_key" -c gpg.program=gpg -c gpg.format=openpgp -c commit.gpgsign=true)
-git "${signing[@]}" commit -S -m "$message" >/dev/null
+if ! commit_out=$(git "${signing[@]}" commit -S -m "$message" 2>&1); then
+    git reset -q || true
+    die "the commit failed, nothing was pushed and the files are unstaged again: $(tail -n 3 <<<"$commit_out" | tr '\n' ' ')"
+fi
 
-# Every commit that is not on the remote yet must be signed well, not only the new one.
-base_ref=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo "origin/main")
-range="HEAD~1..HEAD"
-if git rev-parse --verify -q "$base_ref" >/dev/null; then range="$base_ref..HEAD"; fi
+# Every commit that is on no remote ref yet must be signed well, not only the new one.
+if [ -n "$(git for-each-ref --count=1 refs/remotes/origin)" ]; then
+    log_args=(HEAD --not --remotes=origin)
+else
+    log_args=(-1 HEAD)
+fi
+log_out=$(git "${signing[@]}" log "--format=%H %G?" "${log_args[@]}")
+checked=0
 unsigned=""
 while read -r sha signature; do
+    [ -n "$sha" ] || continue
+    checked=$((checked + 1))
     if ! is_good_signature "$signature"; then unsigned+=" $(git rev-parse --short "$sha")($signature)"; fi
-done < <(git "${signing[@]}" log "--format=%H %G?" "$range")
+done <<<"$log_out"
 [ -z "$unsigned" ] || die "not pushing: commit(s) without a good signature:$unsigned. They stay local; report it."
-
-checked=$(git log --format=%H "$range" | wc -l | tr -d ' ')
 if ! push_out=$(git push --set-upstream origin "$branch" 2>&1); then
     reason=$(grep -E "$PUSH_ERROR_PATTERN" <<<"$push_out" | head -n 3 | tr '\n' ' ' || true)
     [ -n "$reason" ] || reason=$(tail -n 3 <<<"$push_out" | tr '\n' ' ')
