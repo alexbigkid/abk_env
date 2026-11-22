@@ -81,3 +81,21 @@ Or "None - can start immediately" if no blockers.
 </issue-template>
 
 Do NOT close or modify any parent issue.
+
+### 6. Link the dependencies and queue the issues
+
+The "Blocked by" section is text for humans. Also create the real relationships, so the board and the `prioritize` skill can read them. For every issue `<n>` blocked by `<blocker>`:
+
+```bash
+gh api -X POST repos/{owner}/{repo}/issues/<n>/dependencies/blocked_by \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  -F issue_id="$(gh api repos/{owner}/{repo}/issues/<blocker> -q .id)"
+```
+
+`issue_id` is the numeric issue id, not the issue number.
+
+Then put each issue on the repo's project board in Triage (`SKIPPED` when the repo has no board, which is fine):
+
+```bash
+~/.claude/skills/project-board/scripts/board.sh add <n>
+```
