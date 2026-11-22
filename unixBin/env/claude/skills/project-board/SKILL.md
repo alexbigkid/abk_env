@@ -1,6 +1,6 @@
 ---
 name: project-board
-description: Move GitHub issues between project board columns (Triage, Todo, Doing, Review, Testing, Done), set board fields (Priority, Size, Estimate, Start date, End date) and mark which agent works on an issue via the Agent issue field. Use when an issue-workflow agent (triager, coder, reviewer, tester) hands an issue over, claims it, or needs its board status.
+description: Move GitHub issues between project board columns (Triage, Todo, Doing, Review, Testing, Done), order a column, set board fields (Priority, Size, Estimate, Start date, End date), edit blocked-by relationships and mark which agent works on an issue via the Agent issue field. Use when an issue-workflow agent (triager, coder, reviewer, tester) hands an issue over, claims it, or needs its board status.
 ---
 
 # Project Board
@@ -20,9 +20,20 @@ scripts/board.sh set <n> "End date" today
 scripts/board.sh claim <n> Coder                # Triager | Coder | Reviewer | Tester
 scripts/board.sh release <n>
 scripts/board.sh add <n>                        # put issue on the repo's linked board in Triage (kept if already on a board)
+scripts/board.sh order <n1> <n2> <n3>        # put the issues in this order at the top of their column
 ```
 
 Names are case-insensitive; the emoji in the column names is not needed. `add` does nothing (`kept`) when the issue is already on a board, and is skipped when the repo has no linked board.
+
+## Relationships
+
+`scripts/blockers.sh` reads and edits the native "blocked by" relationships (no board needed):
+
+```bash
+scripts/blockers.sh list <n>                  # what <n> is blocked by, with state and title
+scripts/blockers.sh add <n> <blocker>...      # kept if it exists; refuses a direct cycle
+scripts/blockers.sh remove <n> <blocker>...   # kept if it does not exist
+```
 
 ## Hand-off pattern
 

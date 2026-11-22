@@ -32,6 +32,7 @@ usage: board.sh <command> <issue-number> [args]
   set     <n> <field> <value> [$IF_EMPTY_FLAG]   Priority P0-P2, Size XS-XL, Estimate <number>, Start/End date (YYYY-MM-DD or $TODAY_KEYWORD)
   claim   <n> <agent>                 set the Agent issue field (Triager|Coder|Reviewer|Tester)
   release <n>                         clear the Agent issue field
+  order   <n> [<n>...]                place the issues in this order at the top of their column (first = top)
   add     <n>                         add the issue to the repo's linked board in $DEFAULT_STATUS (kept if already on a board)
 Without a board, board commands print "SKIPPED: ..." and exit 0.
 USAGE
@@ -208,6 +209,24 @@ cmd_add() {
     set_field "$issue" "$STATUS_FIELD" "$DEFAULT_STATUS"
 }
 
+cmd_order() {
+    local issue after_id="" args
+    for issue in "$@"; do
+        if ! load_item "$issue"; then
+            [ -n "$after_id" ] || { echo "SKIPPED: #$issue is not on a project board, order not changed"; return 0; }
+            die "issue #$issue is not on the board, order only partly applied"
+        fi
+        args=(-f p="$PROJECT_ID" -f i="$ITEM_ID")
+        if [ -n "$after_id" ]; then args+=(-f a="$after_id"); fi
+        # shellcheck disable=SC2016  # $vars below are GraphQL variables, not shell
+        gh api graphql "${args[@]}" -f query='
+            mutation($p:ID!,$i:ID!,$a:ID){updateProjectV2ItemPosition(input:{projectId:$p,itemId:$i,afterId:$a}){items(first:1){nodes{id}}}}' >/dev/null ||
+            die "cannot place #$issue (API error or rate limit)"
+        after_id=$ITEM_ID
+    done
+    echo "ordered: $(printf '#%s ' "$@")"
+}
+
 cmd_info() {
     local issue=$1 field agent
     if load_item "$issue"; then
@@ -228,6 +247,7 @@ CMD=${1:-}
 case "$CMD" in
     --help|-h|"") usage; exit 0 ;;
     info|release|add) [ $# -eq 2 ] || usage_error ;;
+    order)            [ $# -ge 2 ] || usage_error ;;
     move|claim)       [ $# -eq 3 ] || usage_error ;;
     set)              if [ $# -ne 4 ] && ! { [ $# -eq 5 ] && [ "$5" = "$IF_EMPTY_FLAG" ]; }; then usage_error; fi ;;
     *)                usage_error ;;
@@ -240,4 +260,5 @@ case "$CMD" in
     claim)   cmd_claim "$2" "$3" ;;
     release) cmd_release "$2" ;;
     add)     cmd_add "$2" ;;
+    order)   shift; cmd_order "$@" ;;
 esac
