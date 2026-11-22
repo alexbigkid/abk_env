@@ -17,7 +17,7 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 usage_error() { usage >&2; exit 1; }
 
 # Print only the message of a failed gh call (the text after its last "gh: ").
-api_error() { local m=${1##*gh: }; echo "${m##*$'\n'}"; }
+api_error() { local m=${1##*gh: }; printf '%s\n' "${m##*$'\n'}"; }
 
 # Resolve REPO, OWNER and REPO_NAME without an API call (GH_REPO, else the git remote "origin").
 resolve_repo() {
@@ -41,6 +41,9 @@ gql() {
     }
     printf '%s\n' "$out"
 }
+
+# jq snippet that strips the emoji prefix of a board option name ("🔍 Triage" becomes "Triage").
+JQ_STRIP_PREFIX='sub("^[^A-Za-z0-9]+"; "")'
 
 # Print a string as a GraphQL string literal.
 gql_string() { jq -rn --arg v "$1" '$v | @json'; }

@@ -43,11 +43,13 @@ node_id() { jq -r --argjson n "$1" 'first(.[] | select(.number == $n)) | .id' <<
 # Print whether issue $1 is blocked by issue $2 (yes or no).
 is_blocked_by() { jq -r --argjson n "$1" --argjson b "$2" 'first(.[] | select(.number == $n)) | if any(.blockedBy[]; .number == $b) then "yes" else "no" end' <<<"$STATE"; }
 
+# Show what an issue is blocked by.
 cmd_list() {
     load_blockers "$1"
     jq -r --argjson n "$1" 'first(.[] | select(.number == $n)) | "#\($n) is blocked by: " + (if (.blockedBy | length) == 0 then "nothing" else (.blockedBy | map("#\(.number) (\(.state | ascii_downcase), \(.title))") | join("; ")) end)' <<<"$STATE"
 }
 
+# Make an issue blocked by the given blockers, in one request.
 cmd_add() {
     local issue=$1 blocker
     shift
@@ -66,6 +68,7 @@ cmd_add() {
     apply_mutations
 }
 
+# Remove the given blockers of an issue, in one request.
 cmd_remove() {
     local issue=$1 blocker
     shift

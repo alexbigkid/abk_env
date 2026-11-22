@@ -42,6 +42,8 @@ usage: board.sh <command> ...
   info    <n>                              show board fields and the current Agent
   move    <n> <status> [Field=Value...]    move to a Status column (Triage|Todo|Doing|Review|Testing|Done), set more
                                            fields in the same request, clear Agent
+  apply                                    read a plan from stdin, one issue per line: <n>|Field=Value|Field=Value|...[|$IF_EMPTY_FLAG]
+                                           (Status=<column> also clears the Agent); all issues in one request
   set     <n> Field=Value... [$IF_EMPTY_FLAG]  Priority=P0-P2, Size=XS-XL, Estimate=<number>, "Start date=YYYY-MM-DD|$TODAY_KEYWORD", "End date=..."
   claim   <agent> <n>...                   set the Agent issue field (Triager|Coder|Reviewer|Tester)
   release <n>...                           clear the Agent issue field
@@ -115,16 +117,17 @@ queue_field() {
     fi
     case "$data_type" in
         SINGLE_SELECT)
-            option=$(jq -c --arg v "$value" 'first(.options[] | select((.name | sub("^[^A-Za-z0-9]+"; "") | ascii_downcase) == ($v | ascii_downcase)))' <<<"$field")
+            option=$(jq -c --arg v "$value" 'first(.options[] | select((.name | '"$JQ_STRIP_PREFIX"' | ascii_downcase) == ($v | ascii_downcase)))' <<<"$field")
             [ -n "$option" ] || die "option '$value' not found in '$name' (options: $(jq -r '[.options[].name] | join(", ")' <<<"$field"))"
             literal="{singleSelectOptionId: $(gql_string "$(jq -r .id <<<"$option")")}"
-            value=$(jq -r '.name | sub("^[^A-Za-z0-9]+"; "")' <<<"$option") ;;
+            value=$(jq -r '.name | '"$JQ_STRIP_PREFIX" <<<"$option") ;;
         DATE)
             if [ "$(tr '[:upper:]' '[:lower:]' <<<"$value")" = "$TODAY_KEYWORD" ]; then value=$(date +%F); fi
             [[ "$value" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || die "'$name' needs a date (YYYY-MM-DD or $TODAY_KEYWORD), got '$value'"
             literal="{date: $(gql_string "$value")}" ;;
         NUMBER)
             [[ "$value" =~ ^[0-9]+(\.[0-9]+)?$ ]] || die "'$name' needs a number, got '$value'"
+            value=$(jq -rn --arg v "$value" '$v | tonumber')
             literal="{number: $value}" ;;
         TEXT)
             literal="{text: $(gql_string "$value")}" ;;
@@ -162,6 +165,7 @@ queue_pairs() {
     done
 }
 
+# Show the board fields and the Agent of an issue.
 cmd_info() {
     local field
     load_issues "$1"
@@ -176,20 +180,57 @@ cmd_info() {
     echo "$AGENT_FIELD: $(jq -r '.agent.name // ""' <<<"$(issue_json "$1")")"
 }
 
+# Queue the changes of one plan line: Field=Value pairs; setting the Status also clears the Agent.
+plan_issue() {
+    local issue=$1 pair has_status=""
+    shift
+    for pair in "$@"; do
+        if [[ "$pair" == *=* ]] && [ "$(tr '[:upper:]' '[:lower:]' <<<"${pair%%=*}")" = "$(tr '[:upper:]' '[:lower:]' <<<"$STATUS_FIELD")" ]; then has_status=1; fi
+    done
+    if select_board "$issue"; then
+        queue_pairs "$issue" "$@"
+    else
+        MESSAGES+="SKIPPED: #$issue is not on a project board, nothing changed"$'\n'
+    fi
+    if [ -n "$has_status" ]; then queue_release "$issue"; fi
+}
+
+# Move one issue to a column, set more fields and clear the Agent, in one request.
 cmd_move() {
     local issue=$1 column=$2
     shift 2
     load_issues "$issue"
-    if select_board "$issue"; then
-        queue_field "$issue" "$STATUS_FIELD" "$column"
-        queue_pairs "$issue" "$@"
-    else
-        MESSAGES+="SKIPPED: #$issue is not on a project board, column not changed"$'\n'
-    fi
-    queue_release "$issue"
+    plan_issue "$issue" "Status=$column" "$@"
     apply_mutations
 }
 
+# Apply a plan read from stdin (one issue per line, fields separated by "|") to all its issues in one request.
+cmd_apply() {
+    local line rest part issue plan="" numbers=() fields
+    while IFS= read -r line || [ -n "$line" ]; do
+        case "$line" in ""|"#"*) continue ;; esac
+        plan+="$line"$'\n'
+        numbers+=("${line%%|*}")
+    done
+    [ -n "$plan" ] || die "the plan on stdin is empty"
+    load_issues "${numbers[@]}"
+    while IFS= read -r line; do
+        [ -n "$line" ] || continue
+        issue=${line%%|*}
+        fields=()
+        rest=${line#"$issue"}
+        while [ -n "$rest" ]; do
+            rest=${rest#|}
+            part=${rest%%|*}
+            fields+=("$part")
+            if [ "$part" = "$rest" ]; then rest=""; else rest=${rest#*|}; fi
+        done
+        plan_issue "$issue" ${fields[@]+"${fields[@]}"}
+    done <<<"$plan"
+    apply_mutations
+}
+
+# Set board fields of one issue (no column change, the Agent stays).
 cmd_set() {
     local issue=$1
     shift
@@ -199,6 +240,7 @@ cmd_set() {
     apply_mutations
 }
 
+# Set the Agent issue field of one or more issues.
 cmd_claim() {
     local agent=$1 issue option_id option_name
     shift
@@ -214,6 +256,7 @@ cmd_claim() {
     apply_mutations
 }
 
+# Clear the Agent issue field of one or more issues.
 cmd_release() {
     local issue
     load_issues "$@"
@@ -221,8 +264,13 @@ cmd_release() {
     apply_mutations
 }
 
+# Put the given issues in this order on the board.
 cmd_order() {
-    local issue after_id="" this_id
+    local issue after_id="" this_id seen=""
+    for issue in "$@"; do
+        case " $seen " in *" $issue "*) die "issue #$issue is listed twice" ;; esac
+        seen+=" $issue"
+    done
     load_issues "$@"
     select_board "$1" || { echo "SKIPPED: #$1 is not on a project board, order not changed"; return 0; }
     for issue in "$@"; do
@@ -235,6 +283,7 @@ cmd_order() {
     apply_mutations
 }
 
+# Put an issue on the repo's linked board in the default column.
 cmd_add() {
     local issue=$1 count issue_node new_item
     load_issues "$issue"
@@ -264,6 +313,7 @@ case "$CMD" in
     info|add)      [ $# -eq 2 ] || usage_error ;;
     release|order) [ $# -ge 2 ] || usage_error ;;
     move|set|claim) [ $# -ge 3 ] || usage_error ;;
+    apply)         [ $# -eq 1 ] || usage_error ;;
     *)             usage_error ;;
 esac
 resolve_repo
@@ -274,5 +324,6 @@ case "$CMD" in
     claim)   shift; cmd_claim "$@" ;;
     release) shift; cmd_release "$@" ;;
     order)   shift; cmd_order "$@" ;;
+    apply)   cmd_apply ;;
     add)     cmd_add "$2" ;;
 esac

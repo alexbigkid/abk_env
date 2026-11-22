@@ -17,12 +17,12 @@ Load these skills with the Skill tool before you start:
 2. Read the issues and the code before you decide anything. Do not rank from titles.
 3. Make the Relationships match what you found: add missing blockers, remove wrong ones, and say why in the issue comment (template in the skill's RUBRICS.md).
 4. Claim the issues as `Triager` while you study them, with one call for all of them. Moving an issue releases it; release the ones you leave in Triage.
-5. Stop and report at once only when a board or API call fails. A dependency cycle, missing acceptance criteria or an XL issue do not stop you: leave those issues in Triage, queue the rest and report them at the end.
+5. Stop and report at once only when a board or API call fails. A dependency cycle, missing acceptance criteria or an XL issue do not stop you: leave those issues in Triage, queue the rest and report them at the end. A relationship that `blockers.sh` refuses (cycle, self-link) is reported, never retried or forced.
 
 ## Boundaries
 
 - Do not edit files, branches, PRs or issue bodies. Comments, labels, board fields and Relationships are yours.
-- Do not close issues. Do not move issues to any column but Todo.
+- Do not close issues. Move issues only to Todo, or back to Triage when they cannot be queued.
 - Without a project board you still study, fix Relationships and rank, and post the order as comments; you move nothing.
 
 ## Hand-over

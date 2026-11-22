@@ -15,6 +15,10 @@ Run from inside the repo (or set `GH_REPO`). `<n>` is the issue number. Names ar
 scripts/board.sh info <n>                          # board fields + current Agent
 scripts/board.sh move <n> Doing                    # Triage | Todo | Doing | Review | Testing | Done; clears Agent
 scripts/board.sh move <n> Todo Priority=P1 Size=M Estimate=6   # column + fields in one request
+scripts/board.sh apply <<'PLAN'                    # many issues, different fields, ONE request; Status=... also clears Agent
+4|Status=Todo|Priority=P0|Size=M|Estimate=6
+5|Priority=P1|--if-empty
+PLAN
 scripts/board.sh set <n> Priority=P0 Size=XS       # Priority P0-P2, Size XS-XL, Estimate=<number>
 scripts/board.sh set <n> "Start date=today" --if-empty   # dates: YYYY-MM-DD or today; --if-empty keeps a value
 scripts/board.sh claim Coder <n> [<n>...]          # Triager | Coder | Reviewer | Tester
@@ -23,7 +27,7 @@ scripts/board.sh order <n1> <n2> <n3>              # put the issues in this orde
 scripts/board.sh add <n>                           # put issue on the repo's linked board in Triage (kept if already on a board)
 ```
 
-`add` is skipped when the repo has no linked board. `order` lists must contain issues of one board; list all issues of a column you want ordered.
+`add` is skipped when the repo has no linked board. `order` lists must contain issues of one board, each once; list all issues of a column you want ordered. In a plan, fields are separated by `|` and `--if-empty` applies to the whole line.
 
 ## Relationships
 
@@ -31,7 +35,7 @@ scripts/board.sh add <n>                           # put issue on the repo's lin
 
 ```bash
 scripts/blockers.sh list <n>                  # what <n> is blocked by, with state and title
-scripts/blockers.sh add <n> <blocker>...      # kept if it exists; refuses a self-link and a direct cycle
+scripts/blockers.sh add <n> <blocker>...      # kept if it exists; a self-link or direct cycle is refused with an error (report it, do not retry)
 scripts/blockers.sh remove <n> <blocker>...   # kept if it does not exist
 ```
 

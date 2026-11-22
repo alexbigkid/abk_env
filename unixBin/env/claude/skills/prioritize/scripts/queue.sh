@@ -15,7 +15,8 @@ TODO_COLUMN="todo"
 RANKED_MARKER="Queue position:"
 
 # Issue fields shared by the board and the no-board query.
-ISSUE_FIELDS='number title state body labels(first:20){nodes{name}} blockedBy(first:20){nodes{number state}} blocking(first:20){nodes{number}}'
+ISSUE_FIELDS='number title state body repository{nameWithOwner} labels(first:20){nodes{name}}
+    blockedBy(first:20){nodes{number state repository{nameWithOwner}}} blocking(first:20){nodes{number repository{nameWithOwner}}}'
 
 usage() {
     cat <<USAGE
@@ -26,11 +27,14 @@ Lists the issues to prioritize, with their blockers, as JSON, in board order.
 The repo must have exactly one linked project board, or none.
 Output: {"board": <project number or null>, "issues": [
   {"number", "title", "column", "labels", "hasAcceptance", "ranked",
-   "blockedBy": [{"number", "state", "status"}], "blocking": [numbers]}]}
+   "blockedBy": [{"number", "state", "status", "repo"}], "blocking": [numbers]}]}
 "status" is the board column of a blocker (null without a board or when the
 blocker is not on the board). "ranked" is true when the issue already has a
-"$RANKED_MARKER" comment (read without a board only). At most 20 labels, blockers and
-blocked issues per issue are read. Repo from the current directory or GH_REPO.
+"$RANKED_MARKER" comment; it is read without a board only and is false with a board.
+"repo" (owner/name) is only present for a blocker of another repository, which is
+listed as "owner/name#number" in "blocking". Issues of other repositories on the board
+are ignored. At most 20 labels, blockers and blocked issues per issue are read.
+Repo from the current directory or GH_REPO.
 USAGE
 }
 
@@ -70,27 +74,30 @@ else
     board=null
     items="[]"
     more=true
-    cursor=""
+    cursor_args=()
     while [ "$more" = "true" ]; do
         # shellcheck disable=SC2016
-        page=$(gql -f owner="$OWNER" -f name="$REPO_NAME" ${cursor:+-f c="$cursor"} -f query='
+        page=$(gql -f owner="$OWNER" -f name="$REPO_NAME" ${cursor_args[@]+"${cursor_args[@]}"} -f query='
             query($owner:String!,$name:String!,$c:String){repository(owner:$owner,name:$name){
               issues(states:OPEN,first:100,after:$c){pageInfo{hasNextPage endCursor}
                 nodes{'"$ISSUE_FIELDS"' comments(last:20){nodes{body}}}}}}')
         items=$(jq -c --argjson more "$(jq -c '[.data.repository.issues.nodes[] | {status: null, content: .}]' <<<"$page")" '. + $more' <<<"$items")
         more=$(jq -r '.data.repository.issues.pageInfo.hasNextPage' <<<"$page")
-        cursor=$(jq -r '.data.repository.issues.pageInfo.endCursor' <<<"$page")
+        cursor_args=(-f c="$(jq -r '.data.repository.issues.pageInfo.endCursor' <<<"$page")")
     done
 fi
 
-jq --argjson board "$board" --arg triage "$TRIAGE_COLUMN" --arg todo "$TODO_COLUMN" --arg marker "$RANKED_MARKER" '
-    def column: (.status.name // "") | sub("^[^A-Za-z0-9]+"; "");
-    (map({key: (.content.number | tostring), value: (column | if . == "" then null else . end)}) | from_entries) as $columns
+jq --argjson board "$board" --arg repo "$REPO" --arg triage "$TRIAGE_COLUMN" --arg todo "$TODO_COLUMN" --arg marker "$RANKED_MARKER" '
+    def column: (.status.name // "") | '"$JQ_STRIP_PREFIX"';
+    def key: "\(.repository.nameWithOwner)#\(.number)";
+    (map(select(.content.number != null) | {key: (.content | key), value: (column | if . == "" then null else . end)}) | from_entries) as $columns
     | {board: $board, issues: [
-        .[] | select(.content.state == "OPEN" and ($board == null or (column | ascii_downcase | IN($triage, $todo))))
+        .[] | select(.content.repository.nameWithOwner == $repo and .content.state == "OPEN"
+                     and ($board == null or (column | ascii_downcase | IN($triage, $todo))))
         | .content as $c
         | {number: $c.number, title: $c.title, column: (column | if . == "" then null else . end), labels: [$c.labels.nodes[].name],
            hasAcceptance: ($c.body | test("acceptance criteria"; "i")),
            ranked: (($c.comments.nodes // []) | any(.body | contains($marker))),
-           blockedBy: [$c.blockedBy.nodes[] | {number, state, status: $columns[(.number | tostring)]}],
-           blocking: [$c.blocking.nodes[].number]}]}' <<<"$items"
+           blockedBy: [$c.blockedBy.nodes[] | {number, state, status: $columns[key]}
+                       + (if .repository.nameWithOwner != $repo then {repo: .repository.nameWithOwner} else {} end)],
+           blocking: [$c.blocking.nodes[] | if .repository.nameWithOwner == $repo then .number else "\(.repository.nameWithOwner)#\(.number)" end]}]}' <<<"$items"
