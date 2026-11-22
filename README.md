@@ -348,7 +348,7 @@ What gets set up:
 
 | in <code>~/.claude</code>                                | how                                                               |
 | :------------------------------------------------------- | :---------------------------------------------------------------- |
-| <code>commands</code>, <code>templates</code>, <code>workspaces</code>, <code>skills</code> | symlinked to <code>unixBin/env/claude/&lt;dir&gt;</code> |
+| <code>commands</code>, <code>templates</code>, <code>workspaces</code>, <code>skills</code>, <code>agents</code> | symlinked to <code>unixBin/env/claude/&lt;dir&gt;</code> |
 | <code>CLAUDE.md</code>                                   | symlinked to <code>unixBin/env/claude/CLAUDE.md</code>            |
 | <code>config/*.json</code>                               | generated from <code>config/*.template.*</code> with your env vars (mode 600) |
 

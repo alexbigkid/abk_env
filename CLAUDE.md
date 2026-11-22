@@ -45,12 +45,13 @@ The `test_install.sh` script validates:
 - `./unixBin/setSwGpg.sh` - Create a software-only GPG key (Ed25519 certify-only master + sign/encrypt/auth subkeys, 2y expiry, **no passphrase**); backups in `~/.gnupg-backup/`. Finds the new key by exact fingerprint. Does **not** remove the master key from the keyring; the manual steps are in the script header and README
 
 ### Claude Environment Setup
-- `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands, configs, templates, workspaces, skills, and global CLAUDE.md
+- `./unixBin/setClaudeEnv.sh` - Set up centralized Claude environment with git-controlled commands, configs, templates, workspaces, skills, agents, and global CLAUDE.md
 - `./unixBin/resetClaudeEnv.sh` - Unlink `~/.claude` from this repo (removes symlinks and generated config; does not restore pre-setup local files)
 - **Commands**: `unixBin/env/claude/commands/` → `~/.claude/commands` (symlinked)
 - **Templates**: `unixBin/env/claude/templates/` → `~/.claude/templates` (symlinked) 
 - **Workspaces**: `unixBin/env/claude/workspaces/` → `~/.claude/workspaces` (symlinked)
 - **Skills**: `unixBin/env/claude/skills/` → `~/.claude/skills` (symlinked)
+- **Agents**: `unixBin/env/claude/agents/` → `~/.claude/agents` (symlinked)
 - **Global CLAUDE.md**: `unixBin/env/claude/CLAUDE.md` → `~/.claude/CLAUDE.md` (symlinked)
 - **Config**: `unixBin/env/claude/config/*.template.*` → `~/.claude/config/*.json` (generated with env vars)
 
@@ -86,6 +87,7 @@ The `test_install.sh` script validates:
 - `unixBin/env/claude/templates/` - Git-controlled code templates and snippets (symlinked)
 - `unixBin/env/claude/workspaces/` - Git-controlled workspace configurations (symlinked)
 - `unixBin/env/claude/skills/` - Git-controlled Claude skills directory (symlinked)
+- `unixBin/env/claude/agents/` - Git-controlled Claude agents directory (symlinked)
 - `unixBin/env/claude/CLAUDE.md` - Git-controlled user-global Claude instructions (symlinked)
 - `unixBin/env/claude/config/` - Template configuration files with environment variable placeholders
 - `unixBin/setClaudeEnv.sh` - Setup script for centralized environment management
@@ -168,6 +170,12 @@ The repository provides comprehensive centralized management for Claude developm
 - Symlinked from `unixBin/env/claude/skills/`
 - Preserved and merged during setup
 
+**Agents** (`~/.claude/agents/`)
+- Git-controlled agent definitions (each agent is a `.md` file that loads the skills it needs)
+- Symlinked from `unixBin/env/claude/agents/`
+- Preserved and merged during setup
+- Issue-workflow agents (triager, coder, reviewer, tester) move issues across the GitHub project board via the `project-board` skill
+
 **Configuration** (`~/.claude/config/`)
 - Secure configuration with environment variable substitution
 - API keys loaded from environment variables or password managers
@@ -177,7 +185,7 @@ The repository provides comprehensive centralized management for Claude developm
 ### Setup Process
 1. **Run Setup**: `./unixBin/setClaudeEnv.sh`
    - **Prerequisites**: Installs required tools (`rsync`, `envsubst`)
-   - **Subdirectories**: For each of `commands`, `templates`, `workspaces`, `skills`:
+   - **Subdirectories**: For each of `commands`, `templates`, `workspaces`, `skills`, `agents`:
      - If `~/.claude/<subdir>/` is a real directory, any files not already in the git repo are merged in (git repo wins on conflicts), then the original is removed
      - A symlink is created from `~/.claude/<subdir>` → `unixBin/env/claude/<subdir>/`
    - **Global CLAUDE.md**: `~/.claude/CLAUDE.md` is symlinked to `unixBin/env/claude/CLAUDE.md`. On first setup, if a local file exists and the git copy does not, the local file is copied into the repo to preserve user content
@@ -185,14 +193,14 @@ The repository provides comprehensive centralized management for Claude developm
 
 ### Reset Process
 1. **Run Reset**: `./unixBin/resetClaudeEnv.sh`
-   - **Cleanup Order**: Removes the CLAUDE.md, skills, workspaces, templates, and commands symlinks (reverse of setup order)
+   - **Cleanup Order**: Removes the CLAUDE.md, agents, skills, workspaces, templates, and commands symlinks (reverse of setup order)
    - **Symlinks Only**: Each symlink is removed; the git-controlled files at `unixBin/env/claude/` are never touched
    - **User Data Preserved**: If `~/.claude/<subdir>/` or `~/.claude/CLAUDE.md` exists as a real file/directory (not a symlink), it is left alone
    - **Config Security**: Only files generated from `*.template.*` are removed from `~/.claude/config/`; anything you added by hand is preserved
 
 ### Replicating This Environment On A New Machine
 
-Everything that lives in `unixBin/env/claude/` (commands, templates, workspaces, skills, global `CLAUDE.md`) follows you to any new Mac by cloning this repo and running `setClaudeEnv.sh`.
+Everything that lives in `unixBin/env/claude/` (commands, templates, workspaces, skills, agents, global `CLAUDE.md`) follows you to any new Mac by cloning this repo and running `setClaudeEnv.sh`.
 
 **Steps:**
 
@@ -233,9 +241,9 @@ Everything that lives in `unixBin/env/claude/` (commands, templates, workspaces,
    ```bash
    ./unixBin/setClaudeEnv.sh
    ```
-   This creates the five symlinks (`commands`, `templates`, `workspaces`, `skills`, `CLAUDE.md` → git repo) and generates `~/.claude/config/*.json` from templates with mode `600`.
+   This creates the six symlinks (`commands`, `templates`, `workspaces`, `skills`, `agents`, `CLAUDE.md` → git repo) and generates `~/.claude/config/*.json` from templates with mode `600`.
 
-After step 5: all your git-tracked slash commands, code templates, workspace defs, skills, and global Claude instructions are live on the new machine.
+After step 5: all your git-tracked slash commands, code templates, workspace defs, skills, agents, and global Claude instructions are live on the new machine.
 
 **What does NOT transfer (not in this repo):**
 

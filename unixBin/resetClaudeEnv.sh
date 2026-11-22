@@ -7,7 +7,7 @@
 # (unixBin/env/claude/).
 #
 # What it does:
-#   - Removes the ~/.claude/{CLAUDE.md,skills,workspaces,templates,commands}
+#   - Removes the ~/.claude/{CLAUDE.md,agents,skills,workspaces,templates,commands}
 #     symlinks (reverse of setup order)
 #   - Removes ~/.claude/config/*.json files generated from config/*.template.*
 #     and the config dir itself if it is left empty
@@ -182,6 +182,7 @@ set -e
 
 checkPrerequisiteToolsAreInstalled || PrintUsageAndExitWithCode $? "${RED}❌ claude is not installed. Please install claude. Aborting.${NC}"
 unlinkClaudeFile   CLAUDE.md  || PrintUsageAndExitWithCode $? "${RED}❌ unlinkClaudeFile CLAUDE.md failed. Aborting.${NC}"
+unlinkClaudeSubdir agents     || PrintUsageAndExitWithCode $? "${RED}❌ unlinkClaudeSubdir agents failed. Aborting.${NC}"
 unlinkClaudeSubdir skills     || PrintUsageAndExitWithCode $? "${RED}❌ unlinkClaudeSubdir skills failed. Aborting.${NC}"
 unlinkClaudeSubdir workspaces || PrintUsageAndExitWithCode $? "${RED}❌ unlinkClaudeSubdir workspaces failed. Aborting.${NC}"
 unlinkClaudeSubdir templates  || PrintUsageAndExitWithCode $? "${RED}❌ unlinkClaudeSubdir templates failed. Aborting.${NC}"
