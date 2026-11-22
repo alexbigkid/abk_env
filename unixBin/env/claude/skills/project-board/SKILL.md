@@ -5,25 +5,25 @@ description: Move GitHub issues between project board columns (Triage, Todo, Doi
 
 # Project Board
 
-One script, `scripts/board.sh`, does all board access for the workflow agents. Call it instead of writing `gh project ...` commands yourself. It resolves field and option ids at runtime, so it works on any board created from `board-template`.
+`scripts/board.sh` does all board access for the workflow agents and `scripts/blockers.sh` all Relationship edits. Call them instead of writing `gh` commands yourself. They use GraphQL only and keep the API usage small: **one query reads everything, one request applies all changes**, so prefer one call with several issues or fields over many calls. Field and option ids are resolved at runtime, so any board made from `board-template` works.
 
 ## Commands
 
-Run from inside the repo (or set `GH_REPO`). `<n>` is the issue number.
+Run from inside the repo (or set `GH_REPO`). `<n>` is the issue number. Names are case-insensitive; the emoji in column names is not needed.
 
 ```bash
-scripts/board.sh info <n>                       # board fields + current Agent
-scripts/board.sh move <n> Doing                 # Triage | Todo | Doing | Review | Testing | Done
-scripts/board.sh set <n> Priority P0            # Priority P0-P2, Size XS-XL, Estimate <number>
-scripts/board.sh set <n> "Start date" today --if-empty
-scripts/board.sh set <n> "End date" today
-scripts/board.sh claim <n> Coder                # Triager | Coder | Reviewer | Tester
-scripts/board.sh release <n>
-scripts/board.sh add <n>                        # put issue on the repo's linked board in Triage (kept if already on a board)
-scripts/board.sh order <n1> <n2> <n3>        # put the issues in this order at the top of their column
+scripts/board.sh info <n>                          # board fields + current Agent
+scripts/board.sh move <n> Doing                    # Triage | Todo | Doing | Review | Testing | Done; clears Agent
+scripts/board.sh move <n> Todo Priority=P1 Size=M Estimate=6   # column + fields in one request
+scripts/board.sh set <n> Priority=P0 Size=XS       # Priority P0-P2, Size XS-XL, Estimate=<number>
+scripts/board.sh set <n> "Start date=today" --if-empty   # dates: YYYY-MM-DD or today; --if-empty keeps a value
+scripts/board.sh claim Coder <n> [<n>...]          # Triager | Coder | Reviewer | Tester
+scripts/board.sh release <n> [<n>...]
+scripts/board.sh order <n1> <n2> <n3>              # put the issues in this order (relative order within each column)
+scripts/board.sh add <n>                           # put issue on the repo's linked board in Triage (kept if already on a board)
 ```
 
-Names are case-insensitive; the emoji in the column names is not needed. `add` does nothing (`kept`) when the issue is already on a board, and is skipped when the repo has no linked board.
+`add` is skipped when the repo has no linked board. `order` lists must contain issues of one board; list all issues of a column you want ordered.
 
 ## Relationships
 
@@ -31,13 +31,13 @@ Names are case-insensitive; the emoji in the column names is not needed. `add` d
 
 ```bash
 scripts/blockers.sh list <n>                  # what <n> is blocked by, with state and title
-scripts/blockers.sh add <n> <blocker>...      # kept if it exists; refuses a direct cycle
+scripts/blockers.sh add <n> <blocker>...      # kept if it exists; refuses a self-link and a direct cycle
 scripts/blockers.sh remove <n> <blocker>...   # kept if it does not exist
 ```
 
 ## Hand-off pattern
 
-1. When you pick an issue up: `move` it to your column if needed, then `claim` it.
+1. When you pick an issue up: `claim` it (and `move` it to your column if needed).
 2. When you finish: `move` it to the next column. `move` always clears the Agent field, so an empty Agent means nobody is working on it.
 3. Set board fields when your role owns them: triager sets Priority, Size, Estimate; coder sets Start date on first Doing (`--if-empty`, so rework keeps the original); tester sets End date on Done.
 
@@ -47,8 +47,8 @@ If the issue is on no project board, board commands print `SKIPPED: ...` and exi
 
 ## Errors
 
-API problems (including rate limits) are errors, never "no board". `move` changes the column first, then clears Agent; if clearing fails the command exits non-zero but the column has already moved.
+API problems (including rate limits) are errors, never "no board"; the message carries the API's reason. All changes of one command go in one request and are applied in order; if the API rejects it, earlier changes of that request may already be applied, so re-run `info` before retrying.
 
 - `issue field 'Agent' not found`: create the single-select field Agent (Triager, Coder, Reviewer, Tester) under Settings > Issue fields.
-- `cannot read issue fields`: the message carries the API's reason; for a missing scope the user must run `gh auth refresh -h github.com -s read:user`.
+- A message about a missing scope: the user must run `gh auth refresh -h github.com -s <scope>` (`read:user` for the Agent field, `project` for the board).
 - `option '...' not found`: the message lists the valid options.

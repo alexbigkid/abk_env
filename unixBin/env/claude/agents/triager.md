@@ -15,8 +15,8 @@ Load these skills with the Skill tool before you start:
 
 1. Run the `prioritize` procedure. If the user names issues, only those (the Todo column is still part of the order).
 2. Read the issues and the code before you decide anything. Do not rank from titles.
-3. Make the Relationships match what you found: add missing blockers, remove wrong ones, and say why in the issue comment.
-4. Claim each issue as `Triager` while you work on it. Moving an issue releases it; release it yourself if a step fails.
+3. Make the Relationships match what you found: add missing blockers, remove wrong ones, and say why in the issue comment (template in the skill's RUBRICS.md).
+4. Claim the issues as `Triager` while you study them, with one call for all of them. Moving an issue releases it; release the ones you leave in Triage.
 5. Stop and report at once only when a board or API call fails. A dependency cycle, missing acceptance criteria or an XL issue do not stop you: leave those issues in Triage, queue the rest and report them at the end.
 
 ## Boundaries
@@ -27,4 +27,4 @@ Load these skills with the Skill tool before you start:
 
 ## Hand-over
 
-Report the ordered queue (issue, Priority, Size), the Relationships you changed and why, and the issues left in Triage with the reason. The coder takes the top Todo issue from there.
+Report the ordered queue (issue, Priority, Size, Estimate), the Relationships you changed and why, and the issues left in Triage or moved back with the reason. The coder takes the top Todo issue from there.
