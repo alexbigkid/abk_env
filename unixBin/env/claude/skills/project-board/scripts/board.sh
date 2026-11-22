@@ -41,7 +41,7 @@ usage() {
 usage: board.sh <command> ...
   info    <n>                              show board fields and the current Agent
   move    <n> <status> [Field=Value...]    move to a Status column (Triage|Todo|Doing|Review|Testing|Done), set more
-                                           fields in the same request, clear Agent
+                                           fields in the same request (Field:=Value only when empty), clear Agent
   apply                                    read a plan from stdin, one issue per line: <n>|Field=Value|Field=Value|...[|$IF_EMPTY_FLAG]
                                            (Status=<column> also clears the Agent; use Field:=Value, not $IF_EMPTY_FLAG, on lines with a Status); all issues in one request
   set     <n> Field=Value... [$IF_EMPTY_FLAG]  Priority=P0-P2, Size=XS-XL, Estimate=<number>, "Start date=YYYY-MM-DD|$TODAY_KEYWORD", "End date=..."; Field:=Value sets the field only when it is empty

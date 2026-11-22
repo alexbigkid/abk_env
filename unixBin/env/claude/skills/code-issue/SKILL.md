@@ -17,7 +17,7 @@ H=~/.claude/skills/code-issue/scripts/with-https.sh     # git over HTTPS: no SSH
 
 ## 1. Pick the issue
 
-The user may name one; after an interrupted run (for example an API failure) the user names the issue again, it is still in Doing and claimed by Coder, so continue on its branch (step 6 shows how to check out). Otherwise take the top Todo issue whose blockers are all closed (review rework comes back at the top of Todo):
+The user may name one; after an interrupted run (for example an API failure) the user names the issue again, it is still in Doing and claimed by Coder, so continue on its branch (`$H git fetch origin <branch> && git checkout <branch>`). Otherwise take the top Todo issue whose blockers are all closed (review rework comes back at the top of Todo):
 
 ```bash
 $Q | jq -r '[.issues[] | select(.column == "Todo" and all(.blockedBy[]; .state == "CLOSED"))] | first | .number // empty'
@@ -34,7 +34,7 @@ $B claim Coder <n>
 
 ## 3. Branch
 
-Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label: infer the type from title and description and assign the label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words), created and linked to the issue:
+Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out instead of creating it:
 
 ```bash
 $H gh issue develop <n> --name F/<n>/<short-name> --base main --checkout
@@ -46,23 +46,29 @@ Test first (`/tdd`), then the code; run the repo's tests and linters; update the
 
 ## 5. Commit, push, PR, hand-off
 
-Commit in small steps with `$C "<message>" --all` (or the files). It signs with the coder key, pushes only `{Type}/{n}/{name}` branches over HTTPS and never force-pushes; it needs the one-time setup in [GIT-SETUP.md](GIT-SETUP.md). If it refuses (missing config, unsigned, rejected), stop and report; never commit another way. Every git command that talks to GitHub (fetch, pull, clone) goes through `$H`; plain `git` would use your SSH remote and the YubiKey. Message style: look at `git log --oneline -10`; end with the Co-Authored-By line you were given.
+Commit in small steps with `$C "<message>" --all` (all changes, untracked files included) or `$C "<message>" <file>...`. It signs with the coder key, pushes only `{Type}/{n}/{name}` branches over HTTPS and never force-pushes. It refuses staged files that look like secrets, an index you staged yourself and any unsigned commit that is not on the remote yet; it needs the one-time setup in [GIT-SETUP.md](GIT-SETUP.md). If it refuses (missing config, unsigned, rejected, secrets), stop and report; never commit another way. Every git command that talks to GitHub (fetch, pull, clone) goes through `$H`; plain `git` would use your SSH remote and the YubiKey. Message style: look at `git log --oneline -10`; end with the Co-Authored-By line you were given.
 
 ```bash
 gh pr create --base main --head <branch> --title "<title> (#<n>)" --body-file - <<'BODY'
 Closes #<n>
-## What / ## Tested / ## Not verified   (be honest about what you could not test)
+
+## What
+<what changed>
+## Tested
+<what you ran and saw>
+## Not verified
+<what you could not test; be honest>
 BODY
 $B move <n> Review          # clears your claim
 ```
 
 ## 6. Review feedback
 
-The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item and either change the code or open a follow-up issue (`gh issue create`, then `$B add <issue>`). Commit and push with `$C`. Post one PR comment that lists each item with `fixed in <sha>` or `follow-up #<m>`. Then `$B move <n> Review`.
+The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item and either change the code or open a follow-up issue (`gh issue create`, with the body `Follow-up of #<n> (PR #<pr>): ...`, then `$B add <issue>`). Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>` or `follow-up #<m>`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`.
 
 ## No board
 
-The board commands print `SKIPPED` and exit 0; the branch, commits and PR work as usual. Work on the issue the user names, and post a short hand-off comment on the issue (what you did, PR link, what is next). The handover is manual.
+The board commands print `SKIPPED` and exit 0; the branch, commits and PR work as usual. `$Q` has no `column` without a board, so step 1's query finds nothing: work on the issue the user names, and post a short hand-off comment on the issue (what you did, PR link, what is next). The handover is manual.
 
 ## Stop and report
 

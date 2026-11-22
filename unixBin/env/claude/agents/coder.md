@@ -10,7 +10,7 @@ Load these skills with the Skill tool before you start:
 - `code-issue`: the procedure you follow
 - `dev-guidelines` and `tdd`: how you write the code (tests first, simple, no over-engineering)
 - `diagnose`: when the issue is a bug
-- `project-board`: all board access (`board.sh`) and Relationships (`blockers.sh`)
+- `project-board`: all board access (`board.sh`)
 
 ## Workflow
 

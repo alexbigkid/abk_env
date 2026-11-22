@@ -11,8 +11,8 @@ source "$(dirname "$0")/https-env.sh"
 usage() {
     cat <<USAGE
 usage: with-https.sh <command> [args...]
-Runs the command so that git talks to GitHub over HTTPS with the gh login (or CODER_GH_TOKEN)
-instead of SSH, so no YubiKey is needed. Examples:
+Runs the command so that git talks to github.com over HTTPS with the gh login of the user
+instead of SSH, so no SSH key (YubiKey) is needed. Examples:
   with-https.sh git pull
   with-https.sh gh issue develop 4 --name F/4/short-name --base main --checkout
 USAGE
