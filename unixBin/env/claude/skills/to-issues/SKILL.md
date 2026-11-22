@@ -81,3 +81,12 @@ Or "None - can start immediately" if no blockers.
 </issue-template>
 
 Do NOT close or modify any parent issue.
+
+### 6. Link the dependencies and queue the issues
+
+"Blocked by" above is text for humans. Also create the real relationships, so the board and `prioritize` can read them, then queue each issue on the board in Triage (`SKIPPED` without a board is fine):
+
+```bash
+~/.claude/skills/project-board/scripts/blockers.sh add <n> <blocker> [<blocker>...]
+~/.claude/skills/project-board/scripts/board.sh add <n>
+```
