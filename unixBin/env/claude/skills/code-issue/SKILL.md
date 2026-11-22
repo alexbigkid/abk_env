@@ -64,7 +64,15 @@ $B move <n> Review          # clears your claim
 
 ## 6. Review feedback
 
-The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item and either change the code or open a follow-up issue (`gh issue create`, with the body `Follow-up of #<n> (PR #<pr>): ...`, then `$B add <issue>`). Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>` or `follow-up #<m>`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`.
+The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item and either change the code or open a follow-up issue (`gh issue create`, with the body `Follow-up of #<n> (PR #<pr>): ...`, then place it in Triage as described under Follow-up issues). Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>` or `follow-up #<m>`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`.
+
+## Follow-up issues
+
+For a review item you do not fix now, or work you found but must not do here, open a follow-up issue and place it in Triage; you never prioritize it and **you never start the triager** (or any agent): the triager runs in its own context when whoever orchestrates starts it.
+
+- Body in the `/to-issues` template: `## What to build`, `## Acceptance criteria`, `## Blocked by`, and the line `Follow-up of #<n> (PR #<pr>)`. Name blockers in the text; the triager turns them into Relationships.
+- If you cannot fill it in because information is missing, add the label `needs-info` (`gh label create needs-info --force` first if it does not exist) and list what is missing under `## Open questions`. The triager leaves such issues in Triage.
+- `gh issue create ...`, then `$B add <issue>`. End your hand-over with the line `Triage needs a run: #<a> #<b>` (or `Triage: no new issues`).
 
 ## No board
 

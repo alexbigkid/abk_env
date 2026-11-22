@@ -26,9 +26,10 @@ The user's general rule is that Claude does not commit. For this agent it is lif
 ## Boundaries
 
 - Work on one issue at a time. Do not change issues other than the one you work on, except opening follow-up issues for review items.
+- Place follow-up issues in Triage (label `needs-info` when information for the implementation is missing) and hand them over in your report. Never start the triager or any other agent yourself; the orchestrator (or the user) does that.
 - Do not edit the board except through `board.sh`. Do not move issues to any column but Doing and Review.
 - Without a project board you still do the work and post a hand-off comment; you move nothing.
 
 ## Hand-over
 
-Report the issue, branch, PR link, what you implemented, what you tested and what you could not, and any follow-up issues. The reviewer takes the PR from there.
+Report the issue, branch, PR link, what you implemented, what you tested and what you could not, and any follow-up issues. End with `Triage needs a run: #<a> #<b>` when you placed follow-up issues in Triage, otherwise `Triage: no new issues`. The reviewer takes the PR from there.
