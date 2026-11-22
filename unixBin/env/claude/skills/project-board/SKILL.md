@@ -19,10 +19,10 @@ scripts/board.sh set <n> "Start date" today --if-empty
 scripts/board.sh set <n> "End date" today
 scripts/board.sh claim <n> Coder                # Triager | Coder | Reviewer | Tester
 scripts/board.sh release <n>
-scripts/board.sh add <n>                        # put issue on the repo's linked board in Triage
+scripts/board.sh add <n>                        # put issue on the repo's linked board in Triage (kept if already on a board)
 ```
 
-Names are case-insensitive; the emoji in the column names is not needed.
+Names are case-insensitive; the emoji in the column names is not needed. `add` does nothing (`kept`) when the issue is already on a board, and is skipped when the repo has no linked board.
 
 ## Hand-off pattern
 

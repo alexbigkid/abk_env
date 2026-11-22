@@ -8,8 +8,9 @@
 # Repo is taken from the current directory (or GH_REPO).
 # The board is found from the issue itself; nothing to configure.
 #
-# API budget per command: 1 REST call for the repo, 1 GraphQL query for the
-# board item with all its fields, plus 1 mutation or 1-2 REST calls for the change.
+# Typical cost: 1 REST call for the repo and 1 GraphQL query for the board item
+# with all its fields, plus 1 mutation or a few REST calls for the change.
+# "add" needs a few more calls.
 #------------------------------------------------------------------------------
 set -euo pipefail
 
@@ -21,16 +22,17 @@ BOARD_FIELDS=(Status Priority Size Estimate "Start date" "End date")
 OWNER_TYPE_ORG="Organization"
 IF_EMPTY_FLAG="--if-empty"
 NO_VALUE_MESSAGE="Issue field value not found"
+TODAY_KEYWORD="today"
 
 usage() {
     cat <<USAGE
 usage: board.sh <command> <issue-number> [args]
   info    <n>                         show board fields and the current Agent
   move    <n> <status>                move to a Status column (Triage|Todo|Doing|Review|Testing|Done), clears Agent
-  set     <n> <field> <value> [$IF_EMPTY_FLAG]   set Priority, Size, Estimate, Start date, End date ("today" allowed)
+  set     <n> <field> <value> [$IF_EMPTY_FLAG]   Priority P0-P2, Size XS-XL, Estimate <number>, Start/End date (YYYY-MM-DD or $TODAY_KEYWORD)
   claim   <n> <agent>                 set the Agent issue field (Triager|Coder|Reviewer|Tester)
   release <n>                         clear the Agent issue field
-  add     <n>                         add the issue to the repo's linked board in $DEFAULT_STATUS
+  add     <n>                         add the issue to the repo's linked board in $DEFAULT_STATUS (kept if already on a board)
 Without a board, board commands print "SKIPPED: ..." and exit 0.
 USAGE
 }
@@ -107,8 +109,8 @@ set_field() {
             [ -n "$option" ] || die "option '$value' not found in '$name' (options: $(jq -r '[.options[].name] | join(", ")' <<<"$field"))"
             flag=(--single-select-option-id "$option") ;;
         DATE)
-            [ "$value" = "today" ] && value=$(date +%F)
-            [[ "$value" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || die "'$name' needs a date (YYYY-MM-DD or today), got '$value'"
+            if [ "$(tr '[:upper:]' '[:lower:]' <<<"$value")" = "$TODAY_KEYWORD" ]; then value=$(date +%F); fi
+            [[ "$value" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || die "'$name' needs a date (YYYY-MM-DD or $TODAY_KEYWORD), got '$value'"
             flag=(--date "$value") ;;
         NUMBER)
             [[ "$value" =~ ^[0-9]+(\.[0-9]+)?$ ]] || die "'$name' needs a number, got '$value'"
@@ -128,7 +130,7 @@ agent_field_json() {
     if [ "$OWNER_TYPE" = "$OWNER_TYPE_ORG" ]; then path="/orgs/$OWNER/issue-fields"; else path="/user/issue-fields"; fi
     out=$(gh api "$path" -H "$API_VERSION" 2>&1) || {
         local hint=""
-        if grep -qiE "scope|HTTP 40[13]" <<<"$out"; then hint=" (a missing scope needs: gh auth refresh -h github.com -s read:user)"; fi
+        if grep -qi "scope" <<<"$out"; then hint=" (a missing scope needs: gh auth refresh -h github.com -s read:user)"; fi
         die "cannot read issue fields from $path: $(api_error "$out")$hint"
     }
     field=$(jq -c --arg f "$AGENT_FIELD" '[.[] | select(.name == $f)] | first // empty' <<<"$out")
@@ -222,14 +224,17 @@ cmd_info() {
 CMD=${1:-}
 case "$CMD" in
     --help|-h|"") usage; exit 0 ;;
+    info|release|add) [ $# -eq 2 ] || { usage; exit 1; } ;;
+    move|claim)       [ $# -eq 3 ] || { usage; exit 1; } ;;
+    set)              if [ $# -ne 4 ] && ! { [ $# -eq 5 ] && [ "$5" = "$IF_EMPTY_FLAG" ]; }; then usage; exit 1; fi ;;
+    *)                usage; exit 1 ;;
 esac
 resolve_repo
 case "$CMD" in
-    info)    [ $# -eq 2 ] || { usage; exit 1; }; cmd_info "$2" ;;
-    move)    [ $# -eq 3 ] || { usage; exit 1; }; cmd_move "$2" "$3" ;;
-    set)     [ $# -ge 4 ] || { usage; exit 1; }; cmd_set "$2" "$3" "$4" "${5:-}" ;;
-    claim)   [ $# -eq 3 ] || { usage; exit 1; }; cmd_claim "$2" "$3" ;;
-    release) [ $# -eq 2 ] || { usage; exit 1; }; cmd_release "$2" ;;
-    add)     [ $# -eq 2 ] || { usage; exit 1; }; cmd_add "$2" ;;
-    *)       usage; exit 1 ;;
+    info)    cmd_info "$2" ;;
+    move)    cmd_move "$2" "$3" ;;
+    set)     cmd_set "$2" "$3" "$4" "${5:-}" ;;
+    claim)   cmd_claim "$2" "$3" ;;
+    release) cmd_release "$2" ;;
+    add)     cmd_add "$2" ;;
 esac
