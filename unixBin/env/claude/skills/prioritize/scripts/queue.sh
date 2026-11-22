@@ -21,8 +21,10 @@ ISSUE_FIELDS='number title state body repository{nameWithOwner} labels(first:20)
 usage() {
     cat <<USAGE
 usage: queue.sh
-Lists the issues to prioritize, with their blockers, as JSON, in board order.
-  With a project board:  the open issues in the Triage and Todo columns.
+Lists the issues to prioritize, with their blockers, as JSON, in board order
+(the array order is the order on the board, top first; there is no position field).
+  With a project board:  the open issues in the Triage and Todo columns. Issues in Doing,
+                         Review, Testing and Done are not listed; they only appear as blockers.
   Without a board:       all open issues of the repo.
 The repo must have exactly one linked project board, or none.
 Output: {"board": <project number or null>, "issues": [

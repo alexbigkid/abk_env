@@ -1,0 +1,69 @@
+---
+name: code-issue
+description: Take the top issue in the Todo column, implement it on a linked feature branch with signed commits, open a pull request and hand the issue to review; also address review comments on its pull request. Use when the coder should pick up or implement an issue end to end, or fix review feedback on a pull request.
+---
+
+# Code issue
+
+Todo → Doing → Review. You write the code, make the signed commits, create the branch and the PR. You do **not** review, merge or close (reviewer and tester do). Follow `/dev-guidelines` (SOLID, KISS, no over-engineering), `/tdd` for the implementation and `/diagnose` for bugs.
+
+```bash
+Q=~/.claude/skills/prioritize/scripts/queue.sh
+B=~/.claude/skills/project-board/scripts/board.sh
+P=~/.claude/skills/code-issue/scripts/pr-feedback.sh
+C=~/.claude/skills/code-issue/scripts/commit-push.sh
+H=~/.claude/skills/code-issue/scripts/with-https.sh     # git over HTTPS: no SSH, no YubiKey
+```
+
+## 1. Pick the issue
+
+The user may name one; after an interrupted run (for example an API failure) the user names the issue again, it is still in Doing and claimed by Coder, so continue on its branch (step 6 shows how to check out). Otherwise take the top Todo issue whose blockers are all closed (review rework comes back at the top of Todo):
+
+```bash
+$Q | jq -r '[.issues[] | select(.column == "Todo" and all(.blockedBy[]; .state == "CLOSED"))] | first | .number // empty'
+```
+
+Nothing found: report that no issue is ready. Read the issue, its comments and any agent brief. If it has open points that block you (a human decision), stop and report instead of guessing. `$P <n>` tells whether it already has an open PR: then it is rework, go to step 6.
+
+## 2. Start
+
+```bash
+$B move <n> Doing "Start date:=today"     # the date is only set when empty, so rework keeps it
+$B claim Coder <n>
+```
+
+## 3. Branch
+
+Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label: infer the type from title and description and assign the label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words), created and linked to the issue:
+
+```bash
+$H gh issue develop <n> --name F/<n>/<short-name> --base main --checkout
+```
+
+## 4. Implement
+
+Test first (`/tdd`), then the code; run the repo's tests and linters; update the docs the change touches. Keep to the acceptance criteria, no extras.
+
+## 5. Commit, push, PR, hand-off
+
+Commit in small steps with `$C "<message>" --all` (or the files). It signs with the coder key, pushes only `{Type}/{n}/{name}` branches over HTTPS and never force-pushes; it needs the one-time setup in [GIT-SETUP.md](GIT-SETUP.md). If it refuses (missing config, unsigned, rejected), stop and report; never commit another way. Every git command that talks to GitHub (fetch, pull, clone) goes through `$H`; plain `git` would use your SSH remote and the YubiKey. Message style: look at `git log --oneline -10`; end with the Co-Authored-By line you were given.
+
+```bash
+gh pr create --base main --head <branch> --title "<title> (#<n>)" --body-file - <<'BODY'
+Closes #<n>
+## What / ## Tested / ## Not verified   (be honest about what you could not test)
+BODY
+$B move <n> Review          # clears your claim
+```
+
+## 6. Review feedback
+
+The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item and either change the code or open a follow-up issue (`gh issue create`, then `$B add <issue>`). Commit and push with `$C`. Post one PR comment that lists each item with `fixed in <sha>` or `follow-up #<m>`. Then `$B move <n> Review`.
+
+## No board
+
+The board commands print `SKIPPED` and exit 0; the branch, commits and PR work as usual. Work on the issue the user names, and post a short hand-off comment on the issue (what you did, PR link, what is next). The handover is manual.
+
+## Stop and report
+
+Missing signing config, tests you cannot make pass, a blocking open point in the issue, a refused push, or a failing board or API call. Say what you did and what is left.

@@ -43,8 +43,8 @@ usage: board.sh <command> ...
   move    <n> <status> [Field=Value...]    move to a Status column (Triage|Todo|Doing|Review|Testing|Done), set more
                                            fields in the same request, clear Agent
   apply                                    read a plan from stdin, one issue per line: <n>|Field=Value|Field=Value|...[|$IF_EMPTY_FLAG]
-                                           (Status=<column> also clears the Agent, so do not combine it with $IF_EMPTY_FLAG); all issues in one request
-  set     <n> Field=Value... [$IF_EMPTY_FLAG]  Priority=P0-P2, Size=XS-XL, Estimate=<number>, "Start date=YYYY-MM-DD|$TODAY_KEYWORD", "End date=..."
+                                           (Status=<column> also clears the Agent; use Field:=Value, not $IF_EMPTY_FLAG, on lines with a Status); all issues in one request
+  set     <n> Field=Value... [$IF_EMPTY_FLAG]  Priority=P0-P2, Size=XS-XL, Estimate=<number>, "Start date=YYYY-MM-DD|$TODAY_KEYWORD", "End date=..."; Field:=Value sets the field only when it is empty
   claim   <agent> <n>...                   set the Agent issue field (Triager|Coder|Reviewer|Tester)
   release <n>...                           clear the Agent issue field
   order   <n>...                           put the issues in this order (relative order within each column)
@@ -154,16 +154,19 @@ queue_release() {
         "released: #$1 $AGENT_FIELD cleared"
 }
 
-# Split Field=Value arguments into queued field changes of an issue (the $IF_EMPTY_FLAG flag applies to all).
+# Split Field=Value arguments into queued field changes of an issue (Field:=Value sets only an empty field; the $IF_EMPTY_FLAG flag does that for all).
 queue_pairs() {
-    local issue=$1 pair if_empty="" pairs=()
+    local issue=$1 pair name pair_if_empty if_empty="" pairs=()
     shift
     for pair in "$@"; do
         if [ "$pair" = "$IF_EMPTY_FLAG" ]; then if_empty=$IF_EMPTY_FLAG; else pairs+=("$pair"); fi
     done
     for pair in ${pairs[@]+"${pairs[@]}"}; do
         [[ "$pair" == *=* ]] || die "expected Field=Value, got '$pair'"
-        queue_field "$issue" "${pair%%=*}" "${pair#*=}" "$if_empty"
+        name=${pair%%=*}
+        pair_if_empty=$if_empty
+        if [[ "$name" == *: ]]; then name=${name%:}; pair_if_empty=$IF_EMPTY_FLAG; fi
+        queue_field "$issue" "$name" "${pair#*=}" "$pair_if_empty"
     done
 }
 

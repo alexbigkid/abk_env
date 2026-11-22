@@ -20,14 +20,15 @@ scripts/board.sh apply <<'PLAN'                    # many issues, different fiel
 5|Priority=P1|--if-empty
 PLAN
 scripts/board.sh set <n> Priority=P0 Size=XS       # Priority P0-P2, Size XS-XL, Estimate=<number>
-scripts/board.sh set <n> "Start date=today" --if-empty   # dates: YYYY-MM-DD or today; --if-empty keeps a value
+scripts/board.sh move <n> Doing "Start date:=today"     # Field:=Value sets the field only when it is empty (dates: YYYY-MM-DD or today)
+scripts/board.sh set <n> Priority=P1 --if-empty    # --if-empty does that for every field of the call
 scripts/board.sh claim Coder <n> [<n>...]          # Triager | Coder | Reviewer | Tester
 scripts/board.sh release <n> [<n>...]
 scripts/board.sh order <n1> <n2> <n3>              # put the issues in this order (relative order within each column)
 scripts/board.sh add <n>                           # put issue on the repo's linked board in Triage (kept if already on a board)
 ```
 
-`add` is skipped when the repo has no linked board. `order` lists must contain issues of one board, each once; list all issues of a column you want ordered. In a plan, fields are separated by `|` and `--if-empty` applies to the whole line; do not put it on a line that sets `Status` (the Agent is cleared anyway).
+`add` is skipped when the repo has no linked board. `order` lists must contain issues of one board, each once; list all issues of a column you want ordered. In a plan, fields are separated by `|` and `--if-empty` applies to the whole line; never use it on a line that sets `Status` (the column would stay): use `Field:=Value` there.
 
 ## Relationships
 
@@ -43,7 +44,7 @@ scripts/blockers.sh remove <n> <blocker>...   # kept if it does not exist
 
 1. When you pick an issue up: `claim` it (and `move` it to your column if needed).
 2. When you finish: `move` it to the next column. `move` always clears the Agent field, so an empty Agent means nobody is working on it.
-3. Set board fields when your role owns them: triager sets Priority, Size, Estimate; coder sets Start date on first Doing (`--if-empty`, so rework keeps the original); tester sets End date on Done.
+3. Set board fields when your role owns them: triager sets Priority, Size, Estimate; coder sets Start date on first Doing (`Start date:=today`, so rework keeps the original); tester sets End date on Done.
 
 ## No board
 
