@@ -39,6 +39,9 @@ USAGE
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
+# Print the usage to stderr and exit 1 for a wrong call.
+usage_error() { usage >&2; exit 1; }
+
 # Print only the message of a failed gh call (the text after its last "gh: ").
 api_error() { local m=${1##*gh: }; echo "${m##*$'\n'}"; }
 
@@ -126,12 +129,12 @@ set_field() {
 
 # Print the Agent issue field definition as JSON, or fail with the API message.
 agent_field_json() {
-    local path out field
-    if [ "$OWNER_TYPE" = "$OWNER_TYPE_ORG" ]; then path="/orgs/$OWNER/issue-fields"; else path="/user/issue-fields"; fi
-    out=$(gh api "$path" -H "$API_VERSION" 2>&1) || {
+    local api_path out field
+    if [ "$OWNER_TYPE" = "$OWNER_TYPE_ORG" ]; then api_path="/orgs/$OWNER/issue-fields"; else api_path="/user/issue-fields"; fi
+    out=$(gh api "$api_path" -H "$API_VERSION" 2>&1) || {
         local hint=""
         if grep -qi "scope" <<<"$out"; then hint=" (a missing scope needs: gh auth refresh -h github.com -s read:user)"; fi
-        die "cannot read issue fields from $path: $(api_error "$out")$hint"
+        die "cannot read issue fields from $api_path: $(api_error "$out")$hint"
     }
     field=$(jq -c --arg f "$AGENT_FIELD" '[.[] | select(.name == $f)] | first // empty' <<<"$out")
     [ -n "$field" ] || die "issue field '$AGENT_FIELD' not found (Settings > Issue fields)"
@@ -166,9 +169,9 @@ cmd_release() {
 }
 
 cmd_move() {
-    local issue=$1 status=$2
+    local issue=$1 column=$2
     if load_item "$issue"; then
-        set_field "$issue" "$STATUS_FIELD" "$status"
+        set_field "$issue" "$STATUS_FIELD" "$column"
     else
         echo "SKIPPED: #$issue is not on a project board, column not changed"
     fi
@@ -224,10 +227,10 @@ cmd_info() {
 CMD=${1:-}
 case "$CMD" in
     --help|-h|"") usage; exit 0 ;;
-    info|release|add) [ $# -eq 2 ] || { usage; exit 1; } ;;
-    move|claim)       [ $# -eq 3 ] || { usage; exit 1; } ;;
-    set)              if [ $# -ne 4 ] && ! { [ $# -eq 5 ] && [ "$5" = "$IF_EMPTY_FLAG" ]; }; then usage; exit 1; fi ;;
-    *)                usage; exit 1 ;;
+    info|release|add) [ $# -eq 2 ] || usage_error ;;
+    move|claim)       [ $# -eq 3 ] || usage_error ;;
+    set)              if [ $# -ne 4 ] && ! { [ $# -eq 5 ] && [ "$5" = "$IF_EMPTY_FLAG" ]; }; then usage_error; fi ;;
+    *)                usage_error ;;
 esac
 resolve_repo
 case "$CMD" in

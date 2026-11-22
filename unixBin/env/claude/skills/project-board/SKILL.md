@@ -32,7 +32,7 @@ Names are case-insensitive; the emoji in the column names is not needed. `add` d
 
 ## No board
 
-If the issue is on no project board, board commands print `SKIPPED: ...` and exit 0. This is not an error: do your own work, leave the issue where it is and post a short hand-off comment (what you did, which agent or step is next). The Agent field, relationships, branches, PRs and comments do not need a board and still work.
+If the issue is on no project board, board commands print `SKIPPED: ...` and exit 0. This is not an error: do your own work, leave the issue where it is and post a short hand-off comment (what you did, which agent or step is next). The Agent field, relationships, branches, PRs and comments do not need a board and still work. `move` without a board skips the column but still clears Agent.
 
 ## Errors
 
