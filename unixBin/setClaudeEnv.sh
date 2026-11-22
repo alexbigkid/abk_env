@@ -7,7 +7,7 @@
 # (unixBin/env/claude/), so every computer shares the same Claude setup.
 #
 # What it does:
-#   - Symlinks ~/.claude/{commands,templates,workspaces,skills} and
+#   - Symlinks ~/.claude/{commands,templates,workspaces,skills,agents} and
 #     ~/.claude/CLAUDE.md to unixBin/env/claude/
 #   - Generates ~/.claude/config/*.json from config/*.template.* using env
 #     vars (envsubst), mode 600 - real files, not symlinks
@@ -252,6 +252,7 @@ linkClaudeSubdir commands   || PrintUsageAndExitWithCode $? "${RED}❌ linkClaud
 linkClaudeSubdir templates  || PrintUsageAndExitWithCode $? "${RED}❌ linkClaudeSubdir templates failed. Aborting.${NC}"
 linkClaudeSubdir workspaces || PrintUsageAndExitWithCode $? "${RED}❌ linkClaudeSubdir workspaces failed. Aborting.${NC}"
 linkClaudeSubdir skills     || PrintUsageAndExitWithCode $? "${RED}❌ linkClaudeSubdir skills failed. Aborting.${NC}"
+linkClaudeSubdir agents     || PrintUsageAndExitWithCode $? "${RED}❌ linkClaudeSubdir agents failed. Aborting.${NC}"
 linkClaudeFile   CLAUDE.md  || PrintUsageAndExitWithCode $? "${RED}❌ linkClaudeFile CLAUDE.md failed. Aborting.${NC}"
 processConfigTemplates      || PrintUsageAndExitWithCode $? "${RED}❌ processConfigTemplates failed. Aborting.${NC}"
 
