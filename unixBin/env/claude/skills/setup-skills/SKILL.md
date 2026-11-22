@@ -67,18 +67,12 @@ Confirm the layout:
 - **Single-context** — one `CONTEXT.md` + `docs/adr/` at the repo root. Most repos are this.
 - **Multi-context** — `CONTEXT-MAP.md` at the root pointing to per-context `CONTEXT.md` files (typically a monorepo).
 
-**Section D — Project board (optional).**
-
-> Explainer: The issue-workflow agents (triager, coder, reviewer, tester) move issues between the columns of a GitHub Projects board using the `project-board` skill. Without a board they still do their work, but do not move issues.
-
-Ask only if the issue tracker is GitHub and the repo (or its owner) has a Projects board. If yes, note the project number; if no, skip this section.
-
 ### 3. Confirm and edit
 
 Show the user a draft of:
 
 - The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
-- The contents of `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md` (and `docs/agents/project-board.md` if Section D applied)
+- The contents of `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`
 
 Let them edit before writing.
 
@@ -110,10 +104,6 @@ The block:
 ### Domain docs
 
 [one-line summary of layout — "single-context" or "multi-context"]. See `docs/agents/domain.md`.
-
-### Project board
-
-(only if Section D applied) [project number and owner]. See `docs/agents/project-board.md`.
 ```
 
 Then write the three docs files using the seed templates in this skill folder as a starting point:
@@ -123,7 +113,6 @@ Then write the three docs files using the seed templates in this skill folder as
 - [issue-tracker-local.md](./issue-tracker-local.md) — local-markdown issue tracker
 - [triage-labels.md](./triage-labels.md) — label mapping
 - [domain.md](./domain.md) — domain doc consumer rules + layout
-- [project-board.md](./project-board.md) — project board (only if Section D applied)
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 

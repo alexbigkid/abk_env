@@ -174,7 +174,7 @@ The repository provides comprehensive centralized management for Claude developm
 - Git-controlled agent definitions (each agent is a `.md` file that loads the skills it needs)
 - Symlinked from `unixBin/env/claude/agents/`
 - Preserved and merged during setup
-- Issue-workflow agents (triager, coder, reviewer, tester) move issues across the GitHub project board via the `project-board` skill (`docs/agents/project-board.md`)
+- Issue-workflow agents (triager, coder, reviewer, tester) move issues across the GitHub project board via the `project-board` skill
 
 **Configuration** (`~/.claude/config/`)
 - Secure configuration with environment variable substitution

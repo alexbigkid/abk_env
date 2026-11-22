@@ -19,7 +19,7 @@ scripts/board.sh set <n> "Start date" today --if-empty
 scripts/board.sh set <n> "End date" today
 scripts/board.sh claim <n> Coder                # Triager | Coder | Reviewer | Tester
 scripts/board.sh release <n>
-scripts/board.sh add <n>                        # put issue on the board in Triage (needs PROJECT_NUMBER)
+scripts/board.sh add <n>                        # put issue on the repo's linked board in Triage
 ```
 
 Names are case-insensitive; the emoji in the column names is not needed.
@@ -34,10 +34,10 @@ Names are case-insensitive; the emoji in the column names is not needed.
 
 If the issue is on no project board, board commands print `SKIPPED: ...` and exit 0. This is not an error: do your own work, leave the issue where it is and post a short hand-off comment (what you did, which agent or step is next). The Agent field, relationships, branches, PRs and comments do not need a board and still work.
 
-If the issue is on several boards, set `PROJECT_NUMBER` (see `docs/agents/project-board.md`).
-
 ## Errors
 
+API problems (including rate limits) are errors, never "no board". `move` changes the column first, then clears Agent; if clearing fails the command exits non-zero but the column has already moved.
+
 - `issue field 'Agent' not found`: create the single-select field Agent (Triager, Coder, Reviewer, Tester) under Settings > Issue fields.
-- `Missing 'read:user' scope`: the user must run `gh auth refresh -h github.com -s read:user`.
+- `cannot read issue fields`: the message carries the API's reason; for a missing scope the user must run `gh auth refresh -h github.com -s read:user`.
 - `option '...' not found`: the message lists the valid options.
