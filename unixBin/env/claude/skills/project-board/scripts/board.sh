@@ -138,9 +138,6 @@ queue_field() {
         "set: $name = $value on #$issue"
 }
 
-# Issues whose Agent release is already queued (an issue can be on several plan lines).
-RELEASED=""
-
 # Queue clearing the Agent issue field of an issue (nothing when it is not set); once per issue.
 queue_release() {
     local data agent_name field_id

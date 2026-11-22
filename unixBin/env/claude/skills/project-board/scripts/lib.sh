@@ -56,10 +56,12 @@ require_issue_numbers() {
     done
 }
 
-# The mutations of one request (aliased m0, m1, ...) and the messages to print once it succeeded.
+# The state of the request being built: the mutations (aliased m0, m1, ...), the messages to
+# print once it succeeded, and the issues whose Agent release is already queued.
 MUTATIONS=""
 MUTATION_COUNT=0
 MESSAGES=""
+RELEASED=""
 
 # Queue one mutation with the message to print on success.
 queue_mutation() {
@@ -77,4 +79,5 @@ apply_mutations() {
     MUTATIONS=""
     MUTATION_COUNT=0
     MESSAGES=""
+    RELEASED=""
 }
