@@ -20,6 +20,7 @@ DEFAULT_STATUS="Triage"
 BOARD_FIELDS=(Status Priority Size Estimate "Start date" "End date")
 OWNER_TYPE_ORG="Organization"
 IF_EMPTY_FLAG="--if-empty"
+NO_VALUE_MESSAGE="Issue field value not found"
 
 usage() {
     cat <<USAGE
@@ -35,6 +36,9 @@ USAGE
 }
 
 die() { echo "ERROR: $*" >&2; exit 1; }
+
+# Print only the message of a failed gh call (the text after its last "gh: ").
+api_error() { local m=${1##*gh: }; echo "${m##*$'\n'}"; }
 
 # Resolve repository and owner type with one REST call.
 resolve_repo() {
@@ -66,6 +70,7 @@ load_item() {
         -q '.data.repository.issue.projectItems.nodes') || die "cannot read board data of issue #$issue (API error or rate limit)"
     jq -e 'type == "array"' <<<"$nodes" >/dev/null 2>&1 || die "unexpected API answer for issue #$issue (not a board answer)"
 
+    nodes=$(jq -c '[.[] | select(. != null and .project != null)]' <<<"$nodes")
     jq -e 'length > 0' <<<"$nodes" >/dev/null || return 1
     item=$(jq -c '.[0]' <<<"$nodes")
     ITEM_ID=$(jq -r .id <<<"$item")
@@ -121,8 +126,11 @@ set_field() {
 agent_field_json() {
     local path out field
     if [ "$OWNER_TYPE" = "$OWNER_TYPE_ORG" ]; then path="/orgs/$OWNER/issue-fields"; else path="/user/issue-fields"; fi
-    out=$(gh api "$path" -H "$API_VERSION" 2>&1) ||
-        die "cannot read issue fields from $path: $(jq -r '.message // empty' <<<"$out" 2>/dev/null || true) (a missing scope needs: gh auth refresh -h github.com -s read:user)"
+    out=$(gh api "$path" -H "$API_VERSION" 2>&1) || {
+        local hint=""
+        if grep -qiE "scope|HTTP 40[13]" <<<"$out"; then hint=" (a missing scope needs: gh auth refresh -h github.com -s read:user)"; fi
+        die "cannot read issue fields from $path: $(api_error "$out")$hint"
+    }
     field=$(jq -c --arg f "$AGENT_FIELD" '[.[] | select(.name == $f)] | first // empty' <<<"$out")
     [ -n "$field" ] || die "issue field '$AGENT_FIELD' not found (Settings > Issue fields)"
     echo "$field"
@@ -148,10 +156,10 @@ cmd_release() {
     field=$(agent_field_json)
     if out=$(gh api -X DELETE "/repos/$REPO/issues/$issue/issue-field-values/$(jq -r .id <<<"$field")" -H "$API_VERSION" 2>&1); then
         echo "released: #$issue $AGENT_FIELD cleared"
-    elif grep -q "404" <<<"$out"; then
+    elif grep -q "$NO_VALUE_MESSAGE" <<<"$out"; then
         echo "nothing to release: #$issue has no $AGENT_FIELD set"
     else
-        die "cannot clear $AGENT_FIELD on #$issue: $out"
+        die "cannot clear $AGENT_FIELD on #$issue: $(api_error "$out")"
     fi
 }
 
@@ -172,10 +180,15 @@ cmd_set() {
 }
 
 cmd_add() {
-    local issue=$1 projects count number
+    local issue=$1 projects count number owner
+    if load_item "$issue"; then
+        echo "kept: #$issue is already on project #$PROJECT_NUM, column unchanged"
+        return 0
+    fi
     # shellcheck disable=SC2016  # $vars below are GraphQL variables, not shell
     projects=$(gh api graphql -F owner="$OWNER" -F name="$REPO_NAME" -f query='
-        query($owner:String!,$name:String!){repository(owner:$owner,name:$name){projectsV2(first:5){nodes{number}}}}' \
+        query($owner:String!,$name:String!){repository(owner:$owner,name:$name){projectsV2(first:5){nodes{number
+          owner{... on User{login} ... on Organization{login}}}}}}' \
         -q '.data.repository.projectsV2.nodes') || die "cannot read the projects linked to $REPO"
     count=$(jq 'length' <<<"$projects")
     if [ "$count" -eq 0 ]; then
@@ -184,7 +197,8 @@ cmd_add() {
     fi
     [ "$count" -eq 1 ] || die "$REPO has $count linked project boards, cannot choose one"
     number=$(jq -r '.[0].number' <<<"$projects")
-    gh project item-add "$number" --owner "$OWNER" --url "https://github.com/$REPO/issues/$issue" >/dev/null
+    owner=$(jq -r '.[0].owner.login' <<<"$projects")
+    gh project item-add "$number" --owner "$owner" --url "https://github.com/$REPO/issues/$issue" >/dev/null
     load_item "$issue" || die "issue #$issue was not added to project #$number"
     set_field "$issue" "$STATUS_FIELD" "$DEFAULT_STATUS"
 }
