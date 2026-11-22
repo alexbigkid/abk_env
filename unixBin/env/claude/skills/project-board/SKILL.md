@@ -27,7 +27,7 @@ scripts/board.sh order <n1> <n2> <n3>              # put the issues in this orde
 scripts/board.sh add <n>                           # put issue on the repo's linked board in Triage (kept if already on a board)
 ```
 
-`add` is skipped when the repo has no linked board. `order` lists must contain issues of one board, each once; list all issues of a column you want ordered. In a plan, fields are separated by `|` and `--if-empty` applies to the whole line.
+`add` is skipped when the repo has no linked board. `order` lists must contain issues of one board, each once; list all issues of a column you want ordered. In a plan, fields are separated by `|` and `--if-empty` applies to the whole line; do not put it on a line that sets `Status` (the Agent is cleared anyway).
 
 ## Relationships
 

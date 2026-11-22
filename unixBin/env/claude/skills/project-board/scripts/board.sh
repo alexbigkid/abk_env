@@ -43,7 +43,7 @@ usage: board.sh <command> ...
   move    <n> <status> [Field=Value...]    move to a Status column (Triage|Todo|Doing|Review|Testing|Done), set more
                                            fields in the same request, clear Agent
   apply                                    read a plan from stdin, one issue per line: <n>|Field=Value|Field=Value|...[|$IF_EMPTY_FLAG]
-                                           (Status=<column> also clears the Agent); all issues in one request
+                                           (Status=<column> also clears the Agent, so do not combine it with $IF_EMPTY_FLAG); all issues in one request
   set     <n> Field=Value... [$IF_EMPTY_FLAG]  Priority=P0-P2, Size=XS-XL, Estimate=<number>, "Start date=YYYY-MM-DD|$TODAY_KEYWORD", "End date=..."
   claim   <agent> <n>...                   set the Agent issue field (Triager|Coder|Reviewer|Tester)
   release <n>...                           clear the Agent issue field
@@ -138,9 +138,14 @@ queue_field() {
         "set: $name = $value on #$issue"
 }
 
-# Queue clearing the Agent issue field of an issue (nothing when it is not set).
+# Issues whose Agent release is already queued (an issue can be on several plan lines).
+RELEASED=""
+
+# Queue clearing the Agent issue field of an issue (nothing when it is not set); once per issue.
 queue_release() {
     local data agent_name field_id
+    case " $RELEASED " in *" $1 "*) return 0 ;; esac
+    RELEASED+=" $1"
     data=$(issue_json "$1")
     agent_name=$(jq -r '.agent.name // empty' <<<"$data")
     if [ -z "$agent_name" ]; then
@@ -190,7 +195,7 @@ plan_issue() {
     if select_board "$issue"; then
         queue_pairs "$issue" "$@"
     else
-        MESSAGES+="SKIPPED: #$issue is not on a project board, nothing changed"$'\n'
+        MESSAGES+="SKIPPED: #$issue is not on a project board, board fields not changed"$'\n'
     fi
     if [ -n "$has_status" ]; then queue_release "$issue"; fi
 }
@@ -200,7 +205,7 @@ cmd_move() {
     local issue=$1 column=$2
     shift 2
     load_issues "$issue"
-    plan_issue "$issue" "Status=$column" "$@"
+    plan_issue "$issue" "$STATUS_FIELD=$column" "$@"
     apply_mutations
 }
 
@@ -208,6 +213,7 @@ cmd_move() {
 cmd_apply() {
     local line rest part issue plan="" numbers=() fields
     while IFS= read -r line || [ -n "$line" ]; do
+        line=${line%$'\r'}
         case "$line" in ""|"#"*) continue ;; esac
         plan+="$line"$'\n'
         numbers+=("${line%%|*}")

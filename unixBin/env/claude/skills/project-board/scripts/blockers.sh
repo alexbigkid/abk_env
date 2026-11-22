@@ -6,7 +6,8 @@
 # Needs: gh (scope: repo), jq. Repo from the current directory (git remote
 # "origin") or GH_REPO.
 # API cost per command: 1 GraphQL query for all issues involved, plus at most
-# 1 GraphQL request with all the changes. No REST calls.
+# 1 GraphQL request with all the changes. No REST calls. At most 50 blockers per
+# issue are read.
 #------------------------------------------------------------------------------
 set -euo pipefail
 
@@ -20,6 +21,7 @@ usage: blockers.sh <command> <issue-number> [<blocker-number>...]
   add    <n> <blocker>...         make <n> blocked by each blocker (kept if it already exists)
   remove <n> <blocker>...         remove the relationship (kept if it does not exist)
 add refuses a self-link and a direct cycle (the blocker is already blocked by <n>).
+At most 50 blockers per issue are read.
 USAGE
 }
 
