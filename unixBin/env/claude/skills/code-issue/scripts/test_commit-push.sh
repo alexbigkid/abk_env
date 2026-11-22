@@ -123,6 +123,7 @@ remote_sha() { git --git-dir="$REMOTE_DIR" rev-parse --short "$BRANCH" 2>/dev/nu
 branch_has_commit() { git log --format=%s | grep -q "$1"; }
 
 # Create a fresh bare remote and a clone on the test branch; the base commit is unsigned, by someone else.
+# With --unpushed the base commit stays local, so the remote has no refs at all.
 new_repo() {
     CASE_NO=$((CASE_NO + 1))
     CASE_DIR="$TEST_TMP/case-$CASE_NO"
@@ -140,11 +141,21 @@ new_repo() {
     git add base.txt
     git commit -q -m base
     git branch -M main
-    git push -q origin main
+    if [ "${1:-}" != "--unpushed" ]; then git push -q origin main; fi
     git checkout -q -b "$BRANCH"
 }
 
-# Commit as someone else, unsigned, and push to the test branch (a commit the coder must not verify or resend).
+# Make a second clone of the remote, as another person, and print its path.
+other_clone() {
+    local dir="$CASE_DIR/other"
+    git clone -q "$REMOTE_DIR" "$dir" 2>/dev/null
+    git -C "$dir" config user.name o
+    git -C "$dir" config user.email o@example.invalid
+    git -C "$dir" config commit.gpgsign false
+    echo "$dir"
+}
+
+# Commit as someone else, unsigned, on the current branch (not pushed): a commit the coder must refuse to push.
 others_unsigned_commit() {
     echo "$1" > "$1.txt"
     git add "$1.txt"
@@ -222,9 +233,8 @@ run_suite() {
     check_that "nothing was pushed in that case" [ "$(remote_sha)" = "$before" ]
 
     new_repo
-    git clone -q "$REMOTE_DIR" "$CASE_DIR/other" 2>/dev/null
-    (cd "$CASE_DIR/other" && git config user.name o && git config user.email o@example.invalid && git config commit.gpgsign false &&
-        echo m > m.txt && git add m.txt && git commit -q -m "others main commit (unsigned)" && git push -q origin main)
+    other=$(other_clone)
+    (cd "$other" && echo m > m.txt && git add m.txt && git commit -q -m "others main commit (unsigned)" && git push -q origin main)
     git fetch -q origin
     git -c user.name=c -c user.email=c@example.invalid -c user.signingkey="$KEY" -c gpg.program=gpg -c commit.gpgsign=true merge -q -S -m "merge main" origin/main >/dev/null 2>&1
     check_that "(setup) main's unsigned commit of the other author is in the branch" branch_has_commit "others main commit"
@@ -241,9 +251,8 @@ run_suite() {
     expect_pushed "the next run works" "after hook" e.txt
 
     new_repo
-    git clone -q "$REMOTE_DIR" "$CASE_DIR/other" 2>/dev/null
-    (cd "$CASE_DIR/other" && git config user.name o && git config user.email o@example.invalid && git config commit.gpgsign false &&
-        git checkout -q -b "$BRANCH" && echo o > o.txt && git add o.txt && git commit -q -m other && git push -q origin "$BRANCH")
+    other=$(other_clone)
+    (cd "$other" && git checkout -q -b "$BRANCH" && echo o > o.txt && git add o.txt && git commit -q -m other && git push -q origin "$BRANCH")
     echo f > f.txt
     expect_refused "a rejected push shows git's reason" "rejected" "m" f.txt
 
@@ -255,12 +264,11 @@ run_suite() {
     echo first > first.txt
     expect_pushed "signed commit on a pushed branch" "first" first.txt
     good=$(git rev-parse HEAD)
-    git clone -q "$REMOTE_DIR" "$CASE_DIR/other" 2>/dev/null
-    (cd "$CASE_DIR/other" && git config user.name o && git config user.email o@example.invalid && git config commit.gpgsign false &&
-        git checkout -q "$BRANCH" && echo x > x.txt && git add x.txt && git commit -q -m "others unsigned" && git push -q origin "$BRANCH")
+    other=$(other_clone)
+    (cd "$other" && git checkout -q "$BRANCH" && echo x > x.txt && git add x.txt && git commit -q -m "others unsigned" && git push -q origin "$BRANCH")
     git fetch -q origin
     git merge -q --ff-only "origin/$BRANCH"
-    (cd "$CASE_DIR/other" && git push -q --force origin "$good:refs/heads/$BRANCH")
+    (cd "$other" && git push -q --force origin "$good:refs/heads/$BRANCH")
     echo s > s.txt
     expect_refused "a stale origin ref cannot hide an unsigned commit (fetch first)" "without a good signature" "m" s.txt
 
@@ -269,32 +277,27 @@ run_suite() {
     echo g > g.txt
     expect_refused "refuses when the remote cannot be fetched" "cannot fetch" "m" g.txt
 
-    CASE_NO=$((CASE_NO + 1))
-    CASE_DIR="$TEST_TMP/case-$CASE_NO"
-    REMOTE_DIR="$CASE_DIR/remote.git"
-    mkdir -p "$CASE_DIR"
-    git init -q --bare "$REMOTE_DIR"
-    git init -q "$CASE_DIR/work"
-    cd "$CASE_DIR/work" || exit 1
-    git config user.name x
-    git config user.email x@example.invalid
-    git config commit.gpgsign false
-    git remote add origin "$REMOTE_DIR"
-    git checkout -q -b "$BRANCH"
-    echo r > r.txt
-    git add r.txt
-    git commit -q -m "unsigned root"
+    new_repo
+    git remote remove origin
+    echo h > h.txt
+    expect_refused "refuses when there is no remote named origin" "cannot fetch" "m" h.txt
+
+    new_repo --unpushed
     echo n > n.txt
     expect_refused "without any remote ref the whole history is checked" "without a good signature" "m" n.txt
     check_that "nothing was pushed to the empty remote" [ "$(remote_sha)" = "none" ]
 }
 
 # The shells to test: every distinct one of /bin/bash, bash and zsh that exists.
-SEEN=""
+SEEN_SHELLS=()
 for candidate in /bin/bash bash zsh; do
     resolved=$(command -v "$candidate" 2>/dev/null) || continue
-    case " $SEEN " in *" $resolved "*) continue ;; esac
-    SEEN="$SEEN $resolved"
+    duplicate=""
+    for seen in ${SEEN_SHELLS[@]+"${SEEN_SHELLS[@]}"}; do
+        if [ "$resolved" -ef "$seen" ]; then duplicate=1; fi
+    done
+    [ -z "$duplicate" ] || continue
+    SEEN_SHELLS+=("$resolved")
     RUNNER=$resolved
     run_suite
 done

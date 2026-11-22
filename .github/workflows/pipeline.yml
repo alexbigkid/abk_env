@@ -70,7 +70,7 @@ jobs:
                 echo "SHELL = $SHELL"
                 ./test_uninstall.sh "tools_"
 
-            - name: skill script tests (bash and zsh)
+            - name: skill script tests (every shell found)
               shell: bash {0}
               run: |
                 command -v gpg >/dev/null || brew install gnupg
@@ -134,7 +134,7 @@ jobs:
                 echo "SHELL = $SHELL"
                 ./test_uninstall.sh "tools_"
 
-            - name: skill script tests (bash and zsh)
+            - name: skill script tests (every shell found)
               shell: bash {0}
               run: |
                 command -v gpg >/dev/null || sudo apt-get install -y gnupg
@@ -193,7 +193,7 @@ jobs:
                 echo "SHELL = $SHELL"
                 /bin/bash ./test_uninstall.sh "wsl"
 
-            - name: skill script tests (WSL)
+            - name: skill script tests (every shell found, WSL)
               shell: wsl-bash {0}
               run: |
                 /bin/bash ./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh
