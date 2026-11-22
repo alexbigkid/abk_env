@@ -16,3 +16,6 @@ passabk() { PASSWORD_STORE_DIR="$HOME/.psws_abk/secrets" pass "$@"; }
 
 # TradeAgent password store - git@github.com:alexbigkid/psws_ta.git
 passta() { PASSWORD_STORE_DIR="$HOME/.psws_ta/secrets" pass "$@"; }
+
+# AlertCopy password store - git@github.com:alexbigkid/psws_ac.git
+passac() { PASSWORD_STORE_DIR="$HOME/.psws_ac/secrets" pass "$@"; }
