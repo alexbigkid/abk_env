@@ -21,6 +21,8 @@ PUSH_ERROR_PATTERN="rejected|error:|fatal:|denied|failed|Permission"
 SECRET_PATTERN='(^|/)(\.env(\.[^/]+)?|id_(rsa|ed25519|ecdsa|dsa)[^/]*|[^/]*\.(pem|key|p12|pfx))$'
 SECRET_EXCEPTIONS='\.(example|sample|template|dist)$'
 ALL_FLAG="--all"
+REMOTE="origin"
+ERROR_LINES=3
 
 usage() {
     cat <<USAGE
@@ -30,9 +32,12 @@ the coder key and pushes the current branch over HTTPS. It refuses, and leaves n
   - any branch that is not {Type}/{n}/{name} (Type is one of B D F R T)
   - missing coder config, or a signing key that is not in the gpg keyring
   - an index that already has staged changes (they would end up in the commit)
-  - nothing to commit, or staged files that look like secrets (.env, *.pem, *.key, id_rsa ...)
-  - any commit that is on no remote ref yet whose signature is not good
-It never force-pushes. Setup: GIT-SETUP.md
+  - nothing to commit, or staged files that look like secrets (.env, *.pem, *.key, id_rsa ...);
+    deleting such a file is fine
+  - any commit that is on no remote ref yet whose signature is not good (when origin has no refs at
+    all, every commit of the branch is checked)
+It fetches (and prunes) the remote first, so the refs it compares with are current and a stale ref
+cannot hide an unsigned commit; when the fetch fails it refuses. It never force-pushes. Setup: GIT-SETUP.md
 USAGE
 }
 
@@ -62,11 +67,14 @@ signing_key=$(coder_config signingkey)
 coder_name=$(coder_config name)
 coder_email=$(coder_config email)
 gpg --list-secret-keys "$signing_key" >/dev/null 2>&1 || die "the coder signing key $signing_key is not in the gpg keyring"
+if ! fetch_out=$(git fetch --quiet --prune "$REMOTE" 2>&1); then
+    die "cannot fetch '$REMOTE', so it is unknown what is already pushed; nothing was committed: $(tail -n "$ERROR_LINES" <<<"$fetch_out" | tr '\n' ' ')"
+fi
 git diff --cached --quiet || die "the index already has staged changes; unstage them (git reset) or commit them yourself first, the coder only commits what it stages itself"
 
 if [ -n "$stage_all" ]; then git add -A; else git add -- "$@"; fi
 if git diff --cached --quiet; then die "nothing staged to commit"; fi
-secret_hits=$(git -c core.quotepath=false diff --cached --name-only | grep -E -i "$SECRET_PATTERN" | grep -v -E -i "$SECRET_EXCEPTIONS" || true)
+secret_hits=$(git -c core.quotepath=false diff --cached --name-only --diff-filter=d | grep -E -i "$SECRET_PATTERN" | grep -v -E -i "$SECRET_EXCEPTIONS" || true)
 if [ -n "$secret_hits" ]; then
     git reset -q
     die "refusing to commit files that look like secrets (unstaged again): $(tr '\n' ' ' <<<"$secret_hits")"
@@ -75,14 +83,15 @@ fi
 signing=(-c "user.name=$coder_name" -c "user.email=$coder_email" -c "user.signingkey=$signing_key" -c gpg.program=gpg -c gpg.format=openpgp -c commit.gpgsign=true)
 if ! commit_out=$(git "${signing[@]}" commit -S -m "$message" 2>&1); then
     git reset -q || true
-    die "the commit failed, nothing was pushed and the files are unstaged again: $(tail -n 3 <<<"$commit_out" | tr '\n' ' ')"
+    die "the commit failed, nothing was pushed and the files are unstaged again: $(tail -n "$ERROR_LINES" <<<"$commit_out" | tr '\n' ' ')"
 fi
 
-# Every commit that is on no remote ref yet must be signed well, not only the new one.
-if [ -n "$(git for-each-ref --count=1 refs/remotes/origin)" ]; then
-    log_args=(HEAD --not --remotes=origin)
+# Every commit that is on no remote ref yet must be signed well, not only the new one. Without any
+# ref of the remote nothing is known to be pushed, so the whole history of the branch is checked.
+if [ -n "$(git for-each-ref --count=1 "refs/remotes/$REMOTE")" ]; then
+    log_args=(HEAD --not "--remotes=$REMOTE")
 else
-    log_args=(-1 HEAD)
+    log_args=(HEAD)
 fi
 log_out=$(git "${signing[@]}" log "--format=%H %G?" "${log_args[@]}")
 checked=0
@@ -93,9 +102,9 @@ while read -r sha signature; do
     if ! is_good_signature "$signature"; then unsigned+=" $(git rev-parse --short "$sha")($signature)"; fi
 done <<<"$log_out"
 [ -z "$unsigned" ] || die "not pushing: commit(s) without a good signature:$unsigned. They stay local; report it."
-if ! push_out=$(git push --set-upstream origin "$branch" 2>&1); then
-    reason=$(grep -E "$PUSH_ERROR_PATTERN" <<<"$push_out" | head -n 3 | tr '\n' ' ' || true)
-    [ -n "$reason" ] || reason=$(tail -n 3 <<<"$push_out" | tr '\n' ' ')
+if ! push_out=$(git push --set-upstream "$REMOTE" "$branch" 2>&1); then
+    reason=$(grep -E "$PUSH_ERROR_PATTERN" <<<"$push_out" | head -n "$ERROR_LINES" | tr '\n' ' ' || true)
+    [ -n "$reason" ] || reason=$(tail -n "$ERROR_LINES" <<<"$push_out" | tr '\n' ' ')
     die "push of '$branch' failed: $reason. The commit $(git rev-parse --short HEAD) stays local; report it, do not force-push."
 fi
 echo "pushed: $branch $(git rev-parse --short HEAD) signed-as=\"$coder_name <$coder_email>\" commits-checked=$checked"
