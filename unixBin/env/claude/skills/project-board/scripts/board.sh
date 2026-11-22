@@ -33,13 +33,21 @@ OWNER=${REPO%%/*}
 REPO_NAME=${REPO##*/}
 
 # Load the board item of an issue into globals, return 1 when the issue is on no board.
+# Anything but a valid API answer is an error, never "no board".
 load_item() {
     local issue=$1 nodes
     # shellcheck disable=SC2016  # $vars below are GraphQL variables, not shell
     nodes=$(gh api graphql -F owner="$OWNER" -F name="$REPO_NAME" -F n="$issue" -f query='
         query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){issue(number:$n){
-          projectItems(first:20){nodes{id project{id number owner{... on User{login} ... on Organization{login}}}}}}}}' \
-        -q '.data.repository.issue.projectItems.nodes') || die "cannot read issue #$issue"
+          projectItems(first:20){nodes{id
+            project{id number owner{... on User{login} ... on Organization{login}}}
+            fieldValues(first:30){nodes{
+              ... on ProjectV2ItemFieldSingleSelectValue{name field{... on ProjectV2FieldCommon{name}}}
+              ... on ProjectV2ItemFieldDateValue{date field{... on ProjectV2FieldCommon{name}}}
+              ... on ProjectV2ItemFieldNumberValue{number field{... on ProjectV2FieldCommon{name}}}
+              ... on ProjectV2ItemFieldTextValue{text field{... on ProjectV2FieldCommon{name}}}}}}}}}}' \
+        -q '.data.repository.issue.projectItems.nodes') || die "cannot read board data of issue #$issue (API error or rate limit)"
+    jq -e 'type == "array"' <<<"$nodes" >/dev/null 2>&1 || die "unexpected API answer for issue #$issue (not a board answer)"
     local item
     item=$(jq -c --arg p "${PROJECT_NUMBER:-}" '[.[] | select($p == "" or (.project.number|tostring) == $p)] | first // empty' <<<"$nodes")
     [ -n "$item" ] || return 1
@@ -47,15 +55,13 @@ load_item() {
     PROJECT_ID=$(jq -r .project.id <<<"$item")
     PROJECT_NUM=$(jq -r .project.number <<<"$item")
     PROJECT_OWNER=$(jq -r .project.owner.login <<<"$item")
-    FIELDS=$(gh project field-list "$PROJECT_NUM" --owner "$PROJECT_OWNER" --format json)
+    ITEM_VALUES=$(jq -c '.fieldValues.nodes' <<<"$item")
+    FIELDS=$(gh project field-list "$PROJECT_NUM" --owner "$PROJECT_OWNER" --format json) || die "cannot read fields of project #$PROJECT_NUM"
 }
 
-# Print the current value of a project field of an issue (empty when unset).
+# Print the current value of a project field of the loaded item (empty when unset).
 get_value() {
-    local issue=$1 field=$2
-    gh project item-list "$PROJECT_NUM" --owner "$PROJECT_OWNER" --format json -L 1000 |
-        jq -r --argjson n "$issue" --arg r "/$REPO" --arg f "$(tr '[:upper:]' '[:lower:]' <<<"$field")" \
-        '.items[] | select(.content.number == $n and (.repository | endswith($r))) | .[$f] // empty'
+    jq -r --arg f "$1" '.[] | select(.field.name? and (.field.name | ascii_downcase) == ($f | ascii_downcase)) | .name // .date // .number // .text // empty' <<<"$ITEM_VALUES"
 }
 
 # Set a project field by name, resolving field and option ids at runtime.
@@ -67,7 +73,7 @@ set_field() {
     type=$(jq -r .type <<<"$field")
     id=$(jq -r .id <<<"$field")
 
-    if [ "$if_empty" = "--if-empty" ] && [ -n "$(get_value "$issue" "$name")" ]; then
+    if [ "$if_empty" = "--if-empty" ] && [ -n "$(get_value "$name")" ]; then
         echo "kept: $name already set on #$issue"
         return 0
     fi
@@ -148,7 +154,7 @@ cmd_info() {
     if load_item "$issue"; then
         echo "board: project #$PROJECT_NUM ($PROJECT_OWNER)"
         for field in Status Priority Size Estimate "Start date" "End date"; do
-            echo "$field: $(get_value "$issue" "$field")"
+            echo "$field: $(get_value "$field")"
         done
     else
         echo "board: none (issue is on no project board)"
