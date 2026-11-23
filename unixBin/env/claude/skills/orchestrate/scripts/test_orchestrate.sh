@@ -108,7 +108,8 @@ run_suite() {
     reset_stubs
     act 1 unknownagent 12 "x"
     run_script
-    check_that "an unknown agent is refused (no allowlist, no model) and not started" [ "$RC" -ne 0 ] && [ ! -f "$STUB_DIR/claude.log" ]
+    check_that "an unknown agent is refused (no allowlist, no model)" [ "$RC" -ne 0 ]
+    check_that "and not started" [ ! -f "$STUB_DIR/claude.log" ]
 
     reset_stubs
     act 1 coder 12 "x"
@@ -251,7 +252,9 @@ run_suite() {
     reset_stubs
     echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/1.json"
     run_script
-    check_that "an archive action runs the archive script once, then the loop decides again" [ "$RC" -eq 0 ] && [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ] && [ "$(cat "$STUB_DIR/calls")" = "2" ]
+    check_that "an archive action ends with exit 0" [ "$RC" -eq 0 ]
+    check_that "it runs the archive script once" [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ]
+    check_that "then the loop decides again" [ "$(cat "$STUB_DIR/calls")" = "2" ]
     check_that "it starts no agent" [ ! -f "$STUB_DIR/claude.log" ]
 
     reset_stubs
@@ -259,7 +262,9 @@ run_suite() {
     echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/2.json"
     act 3 coder 6 "top of Todo, blockers closed"
     run_script
-    check_that "archive between two agent runs is no repeat: all three ran" [ "$RC" -eq 0 ] && [ "$(lines_of "$STUB_DIR/claude.log")" = "2" ] && [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ]
+    check_that "archive between two agent runs is no repeat: exit 0" [ "$RC" -eq 0 ]
+    check_that "both agents ran" [ "$(lines_of "$STUB_DIR/claude.log")" = "2" ]
+    check_that "and the archive script ran once" [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ]
 
     reset_stubs
     echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/1.json"
@@ -279,7 +284,9 @@ run_suite() {
     reset_stubs
     echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/1.json"
     run_script --dry-run
-    check_that "dry-run prints the archive action and runs nothing" [ "$RC" -eq 0 ] && [ ! -f "$STUB_DIR/archive.log" ] && grep -q '"archive"' <<<"$OUT"
+    check_that "dry-run ends with exit 0" [ "$RC" -eq 0 ]
+    check_that "it runs no archive script" [ ! -f "$STUB_DIR/archive.log" ]
+    check_that "it prints the archive action" grep -q '"archive"' <<<"$OUT"
 
     reset_stubs
     touch "$STUB_DIR/next-fails"
