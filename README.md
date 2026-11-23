@@ -333,7 +333,7 @@ Run <code>./unixBin/setGitAliases.sh</code> to put the same git aliases on every
 It also sets <code>diff-so-fancy</code> as the git pager when it is installed.
 
 ### Releases
-On <code>main</code>, run <code>git rel-patch</code>, <code>git rel-minor</code> or <code>git rel-major</code>. The alias pulls, pushes and pushes a temporary <code>rel-*</code> tag. GitHub Actions then runs the install/uninstall tests on macOS and Ubuntu; if they pass, it bumps <code>VERSION</code>, commits it and creates the <code>vX.Y.Z</code> tag. If they fail, no release is made.
+On a clean, up-to-date <code>main</code>, run <code>git rel-patch</code>, <code>git rel-minor</code> or <code>git rel-major</code>. It creates the branch <code>release/vX.Y.Z</code>, bumps <code>VERSION</code> in a signed commit and opens the pull request "Release vX.Y.Z" (only one release pull request can be open). GitHub Actions runs the install/uninstall tests on macOS, Ubuntu and WSL for it. Merge it (squash), or add <code>--auto-merge</code> (for example <code>git rel-patch --auto-merge</code>) to merge it when the checks are green. After the merge the workflow <code>release-tag.yml</code> creates the <code>vX.Y.Z</code> tag.
 
 
 ## Claude Code environment
