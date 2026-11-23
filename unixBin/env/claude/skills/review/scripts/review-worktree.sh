@@ -74,5 +74,5 @@ case "$1" in
     add)    cmd_add "$2" ;;
     remove) cmd_remove "$2" ;;
     prune)  cmd_prune ;;
-    root)   echo "$WORKTREE_ROOT" ;;
+    root)   mkdir -p "$WORKTREE_ROOT" && (cd "$WORKTREE_ROOT" && pwd -P) ;;
 esac

@@ -67,6 +67,22 @@ run_suite() {
     check_that "a file that runs several shells is summed" out_has "test_a.sh +7 passed +1 failed"
     check_that "a failed count fails the run even when the exit code is 0" [ "$RC" -ne 0 ]
 
+    # No argument: the copy of the script in a repo-shaped tree also runs unixBin/test_*.sh; a directory argument does not.
+    tree="$TEST_TMP/tree"
+    rm -rf "$tree"
+    mkdir -p "$tree/unixBin/env/claude/skills/project-board/scripts"
+    cp "$SCRIPT_DIR/run-unit-tests.sh" "$tree/unixBin/env/claude/skills/project-board/scripts/"
+    SKILLS="$tree/unixBin/env/claude/skills"
+    make_stub_test one test_a.sh 0 "== 1 passed, 0 failed"
+    printf '%s\n' '#!/usr/bin/env bash' 'echo "== 2 passed, 0 failed"' > "$tree/unixBin/test_tool.sh"
+    SCRIPT_UNDER_TEST="$tree/unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh"
+    run_script
+    check_that "no argument also runs unixBin/test_*.sh" out_has "test_tool.sh +2 passed +0 failed"
+    run_script "$SKILLS"
+    check_that "a directory argument runs only the skill tests" [ -z "$(grep test_tool <<< "$OUT")" ]
+    SKILLS="$TEST_TMP/skills"
+    SCRIPT_UNDER_TEST=${RUN_UNIT_TESTS_UNDER_TEST:-$SCRIPT_DIR/run-unit-tests.sh}
+
     run_script "$TEST_TMP/missing"
     check_that "a missing directory is an error" [ "$RC" -ne 0 ]
     run_script --help
