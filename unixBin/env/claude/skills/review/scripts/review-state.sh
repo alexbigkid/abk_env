@@ -20,7 +20,8 @@ usage: review-state.sh <issue-number>
 Prints, as JSON, the open pull request that closes the issue and where its review stands:
 {"pr", "url", "branch", "base", "headSha", "id", "mergeable": MERGEABLE | CONFLICTING | UNKNOWN,
  "round": <reviews of the reviewer so far>, "max": $MAX_REVIEW_ROUNDS, "capped": <round >= max>, "lastReviewAt",
- "headReviewed": <a review of the reviewer is on the current head commit: only the board move can be missing>,
+ "headReviewed": <a review of the reviewer is on the current head commit AND the coder has not answered since (handledIsNew
+                  is false): only the board move can be missing; an answer without a new commit must still be read>,
  "handledComment": the newest "$HANDLED_MARKER" comment of the coder, found by its hidden tag (null if none),
  "handledAt": its last edit or, if never edited, its creation,
  "handledIsNew": <the comment is newer than the last review; false = the coder did not answer this round>,

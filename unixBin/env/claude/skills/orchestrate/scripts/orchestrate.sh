@@ -32,7 +32,7 @@ the loop asks again, until everything is Done or waits for you. One agent at a t
 Guards: a lock (only one orchestrator), the allowlist of each agent ($(basename "$ALLOWED_TOOLS_FILE")), a budget cap per run
 (\$ORCHESTRATE_BUDGET_USD, default $BUDGET_USD), at most \$ORCHESTRATE_MAX_DISPATCHES dispatches per start (default $MAX_DISPATCHES).
 The same action twice in a row (no progress) parks the issue for you instead of running it again.
-A review that reached the round cap is parked without starting the reviewer.
+A review that reached the round cap is parked without starting the reviewer (unless its last review is posted and only the move is missing).
 A failed agent run (no tokens, an error) stops everything with exit $EXIT_AGENT_FAILED: the claim stays, start it again to resume.
 Exit codes: 0 all done, waiting for you, or --once/--dry-run finished; 1 error; $EXIT_AGENT_FAILED agent failed; $EXIT_LIMIT dispatch limit.
 USAGE
@@ -117,7 +117,7 @@ while :; do
     fi
     agent=$(jq -r .agent <<<"$action")
     issue=$(jq -r '.issue // empty' <<<"$action")
-    if [ "$agent" = "reviewer" ] && [ "$("$REVIEW_STATE" "$issue" | jq -r '.capped // false')" = "true" ]; then
+    if [ "$agent" = "reviewer" ] && [ "$("$REVIEW_STATE" "$issue" | jq -r '(.capped // false) and ((.headReviewed // false) | not)')" = "true" ]; then
         echo "review round cap reached for #$issue, parking"
         park_issues "$action" "The review round cap was reached without an agreement. The open review items are in the pull request. Please decide; remove the label when it can go on."
         previous=""

@@ -25,7 +25,7 @@ make_stubs() {
         'if [ -f "$STUB_DIR/actions/$n.json" ]; then cat "$STUB_DIR/actions/$n.json"; else echo "{\"action\":\"done\"}"; fi' > "$STUB_DIR/next-action.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$*" >> "$STUB_DIR/claude.log"' 'exit "$(cat "$STUB_DIR/claude-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/claude"
     printf '%s\n' '#!/usr/bin/env bash' 'printf "park %s | %s\n" "$1" "$2" >> "$STUB_DIR/park.log"' > "$STUB_DIR/park.sh"
-    printf '%s\n' '#!/usr/bin/env bash' 'echo "{\"capped\": $(cat "$STUB_DIR/capped" 2>/dev/null || echo false)}"' > "$STUB_DIR/review-state.sh"
+    printf '%s\n' '#!/usr/bin/env bash' 'echo "{\"capped\": $(cat "$STUB_DIR/capped" 2>/dev/null || echo false), \"headReviewed\": $(cat "$STUB_DIR/head-reviewed" 2>/dev/null || echo false)}"' > "$STUB_DIR/review-state.sh"
     chmod +x "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
 }
 make_stubs
@@ -36,7 +36,7 @@ export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_
 
 # Reset the stubs: no actions, no logs, claude succeeds, nothing capped, no lock.
 reset_stubs() {
-    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/capped"
+    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
     rm -f "$TEST_TMP/lock/pid"; rmdir "$TEST_TMP/lock" 2>/dev/null
     return 0
 }
@@ -136,6 +136,13 @@ run_suite() {
     run_script
     check_that "a review at the round cap is parked" grep -q "^park 12 | .*round cap" "$STUB_DIR/park.log"
     check_that "and the reviewer is not started" [ ! -f "$STUB_DIR/claude.log" ]
+    reset_stubs
+    act 1 reviewer 12 "resume: claimed by Reviewer"
+    echo true > "$STUB_DIR/capped"
+    echo true > "$STUB_DIR/head-reviewed"
+    run_script
+    check_that "at the cap with the last review already posted only the move is missing: the reviewer runs, nothing is parked" [ "$(lines_of "$STUB_DIR/claude.log")" = "1" ]
+    check_that "(not parked)" [ ! -f "$STUB_DIR/park.log" ]
     reset_stubs
     act 1 reviewer 12 "in Review"
     echo false > "$STUB_DIR/capped"

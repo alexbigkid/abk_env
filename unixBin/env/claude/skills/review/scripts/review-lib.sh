@@ -51,9 +51,10 @@ load_pr_state() {
         | ($round_reviews | any(.commit.oid == $p.headRefOid)) as $head_reviewed
         | ([$p.comments.nodes[] | select(.body | contains($handled_tag))] | last) as $handled
         | (if $handled == null then null else ($handled.lastEditedAt // $handled.createdAt) end) as $handled_at
+        | ($handled != null and ($last_review == null or $handled_at > $last_review)) as $handled_is_new
         | {pr: $pr.number, id: $p.id, url: $pr.url, branch: $pr.headRefName, base: $pr.baseRefName, headSha: $p.headRefOid,
-           mergeable: $p.mergeable, round: $rounds, max: $max, capped: ($rounds >= $max), lastReviewAt: $last_review, headReviewed: $head_reviewed,
+           mergeable: $p.mergeable, round: $rounds, max: $max, capped: ($rounds >= $max), lastReviewAt: $last_review, headReviewed: ($head_reviewed and ($handled_is_new | not)),
            handledAt: $handled_at, handledComment: ($handled.body // null),
-           handledIsNew: ($handled != null and ($last_review == null or $handled_at > $last_review)),
+           handledIsNew: $handled_is_new,
            unresolvedThreads: ([$p.reviewThreads.nodes[] | select(.isResolved | not)] | length)}' <<<"$details"
 }
