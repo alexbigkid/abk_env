@@ -15,6 +15,8 @@ C=~/.claude/skills/code-issue/scripts/commit-push.sh
 H=~/.claude/skills/code-issue/scripts/with-https.sh     # git over HTTPS: no SSH, no YubiKey
 ```
 
+In a headless run (the orchestrator) write the literal paths instead of these variables.
+
 ## 1. Pick the issue
 
 The user may name one; after an interrupted run (for example an API failure) the user names the issue again, it is still in Doing and claimed by Coder, so continue on its branch (`$H git fetch origin <branch> && git checkout <branch>`). Otherwise take the top Todo issue whose blockers are all closed and that is not waiting for a human (`needs-info`); review rework comes back at the top of Todo:
@@ -67,9 +69,9 @@ $B move <n> Review          # clears your claim
 The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item. A run that was cut off may have done part of it: when `$P` lists nothing to handle, only the hand-off is missing (`$B move <n> Review`, step 5 was cut off after the PR was opened); an item that the branch already fixes (see `git log`) is answered `fixed in <sha>` without redoing it. The reviewer starts each comment with a tag; an untagged comment (for example from the user) counts as `[must-fix]`.
 
 - `[must-fix]`: change the code in this PR; it cannot be deferred. If you think it is wrong, do not skip it: answer `disputed (<reason>)` in the summary below. A dispute goes to the user; do not wait for it in a loop.
-- `[suggestion]`: you choose. Fix it now when it is cheap and in scope, or open a follow-up issue (see Follow-up issues) and give the reason.
+- `[suggestion]`: you evaluate it and choose. Fix it now when it is cheap and in scope; or decline it with a reason when you judge it not worth doing (`declined`, the reviewer accepts that); or open a follow-up issue (see Follow-up issues) and give the reason. Every suggestion gets one of the three answers.
 
-Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:`, ends with the line `<!-- abk:review-items-handled -->` (the hidden tag the scripts look for) and lists each item with `fixed in <sha>`, `follow-up #<m> (<reason>)` or `disputed (<reason>)`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`, also when a dispute is the only open item (it is listed in that comment for the reviewer and the user).
+Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:`, ends with the line `<!-- abk:review-items-handled -->` (the hidden tag the scripts look for) and lists each item with `fixed in <sha>`, `declined (<reason>)`, `follow-up #<m> (<reason>)` or `disputed (<reason>)`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`, also when a dispute is the only open item (it is listed in that comment for the reviewer and the user).
 
 A `[must-fix]` you are unable to fix (not one you think is wrong) is neither skipped nor guessed: park the issue for the user and report exactly what blocks you.
 

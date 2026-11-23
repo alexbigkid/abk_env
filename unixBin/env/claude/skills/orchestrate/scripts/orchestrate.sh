@@ -14,6 +14,7 @@ source "$SCRIPT_DIR/../../project-board/scripts/lib.sh"
 NEXT_ACTION=${NEXT_ACTION_SCRIPT:-$SCRIPT_DIR/next-action.sh}
 PARK=${PARK_SCRIPT:-$SCRIPT_DIR/park.sh}
 REVIEW_STATE=${REVIEW_STATE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-state.sh}
+WORKTREE_SCRIPT=${WORKTREE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-worktree.sh}
 CLAUDE_BIN=${CLAUDE_BIN:-claude}
 ALLOWED_TOOLS_FILE=${ORCHESTRATE_ALLOWED_TOOLS:-$SCRIPT_DIR/allowed-tools.conf}
 LOCK_DIR=${ORCHESTRATE_LOCK_DIR:-${TMPDIR:-/tmp}/abk-orchestrate.lock}
@@ -64,12 +65,13 @@ allowed_tools() {
     line=$(grep "^$1: " "$ALLOWED_TOOLS_FILE" || true)
     [ -n "$line" ] || die "no allowlist for agent '$1' in $ALLOWED_TOOLS_FILE"
     # The agents call the scripts through a variable (B=~/.claude/...; $B ...): the permission check then matches only the
-    # expanded home path, so every Bash(~/...) entry is allowed in both forms (awk, so no character of $HOME is special).
-    printf '%s\n' "${line#"$1": }" | awk -v home="$HOME" '{
+    # expanded home path, so every Bash(~/...) entry is allowed in both forms (awk reads HOME from ENVIRON: -v would process
+    # backslash escapes in the value).
+    printf '%s\n' "${line#"$1": }" | awk '{
         n = split($0, entry, ", "); out = ""
         for (i = 1; i <= n; i++) {
             out = out (i > 1 ? "," : "") entry[i]
-            if (substr(entry[i], 1, 7) == "Bash(~/") out = out ",Bash(" home "/" substr(entry[i], 8)
+            if (substr(entry[i], 1, 7) == "Bash(~/") out = out ",Bash(" ENVIRON["HOME"] "/" substr(entry[i], 8)
         }
         print out }'
 }
@@ -135,13 +137,17 @@ while :; do
         continue
     fi
     tools=$(allowed_tools "$agent")
+    extra_dirs=()
+    case "$agent" in
+        reviewer|tester) extra_dirs=(--add-dir "$("$WORKTREE_SCRIPT" root)") ;;
+    esac
     dispatches=$((dispatches + 1))
     if [ "$dispatches" -gt "$MAX_DISPATCHES" ]; then echo "dispatch limit ($MAX_DISPATCHES) reached, stopping" >&2; exit "$EXIT_LIMIT"; fi
     previous=$action
 
     echo "== run $dispatches: $agent ${issue:+#$issue }($(jq -r .reason <<<"$action"))"
     agent_rc=0
-    "$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" || agent_rc=$?
+    "$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" ${extra_dirs[@]+"${extra_dirs[@]}"} || agent_rc=$?
     if [ "$agent_rc" -ne 0 ]; then
         echo "agent $agent failed (exit $agent_rc) on ${issue:+#$issue}${issue:-its column}; its claim stays; start the orchestrator again to resume" >&2
         exit "$EXIT_AGENT_FAILED"
