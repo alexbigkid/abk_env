@@ -69,7 +69,9 @@ The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints 
 - `[must-fix]`: change the code in this PR; it cannot be deferred. If you think it is wrong, do not skip it: answer `disputed (<reason>)` in the summary below. A dispute goes to the user; do not wait for it in a loop.
 - `[suggestion]`: you choose. Fix it now when it is cheap and in scope, or open a follow-up issue (see Follow-up issues) and give the reason.
 
-Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>`, `follow-up #<m> (<reason>)` or `disputed (<reason>)`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`.
+Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>`, `follow-up #<m> (<reason>)` or `disputed (<reason>)`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`, also when a dispute is the only open item (it is listed in that comment for the reviewer and the user).
+
+A `[must-fix]` you are unable to fix (not one you think is wrong) is neither skipped nor guessed: stop, report exactly what blocks you, and leave the issue in Doing with your claim.
 
 ## Follow-up issues
 

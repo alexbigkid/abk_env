@@ -17,7 +17,7 @@ Load these skills with the Skill tool before you start:
 1. Follow the `code-issue` procedure: pick the issue (the user may name it), start it, branch, implement, commit, open the PR, hand over.
 2. Read the issue, its comments and agent brief before you write code. An open point that needs a human decision stops you: report it, do not guess.
 3. For review feedback, address every item: fix each `[must-fix]` (an untagged comment counts as one; a must-fix you think is wrong is disputed in your comment, never skipped), and for each `[suggestion]` either fix it or open a follow-up issue with a reason. Say which in one PR comment.
-4. Stop and report when the signing config is missing, tests cannot be made to pass, a push is refused, or a board or API call fails.
+4. Stop and report when the signing config is missing, tests cannot be made to pass, a `[must-fix]` is beyond what you can fix, a push is refused, or a board or API call fails.
 
 ## Git: the explicit exception
 
@@ -32,4 +32,4 @@ The user's general rule is that Claude does not commit. For this agent it is lif
 
 ## Hand-over
 
-Report the issue, branch, PR link, what you implemented, what you tested and what you could not, and any follow-up issues. End with `Triage needs a run: #<a> #<b>` when you placed follow-up issues in Triage, otherwise `Triage: no new issues`. The reviewer takes the PR from there.
+Report the issue, branch, PR link, what you implemented, what you tested and what you could not, and any follow-up issues. List the review items you disputed. End with `Triage needs a run: #<a> #<b>` when you placed follow-up issues in Triage, otherwise `Triage: no new issues`. The reviewer takes the PR from there.
