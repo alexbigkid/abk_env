@@ -42,13 +42,14 @@ Standards, Spec and Quality as in SKILL.md (sources of standards, the issue as s
 - `handledIsNew: true`: read `handledComment` (the coder's `Review items handled:` summary, `pr-feedback.sh` hides it) and the unresolved threads, and check each item.
 - `handledIsNew: false` (no comment since your last review, the coder gave no answer): ignore the old comment; every earlier `[must-fix]` is open unless the code shows it fixed.
 - A `[must-fix]` must be really fixed in the code.
-- A deferred `[suggestion]` is accepted only if its follow-up issue exists and has acceptance criteria (`gh issue view <m>`); otherwise re-mark it `[must-fix]`.
+- A deferred `[suggestion]` is accepted only if its follow-up issue exists and has acceptance criteria (`gh issue view <m>`); otherwise re-mark it `[must-fix]`. Exception: a Quality `judgement call` the coder declines with a reason in its summary stays a `[suggestion]` and is accepted.
 - `disputed (<reason>)` on a must-fix: do not argue it again, go to step 6.
 
 **Classify every finding**, no untagged ones:
 - `[must-fix]`: the acceptance criteria are not met, a bug, a security problem, a broken or missing test for the change, or a hard standard violation.
 - `[suggestion]`: style, an alternative design, optional hardening, extra tests beyond the scope.
-- **Quality findings** are `[suggestion]` by default. They are `[must-fix]` only for clear waste (for example quadratic work over data that grows, one API call per item where one batched call is possible) or a change that is untestable by design. The Quality sub-agent marks each finding `clear` or `judgement call`: `clear` becomes `[must-fix]`, `judgement call` becomes `[suggestion]`. Advise multi-threading or multiprocessing only where the gain is real; otherwise do not mention it.
+- **Quality findings** are `[suggestion]` by default. They are `[must-fix]` only for clear waste (for example quadratic work over data that grows, one API call per item where one batched call is possible) or a change that is untestable by design. The Quality sub-agent marks each finding `clear` or `judgement call`: `clear` becomes `[must-fix]`, `judgement call` becomes `[suggestion]`.
+- **Concurrency advice** (multi-threading, multiprocessing) only where the gain is real; otherwise do not mention it.
 
 ## 4. Post one review
 
