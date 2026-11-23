@@ -30,6 +30,8 @@ scripts/board.sh add <n>                           # put issue on the repo's lin
 
 `add` is skipped when the repo has no linked board. `order` lists must contain issues of one board, each once; list all issues of a column you want ordered. In a plan, fields are separated by `|` and `--if-empty` applies to the whole line; never use it on a line that sets `Status` (the column would stay): use `Field:=Value` there.
 
+Archive columns `Done-<year>` and `Done-<year>-<month>` (made by the `archive-done` skill) count as Done everywhere. `move <n> Done` stays exactly `Done`: agents never move an issue into an archive column; only `archive-done.sh` does.
+
 ## Relationships
 
 `scripts/blockers.sh` reads and edits the native "blocked by" relationships (no board needed):

@@ -26,7 +26,8 @@ The first row that has work wins:
 | 3 | Testing | tester |
 | 4 | Review with an open pull request | reviewer |
 | 5 | top of Todo, all blockers closed (rework is at the top) | coder |
-| 6 | nothing | stop: all Done, or the rest waits for you |
+| 6 | no agent row applies and `Done` holds an issue closed before the current month (UTC) | `archive-done.sh` (no agent); the driver then decides again; a failing script stops it (exit 2), the same archive action twice in a row stops it with an error |
+| 7 | nothing | stop: all Done, or the rest waits for you |
 
 `needs-info` issues are never started. Without a board it prints `no-board` and starts nothing.
 

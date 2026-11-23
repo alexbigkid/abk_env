@@ -15,7 +15,7 @@ RANKED_MARKER="Queue position:"
 
 # Issue fields shared by the board and the no-board query.
 AGENT_FIELD="Agent"
-ISSUE_FIELDS='number title state body repository{nameWithOwner} labels(first:20){nodes{name}}
+ISSUE_FIELDS='number title state closedAt body repository{nameWithOwner} labels(first:20){nodes{name}}
     issueFieldValues(first:10){nodes{... on IssueFieldSingleSelectValue{name field{... on IssueFieldSingleSelect{name}}}}}
     closedByPullRequestsReferences(first:5){nodes{number state}}
     blockedBy(first:20){nodes{number state repository{nameWithOwner}}} blocking(first:20){nodes{number repository{nameWithOwner}}}'
@@ -25,14 +25,15 @@ usage() {
 usage: queue.sh [column...]
 Lists the issues of board columns, with their blockers, as JSON, in board order
 (the array order is the order on the board, top first; there is no position field).
-  With a project board:  the open issues in the given columns (names without emoji, any case),
+  With a project board:  the open issues in the given columns (the column Done lists its closed issues; archive
+                         columns Done-<year>[-<month>] are never listed) (names without emoji, any case),
                          default Triage and Todo, for example: queue.sh Review (a name no issue is in gives an
                          empty list, it is not checked against the board). Issues in other
                          columns are not listed; they only appear as blockers.
   Without a board:       all open issues of the repo.
 The repo must have exactly one linked project board, or none.
 Output: {"board": <project number or null>, "issues": [
-  {"number", "title", "column", "labels", "agent", "openPrs", "hasAcceptance", "ranked",
+  {"number", "title", "closedAt", "column", "labels", "agent", "openPrs", "hasAcceptance", "ranked",
    "blockedBy": [{"number", "state", "status", "repo"}], "blocking": [numbers]}]}
 "agent" is the Agent issue field (the claim of a running agent) or null; "openPrs" are the numbers of the open
 pull requests that close the issue. "status" is the board column of a blocker (null without a board or when the
@@ -100,10 +101,10 @@ jq --argjson board "$board" --arg agent_field "$AGENT_FIELD" --arg repo "$REPO" 
     def key: "\(.repository.nameWithOwner)#\(.number)";
     (map(select(.content.number != null) | {key: (.content | key), value: (column | if . == "" then null else . end)}) | from_entries) as $columns
     | {board: $board, issues: [
-        .[] | select(.content.repository.nameWithOwner == $repo and .content.state == "OPEN"
+        .[] | select(.content.repository.nameWithOwner == $repo and (.content.state == "OPEN" or ($board != null and (column | ascii_downcase) == "done"))
                      and ($board == null or (column | ascii_downcase | IN($wanted[]))))
         | .content as $c
-        | {number: $c.number, title: $c.title, column: (column | if . == "" then null else . end), labels: [$c.labels.nodes[].name],
+        | {number: $c.number, title: $c.title, closedAt: $c.closedAt, column: (column | if . == "" then null else . end), labels: [$c.labels.nodes[].name],
            agent: ([$c.issueFieldValues.nodes[] | select(.field.name? == $agent_field) | .name] | first),
            openPrs: [$c.closedByPullRequestsReferences.nodes[] | select(.state == "OPEN") | .number],
            hasAcceptance: ($c.body | test("acceptance criteria"; "i")),

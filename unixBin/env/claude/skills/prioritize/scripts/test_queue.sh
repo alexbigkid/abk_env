@@ -24,7 +24,7 @@ export STUB_DIR GH_REPO="o/r" PATH="$TEST_TMP/bin:$PATH"
 item() {
     jq -nc --argjson n "$1" --arg column "$2" --arg agent "$3" --arg labels "$4" --arg prs "$5" --arg blockers "$6" '
         {status: (if $column == "" then null else {name: $column} end),
-         content: {number: $n, title: "t\($n)", state: "OPEN", body: "## Acceptance criteria", repository: {nameWithOwner: "o/r"},
+         content: {number: $n, title: "t\($n)", state: (if $column | test("Done") then "CLOSED" else "OPEN" end), closedAt: "2026-10-05T10:00:00Z", body: "## Acceptance criteria", repository: {nameWithOwner: "o/r"},
            labels: {nodes: ($labels | split(",") | map(select(. != "") | {name: .}))},
            issueFieldValues: {nodes: ([{name: "P1", field: {name: "Other"}}] + (if $agent == "" then [] else [{name: $agent, field: {name: "Agent"}}] end))},
            closedByPullRequestsReferences: {nodes: ($prs | split(",") | map(select(. != "") | split(":") | {number: (.[0] | tonumber), state: .[1]}))},
@@ -53,10 +53,18 @@ run_suite() {
     field_is "only OPEN pull requests count" 3 .openPrs '[30]'
     field_is "an issue without pull requests has none" 1 .openPrs '[]'
     field_is "a blocker is reported with its state" 4 '.blockedBy[0].state' '"OPEN"'
+    field_is "closedAt is reported" 1 .closedAt '"2026-10-05T10:00:00Z"'
     check_that "an issue in a column that was not asked for is left out" [ "$(jq '[.issues[] | select(.number == 5)] | length' <<<"$OUT")" = "0" ]
     check_that "the board number is reported" [ "$(jq .board <<<"$OUT")" = "12" ]
     check_that "the order is the order on the board" [ "$(jq -c '[.issues[].number]' <<<"$OUT")" = "[1,2,3,4]" ]
 
+    run_script Done
+    check_that "the closed issues of the Done column can be asked for" [ "$(jq -c '[.issues[].number]' <<<"$OUT")" = "[5]" ]
+    board_with "$(item 5 "✅ Done" "" "" "" "")" "$(item 6 "✅ Done-2026-10" "" "" "" "")" "$(item 7 "✅ Done-2025" "" "" "" "")"
+    run_script Triage Todo Doing Review Testing Done
+    check_that "archive columns are not listed, not even with Done asked for" [ "$(jq -c '[.issues[].number]' <<<"$OUT")" = "[5]" ]
+    board_with "$(item 1 "🔍 Triage" "" "needs-info,bug" "" "")" "$(item 2 "🚧 Doing" "Coder" "" "" "")" \
+        "$(item 3 "👀 Review" "" "" "30:OPEN,31:MERGED,32:CLOSED" "")" "$(item 4 "📋 Todo" "" "" "" "2:OPEN")" "$(item 5 "✅ Done" "" "" "" "")"
     run_script Review
     check_that "a single column can be asked for" [ "$(jq -c '[.issues[].number]' <<<"$OUT")" = "[3]" ]
     run_script

@@ -27,17 +27,18 @@ make_stubs() {
     printf '%s\n' '#!/usr/bin/env bash' 'printf "park %s | %s\n" "$1" "$2" >> "$STUB_DIR/park.log"' > "$STUB_DIR/park.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo /stub/worktree-root' > "$STUB_DIR/review-worktree.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo "{\"capped\": $(cat "$STUB_DIR/capped" 2>/dev/null || echo false), \"headReviewed\": $(cat "$STUB_DIR/head-reviewed" 2>/dev/null || echo false)}"' > "$STUB_DIR/review-state.sh"
-    chmod +x "$STUB_DIR/review-worktree.sh" "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
+    printf '%s\n' '#!/usr/bin/env bash' 'echo archived >> "$STUB_DIR/archive.log"' 'exit "$(cat "$STUB_DIR/archive-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/archive-done.sh"
+    chmod +x "$STUB_DIR/archive-done.sh" "$STUB_DIR/review-worktree.sh" "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
 }
 make_stubs
 printf '%s\n' "model-tester: haiku" "coder: Read, Edit, Bash(~/.claude/skills/x/run.sh:*), Bash(gh issue view:*)" "reviewer: Read" "tester: Read" "triager: Read, Grep" > "$STUB_DIR/allowed.conf"
-export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" \
+export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" ARCHIVE_SCRIPT="$STUB_DIR/archive-done.sh" \
     REVIEW_STATE_SCRIPT="$STUB_DIR/review-state.sh" WORKTREE_SCRIPT="$STUB_DIR/review-worktree.sh" ORCHESTRATE_ALLOWED_TOOLS="$STUB_DIR/allowed.conf" \
     ORCHESTRATE_USAGE_LOG="$TEST_TMP/usage.log" ORCHESTRATE_LOCK_DIR="$TEST_TMP/lock" GH_REPO="o/r"
 
 # Reset the stubs: no actions, no logs, claude succeeds, nothing capped, no lock.
 reset_stubs() {
-    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/claude-out" "$TEST_TMP/usage.log" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
+    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/archive.log" "$STUB_DIR/archive-rc" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/claude-out" "$TEST_TMP/usage.log" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
     rm -f "$TEST_TMP/lock/pid"; rmdir "$TEST_TMP/lock" 2>/dev/null
     return 0
 }
@@ -246,6 +247,39 @@ run_suite() {
     ORCHESTRATE_MAX_DISPATCHES=2 run_script
     check_that "the dispatch limit stops with exit 3" [ "$RC" -eq 3 ]
     check_that "after exactly the allowed runs" [ "$(lines_of "$STUB_DIR/claude.log")" = "2" ]
+
+    reset_stubs
+    echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/1.json"
+    run_script
+    check_that "an archive action runs the archive script once, then the loop decides again" [ "$RC" -eq 0 ] && [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ] && [ "$(cat "$STUB_DIR/calls")" = "2" ]
+    check_that "it starts no agent" [ ! -f "$STUB_DIR/claude.log" ]
+
+    reset_stubs
+    act 1 coder 5 "top of Todo, blockers closed"
+    echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/2.json"
+    act 3 coder 6 "top of Todo, blockers closed"
+    run_script
+    check_that "archive between two agent runs is no repeat: all three ran" [ "$RC" -eq 0 ] && [ "$(lines_of "$STUB_DIR/claude.log")" = "2" ] && [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ]
+
+    reset_stubs
+    echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/1.json"
+    echo "1" > "$STUB_DIR/archive-rc"
+    run_script
+    check_that "a failing archive script stops with exit 2" [ "$RC" -eq 2 ]
+    check_that "and the script ran once" [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ]
+
+    reset_stubs
+    echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/1.json"
+    echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/2.json"
+    run_script
+    check_that "the same archive action twice in a row stops with an error" [ "$RC" -eq 1 ]
+    check_that "after one archive run" [ "$(lines_of "$STUB_DIR/archive.log")" = "1" ]
+    check_that "and parks nothing" [ ! -f "$STUB_DIR/park.log" ]
+
+    reset_stubs
+    echo '{"action":"archive","reason":"old Done issues"}' > "$STUB_DIR/actions/1.json"
+    run_script --dry-run
+    check_that "dry-run prints the archive action and runs nothing" [ "$RC" -eq 0 ] && [ ! -f "$STUB_DIR/archive.log" ] && grep -q '"archive"' <<<"$OUT"
 
     reset_stubs
     touch "$STUB_DIR/next-fails"
