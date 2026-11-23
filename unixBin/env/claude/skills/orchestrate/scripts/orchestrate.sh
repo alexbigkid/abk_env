@@ -91,8 +91,12 @@ report_run() {
     jq -r '.result // empty' <<<"$out"
     usage=$(jq -r '[(if .usage.input_tokens != null then "in=\(.usage.input_tokens)" else empty end),
         (if .usage.output_tokens != null then "out=\(.usage.output_tokens)" else empty end),
+        (if .usage.cache_creation_input_tokens != null or .usage.cache_read_input_tokens != null then "cache=\((.usage.cache_creation_input_tokens // 0) + (.usage.cache_read_input_tokens // 0))" else empty end),
         (if .total_cost_usd != null then "cost=$\(.total_cost_usd)" else empty end)] | join(" ")' <<<"$out")
     line="usage: $agent ${issue:+#$issue }${seconds}s${usage:+ $usage}"
+    if [ "$(jq -r '.is_error // false' <<<"$out")" = true ]; then
+        line="$line error=$(jq -r '[.subtype, .terminal_reason] | map(select(. != null)) | join("/")' <<<"$out")"
+    fi
     echo "$line"
     mkdir -p "$(dirname "$USAGE_LOG")"
     printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line" >> "$USAGE_LOG"

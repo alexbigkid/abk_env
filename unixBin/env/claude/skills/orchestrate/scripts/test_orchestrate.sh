@@ -98,6 +98,24 @@ run_suite() {
 
     reset_stubs
     act 1 coder 12 "x"
+    echo '{"result":"","is_error":true,"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","usage":{"input_tokens":2,"cache_creation_input_tokens":30,"cache_read_input_tokens":12}}' > "$STUB_DIR/claude-out"
+    echo 1 > "$STUB_DIR/claude-rc"
+    run_script
+    check_that "a JSON error run exits 2" [ "$RC" -eq 2 ]
+    check_that "its usage line has the cache tokens and the reason" grep -q 'usage: coder #12 .*in=2 cache=42 error=error_max_budget_usd/budget_exhausted' <<<"$OUT"
+
+    reset_stubs
+    act 1 unknownagent 12 "x"
+    run_script
+    check_that "an unknown agent is refused (no allowlist, no model) and not started" [ "$RC" -ne 0 ] && [ ! -f "$STUB_DIR/claude.log" ]
+
+    reset_stubs
+    act 1 coder 12 "x"
+    run_script
+    check_that "an agent without a model line gets no --model" bash -c '! grep -q -- "--model" "$1"' _ "$STUB_DIR/claude.log"
+
+    reset_stubs
+    act 1 coder 12 "x"
     echo '{"result":"only text"}' > "$STUB_DIR/claude-out"
     run_script
     check_that "missing usage fields are left out" grep -q 'usage: coder #12 [0-9]*s$' <<<"$OUT"
