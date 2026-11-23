@@ -221,6 +221,15 @@ run_suite() {
     act 1 tester 12 "in Testing"
     run_script
     check_that "the tester may enter the worktree root too" grep -q -- "--add-dir /stub/worktree-root" "$STUB_DIR/claude.log"
+    check_that "the tester may run scripts below the worktree root (the tests of the pull request)" grep -q -- "Bash(/stub/worktree-root/\*)" "$STUB_DIR/claude.log"
+    reset_stubs
+    act 1 reviewer 12 "in Review"
+    run_script
+    check_that "the reviewer may run scripts below the worktree root" grep -q -- "Bash(/stub/worktree-root/\*)" "$STUB_DIR/claude.log"
+    reset_stubs
+    act 1 coder 12 "top of Todo"
+    run_script
+    check_that "the coder gets no worktree root entry" [ "$(grep -c -- "worktree-root" "$STUB_DIR/claude.log")" = "0" ]
     reset_stubs
     act 1 coder 12 "top of Todo"
     echo true > "$STUB_DIR/capped"
@@ -302,6 +311,11 @@ run_suite() {
     check_that "and is not started" [ ! -f "$STUB_DIR/claude.log" ]
 
     check_that "the real allowlist file has a line for every agent" [ "$(grep -c -E '^(triager|coder|reviewer|tester): ' "$SCRIPT_DIR/allowed-tools.conf")" = "4" ]
+
+    check_that "no agent may run an interpreter (bash, zsh, sh): it would allow any command" [ "$(grep -c -E 'Bash\((bash|zsh|sh)[: )]' "$SCRIPT_DIR/allowed-tools.conf")" = "0" ]
+    for agent in coder reviewer tester; do
+        check_that "the $agent may run run-unit-tests.sh by its literal path" grep -q -E "^$agent: .*Bash\(~/.claude/skills/project-board/scripts/run-unit-tests.sh:\*\)" "$SCRIPT_DIR/allowed-tools.conf"
+    done
 
     check_that "the real file gives triager and tester a cheaper model" [ "$(grep -c -E '^model-(triager|tester): ' "$SCRIPT_DIR/allowed-tools.conf")" = "2" ]
 

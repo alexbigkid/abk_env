@@ -176,7 +176,11 @@ while :; do
     tools=$(allowed_tools "$agent")
     extra_dirs=()
     case "$agent" in
-        reviewer|tester) extra_dirs=(--add-dir "$("$WORKTREE_SCRIPT" root)") ;;
+        reviewer|tester)
+            # The tests of the pull request run from the review worktree, whose root differs per machine: allow its scripts here.
+            worktree_root=$("$WORKTREE_SCRIPT" root)
+            extra_dirs=(--add-dir "$worktree_root")
+            tools="$tools,Bash($worktree_root/*)" ;;
     esac
     dispatches=$((dispatches + 1))
     if [ "$dispatches" -gt "$MAX_DISPATCHES" ]; then echo "dispatch limit ($MAX_DISPATCHES) reached, stopping" >&2; exit "$EXIT_LIMIT"; fi
