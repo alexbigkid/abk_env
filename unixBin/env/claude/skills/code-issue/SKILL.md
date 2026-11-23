@@ -73,6 +73,8 @@ The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints 
 
 Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:`, ends with the line `<!-- abk:review-items-handled -->` (the hidden tag the scripts look for) and lists each item with `fixed in <sha>`, `declined (<reason>)`, `follow-up #<m> (<reason>)` or `disputed (<reason>)`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`, also when a dispute is the only open item (it is listed in that comment for the reviewer and the user).
 
+If the PR of the issue is already merged (a reopened issue) and your answers need no code change, there is nothing to review: post the summary, then hand the issue to the tester with `$B move <n> Testing`; it finishes the merged PR (step 1 of `test-issue`). Do not move it to Review: the reviewer needs an open PR.
+
 A `[must-fix]` you are unable to fix (not one you think is wrong) is neither skipped nor guessed: park the issue for the user and report exactly what blocks you.
 
 ## Follow-up issues
