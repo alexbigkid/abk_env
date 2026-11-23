@@ -73,5 +73,8 @@ run_suite() {
     check_that "--help prints the usage and exits 0" [ "$RC" -eq 0 ]
 }
 
+check_that "run-unit-tests.sh is executable (agents and CI call it by path)" [ -x "$SCRIPT_DIR/run-unit-tests.sh" ]
+check_that "test_run-unit-tests.sh is executable" [ -x "$SCRIPT_DIR/test_run-unit-tests.sh" ]
+
 for_each_shell run_suite
 finish
