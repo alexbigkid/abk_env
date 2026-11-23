@@ -16,7 +16,7 @@ handle_test_help "$@"
 source "$SCRIPT_DIR/../../review/scripts/review-lib.sh"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/../../review/scripts/review-stub-lib.sh"
-MAX_CHECKS=$(sed -n 's/^MAX_CHECKS=//p' "$SCRIPT_DIR/merge-pr.sh")
+MAX_CHECKS=$(sed -n 's/^MAX_CHECKS=\([0-9]*\).*/\1/p' "$SCRIPT_DIR/merge-pr.sh")
 
 STUB_DIR="$TEST_TMP/stub"
 MERGE_SHA="1111111111111111111111111111111111111111"

@@ -26,7 +26,7 @@ $B claim Tester <n>
 $S <n>          # pr, branch, base, headSha, mergeable
 ```
 
-`"pr": null`: look whether the PR was merged already (`gh issue view <n> --json closedByPullRequestsReferences`, then `gh pr view <pr> --json state`). Merged (by you in an earlier run whose board move failed, or by someone else): do not test again, go to step 4 and 5 with that PR. No PR at all: `$B release <n>` and report.
+`"pr": null`: look whether the PR was merged already (`gh issue view <n> --json closedByPullRequestsReferences`; of the PRs listed take the newest one with `gh pr view <pr> --json state,mergeCommit`). It is MERGED (by you in an earlier run whose board move failed, or by someone else): do not test again, go to step 4 and 5 with that PR and its `mergeCommit` sha. The newest one closed unmerged: treat it as no PR. No PR at all: `$B release <n>` and report.
 
 ## 2. Test
 
@@ -54,16 +54,16 @@ The script merges only when the PR head is still `$sha`, the PR is `MERGEABLE` a
 - `2` a check failed: the failure path (step 5), name the checks.
 - `3` checks still running: stop and report, leave the issue in Testing, `$B release <n>`; run again later. Do not wait in a loop.
 - `4` merged but not verified: report it to the user, then go on.
-- `1` anything else (head moved: test the new head again from step 2; `CONFLICTING`: failure path, the coder must rebase; more than 100 checks: park, a human must judge).
+- `1` anything else (head moved: test the new head again from step 2; `CONFLICTING`: failure path, the coder must rebase; too many checks to judge: park, a human must judge).
 
-Remove the worktree (`$W remove "$dir"`) after the merge and on every one of these exits.
+Remove the worktree after the merge and on every one of these exits (also in steps 5 and 6).
 
 ## 4. QA
 
 After the merge, when the repo defines it: `docs/agents/qa-testing.md` lists per component (for example backend, frontend) how the merged code reaches QA and how to tell it has arrived (a version endpoint, a deploy job), the integration test command, the QA addresses, and which components depend on which. Backend integration tests call the API, so they test backend and API together; frontend integration tests run against the QA backend. The coder writes them with the code (see `code-issue`); you only run them.
 
 1. The components the PR changed (from its file paths) and the components that depend on them are the ones to test: a backend change runs the backend API tests **and** the integration tests of the frontends that use it, a frontend change runs its own.
-2. Wait until the merge commit is deployed to QA, as the file says (a few checks, no endless loop). Not deployed in time: stop and report; the issue stays in Testing and the next run does steps 4 and 5 for the merged PR.
+2. Wait until the merge commit is deployed to QA, as the file says (a few checks, no endless loop). Not deployed in time: `$B release <n>`, stop and report; the issue stays in Testing and the next run does steps 4 and 5 for the merged PR.
 3. Run the integration tests those components define. Any failure: the failure path in step 5.
 4. No qa-testing.md, or no integration tests defined for the affected components: skip and say so in the result comment ("QA skipped: nothing defined"). That is not an error.
 
@@ -72,7 +72,7 @@ After the merge, when the repo defines it: `docs/agents/qa-testing.md` lists per
 **Passed**: `$B move <n> Done "End date=today"` (`=`, so a second Done after a reopen replaces the old date) and post a comment: what you tested, the merge commit, QA run (which tests) or skipped. If the move fails after the merge, retry it; if it still fails, report that the PR is merged and the board move is missing, the next run finishes it (step 1).
 
 **Failed**: post a comment with exactly what failed (criterion, check or command), the output, and how to reproduce it; then `$B move <n> Todo` and `$B order <n>` so it comes first.
-- Before the merge the PR is still open and the coder continues on its branch. Remove the worktree.
+- Before the merge the PR is still open and the coder continues on its branch.
 - After the merge (a QA failure) the PR is merged and the issue is closed by it: `gh issue reopen <n>`. The fix goes in a **new** PR: the comment says so and names the merged PR and the merge commit; the coder starts a new branch `{Type}/<n>/<short-name>-fix`.
 
 ## 6. Park for the user
