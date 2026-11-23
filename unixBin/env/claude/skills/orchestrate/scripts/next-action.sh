@@ -31,7 +31,8 @@ The first row that has work wins (one agent runs at a time):
   4. an issue in Review with an open pull request: reviewer
   5. the top issue in Todo whose blockers are all closed: coder
   6. Done holds an issue closed before this month: archive (after all agent rows, before waiting and done)
-Issues with $LABEL_PARKED are never started (except an interrupted run, row 1). Repo from the current directory or GH_REPO.
+Issues of another author than the owner (queue.sh "trusted" is not true; extra logins: ABK_TRUSTED_LOGINS) are never started, not even
+as an interrupted run: they wait with the reason "not written by the owner". Issues with $LABEL_PARKED are never started (except an interrupted run, row 1). Repo from the current directory or GH_REPO.
 USAGE
 }
 
@@ -48,29 +49,32 @@ jq -c --arg parked "$LABEL_PARKED" --arg today "$TODAY" '
     def triager_issues($q): [$q.issues[] | select(.agent == "Triager" or (.column == "Triage" and (is_parked | not))) | .number];
     def first_in($column): [.issues[] | select(.column == $column and (is_parked | not))] | first;
     def is_done: .column == "Done";
+    def untrusted: .trusted != true;
     . as $all
     | ([$all.issues[] | select(is_done and .closedAt != null and .closedAt[0:7] < $today[0:7])] | length) as $old_done
     | ($all | .issues |= map(select(.column == null or (.column | startswith("Done") | not)))) as $q
+    | ($q | .issues |= map(select(untrusted | not))) as $own
     | if $q.board == null then {action: "no-board", reason: "without a board the columns are missing; name the issue and the agent yourself"}
       else
-        ([$q.issues[] | select(.agent != null)] | first) as $claimed
-        | ([$q.issues[] | select(.column == "Doing" and (is_parked | not))] | first) as $doing
-        | ($q | first_in("Triage")) as $triage
-        | ($q | first_in("Testing")) as $testing
-        | ([$q.issues[] | select(.column == "Review" and (is_parked | not) and (.openPrs | length) > 0)] | first) as $review
-        | ([$q.issues[] | select(.column == "Todo" and (is_parked | not) and (open_blockers | length) == 0)] | first) as $todo
+        ([$own.issues[] | select(.agent != null)] | first) as $claimed
+        | ([$own.issues[] | select(.column == "Doing" and (is_parked | not))] | first) as $doing
+        | ($own | first_in("Triage")) as $triage
+        | ($own | first_in("Testing")) as $testing
+        | ([$own.issues[] | select(.column == "Review" and (is_parked | not) and (.openPrs | length) > 0)] | first) as $review
+        | ([$own.issues[] | select(.column == "Todo" and (is_parked | not) and (open_blockers | length) == 0)] | first) as $todo
         | if $claimed != null then
             (run($claimed.agent | ascii_downcase; (if $claimed.agent == "Triager" then null else $claimed.number end); "resume: claimed by \($claimed.agent)")
-             + (if $claimed.agent == "Triager" then {issues: triager_issues($q)} else {} end))
+             + (if $claimed.agent == "Triager" then {issues: triager_issues($own)} else {} end))
           elif $doing != null then run("coder"; $doing.number; "resume: in Doing without a claim")
-          elif $triage != null then (run("triager"; null; "new issues in Triage") + {issues: triager_issues($q)})
+          elif $triage != null then (run("triager"; null; "new issues in Triage") + {issues: triager_issues($own)})
           elif $testing != null then run("tester"; $testing.number; "in Testing")
           elif $review != null then run("reviewer"; $review.number; "in Review with an open pull request")
           elif $todo != null then run("coder"; $todo.number; "top of Todo, blockers closed")
           elif $old_done > 0 then {action: "archive", reason: "\($old_done) issue(s) in Done were closed before this month"}
           elif ($q.issues | length) == 0 then {action: "done"}
           else {action: "waiting", issues: [$q.issues[] | {number, why:
-                  (if is_parked then "needs your answer (\($parked))"
+                  (if untrusted then "not written by the owner (\(.author // "unknown author"))"
+                   elif is_parked then "needs your answer (\($parked))"
                    elif .column == "Review" then "in Review without an open pull request"
                    elif .column == "Todo" then "blocked by \(open_blockers | map("#\(.)") | join(", "))"
                    else "in \(.column)" end)}]}

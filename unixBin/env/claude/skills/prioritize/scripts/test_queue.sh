@@ -24,7 +24,7 @@ export STUB_DIR GH_REPO="o/r" PATH="$TEST_TMP/bin:$PATH"
 item() {
     jq -nc --argjson n "$1" --arg column "$2" --arg agent "$3" --arg labels "$4" --arg prs "$5" --arg blockers "$6" '
         {status: (if $column == "" then null else {name: $column} end),
-         content: {number: $n, title: "t\($n)", state: (if $column | test("Done") then "CLOSED" else "OPEN" end), closedAt: "2026-10-05T10:00:00Z", body: "## Acceptance criteria", repository: {nameWithOwner: "o/r"},
+         content: {number: $n, title: "t\($n)", author: {login: (if $n == 90 then "stranger" elif $n == 91 then "Friend" else "O" end)}, state: (if $column | test("Done") then "CLOSED" else "OPEN" end), closedAt: "2026-10-05T10:00:00Z", body: "## Acceptance criteria", repository: {nameWithOwner: "o/r"},
            labels: {nodes: ($labels | split(",") | map(select(. != "") | {name: .}))},
            issueFieldValues: {nodes: ([{name: "P1", field: {name: "Other"}}] + (if $agent == "" then [] else [{name: $agent, field: {name: "Agent"}}] end))},
            closedByPullRequestsReferences: {nodes: ($prs | split(",") | map(select(. != "") | split(":") | {number: (.[0] | tonumber), state: .[1]}))},
@@ -58,6 +58,19 @@ run_suite() {
     check_that "the board number is reported" [ "$(jq .board <<<"$OUT")" = "12" ]
     check_that "the order is the order on the board" [ "$(jq -c '[.issues[].number]' <<<"$OUT")" = "[1,2,3,4]" ]
 
+    field_is "the author is reported" 1 .author '"O"'
+    field_is "an issue of the owner is trusted (logins compare case-insensitive)" 1 .trusted true
+
+    board_with "$(item 1 "📋 Todo" "" "" "" "")" "$(item 90 "📋 Todo" "" "" "" "")" "$(item 91 "📋 Todo" "" "" "" "")"
+    run_script Todo
+    field_is "an issue of another author is reported with its author" 90 .author '"stranger"'
+    field_is "an issue of another author is not trusted" 90 .trusted false
+    field_is "a login of the extra list is not trusted by default" 91 .trusted false
+    ABK_TRUSTED_LOGINS="x, friend" run_script Todo
+    field_is "a login of ABK_TRUSTED_LOGINS is trusted" 91 .trusted true
+    field_is "the extra list does not trust the others" 90 .trusted false
+
+    board_with "$(item 5 "✅ Done" "" "" "" "")"
     run_script Done
     check_that "the closed issues of the Done column can be asked for" [ "$(jq -c '[.issues[].number]' <<<"$OUT")" = "[5]" ]
     board_with "$(item 5 "✅ Done" "" "" "" "")" "$(item 6 "✅ Done-2026-10" "" "" "" "")" "$(item 7 "✅ Done-2025" "" "" "" "")"

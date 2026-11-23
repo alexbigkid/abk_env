@@ -31,6 +31,11 @@ resolve_repo() {
     REPO_NAME=${REPO##*/}
 }
 
+# Print the trusted logins (lower case) as a JSON array: the repository owner plus the comma list in ABK_TRUSTED_LOGINS. Needs resolve_repo.
+trusted_logins() {
+    jq -nc --arg owner "$OWNER" --arg extra "${ABK_TRUSTED_LOGINS:-}" '([$owner] + ($extra | split(",") | map(gsub("\\s"; "") | select(. != "")))) | map(ascii_downcase)'
+}
+
 # Run a GraphQL request with the given gh arguments and print the JSON answer; any API problem is an error.
 gql() {
     local out
