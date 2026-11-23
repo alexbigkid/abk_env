@@ -13,19 +13,11 @@ SCRIPT_UNDER_TEST=${PR_FEEDBACK_UNDER_TEST:-$SCRIPT_DIR/pr-feedback.sh}
 source "$SCRIPT_DIR/../../project-board/scripts/testing-lib.sh"
 handle_test_help "$@"
 
-TAG='<!-- abk:review-items-handled -->'
+# The hidden tag of the coder's summary, as pr-feedback.sh defines it.
+TAG=$(sed -n "s/^HANDLED_TAG='\(.*\)'\$/\1/p" "$SCRIPT_UNDER_TEST")
 STUB_DIR="$TEST_TMP/stub"
-mkdir -p "$STUB_DIR" "$TEST_TMP/bin"
-cat > "$TEST_TMP/bin/gh" <<'STUB'
-#!/usr/bin/env bash
-args="$*"
-printf '%s\n----\n' "$args" >> "$STUB_DIR/queries.log"
-if [[ "$args" == *"pullRequests("* ]]; then cat "$STUB_DIR/prs.json"; exit 0; fi
-if [[ "$args" == *"pullRequest(number"* ]]; then cat "$STUB_DIR/details.json"; exit 0; fi
-echo "stub gh: unexpected call: $args" >&2
-exit 99
-STUB
-chmod +x "$TEST_TMP/bin/gh"
+mkdir -p "$STUB_DIR"
+make_read_gh_stub "$TEST_TMP/bin"
 export STUB_DIR GH_REPO="o/r" PATH="$TEST_TMP/bin:$PATH"
 
 # Write the stub data: one open PR (number 9) that closes issue 4 and one that closes issue 8.
@@ -51,6 +43,9 @@ write_data() {
 # Run the whole suite with the current shell.
 run_suite() {
     write_data
+    check_that "the hidden tag is defined in pr-feedback.sh" [ -n "$TAG" ]
+    check_that "review-lib.sh uses the same hidden tag" grep -q -F "HANDLED_TAG='$TAG'" "$SCRIPT_DIR/../../review/scripts/review-lib.sh"
+    check_that "the coder skill tells to end the summary with the same tag" grep -q -F "$TAG" "$SCRIPT_DIR/../SKILL.md"
     run_script 4
     check_that "the PR that closes the issue is found" [ "$(jq -r .pr <<<"$OUT")" = "9" ]
     check_that "its branch and url are reported" [ "$(jq -r '"\(.branch) \(.url)"' <<<"$OUT")" = "F/4/x https://x/9" ]

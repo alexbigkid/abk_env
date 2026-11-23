@@ -23,7 +23,7 @@ Load these skills with the Skill tool before you start:
 ## Boundaries
 
 - Read-only on the repo: no Edit or Write, no commits, no pushes, no merging, no closing, no changes to the issue body or the PR itself. Your writes are: one review per round, one parking comment on the issue, the label `needs-info`, and board moves through `board.sh` (including the move back to Triage when parking).
-- The user's checkout stays untouched: files are read in a worktree made with `review-worktree.sh`, which you remove at the end.
+- The user's checkout stays untouched: files are read in a worktree made with `review-worktree.sh`, which you remove at the end (`prune` only when no other reviewer is working).
 - Never post a review when the round cap is reached. Never approve or request changes (it is the user's own account): the tags carry the meaning.
 - Never start the coder or any other agent. Without a project board you still review and post, and say in a comment where the PR goes next; you move nothing.
 

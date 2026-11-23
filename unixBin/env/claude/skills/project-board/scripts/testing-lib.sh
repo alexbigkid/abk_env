@@ -88,3 +88,27 @@ finish() {
     echo "== $PASSED passed, $FAILED failed"
     [ "$FAILED" -eq 0 ]
 }
+
+# The part of a stub `gh` that serves the read queries of the PR scripts from STUB_DIR/prs.json and
+# STUB_DIR/details.json and logs every query in STUB_DIR/queries.log. When STUB_DIR/details.next exists
+# it becomes the answer of the details queries after the next one (to test a state that changes).
+# shellcheck disable=SC2016  # the text is a script for the stub, expanded when the stub runs
+GH_STUB_READS='printf "%s\n----\n" "$args" >> "$dir/queries.log"
+if [[ "$args" == *"pullRequests("* ]]; then cat "$dir/prs.json"; exit 0; fi
+if [[ "$args" == *"pullRequest(number"* ]]; then
+    cat "$dir/details.json"
+    if [ -f "$dir/details.next" ]; then mv "$dir/details.next" "$dir/details.json"; fi
+    exit 0
+fi'
+
+# Create a stub `gh` in the given dir that only serves the read queries (see GH_STUB_READS).
+# shellcheck disable=SC2016  # the text is a script for the stub, expanded when the stub runs
+make_read_gh_stub() {
+    mkdir -p "$1"
+    {
+        printf '%s\n' '#!/usr/bin/env bash' 'dir=${STUB_DIR:?}' 'args="$*"'
+        printf '%s\n' "$GH_STUB_READS"
+        printf '%s\n' 'echo "stub gh: unexpected call: $args" >&2' 'exit 99'
+    } > "$1/gh"
+    chmod +x "$1/gh"
+}

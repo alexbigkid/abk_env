@@ -32,11 +32,11 @@ sha=$(git -C "$dir" rev-parse HEAD)       # the commit you review; you pin it in
 git diff origin/<base>...origin/<branch>  # the change; commits: git log origin/<base>..origin/<branch> --oneline
 ```
 
-Always remove the worktree when you are done, also when you stop early or fail: `$W remove "$dir"`.
+Always remove the worktree when you are done, also when you stop early or fail: `$W remove "$dir"`. After a crash, `$W prune` removes leftover review worktrees and empty temp dirs; run it only when no other reviewer is working, because it removes every review worktree.
 
 ## 3. Review
 
-Standards and Spec as in SKILL.md (sources of standards, the issue as spec: `gh issue view <n>`). Without the Agent tool do the two axes yourself, one after the other, and keep them separate; with it you may run them as parallel sub-agents. Run the repo's tests and linters in the worktree. `mergeable: CONFLICTING` is a `[must-fix]` (the PR conflicts with its base).
+Standards and Spec as in SKILL.md (sources of standards, the issue as spec: `gh issue view <n>`). Without the Agent tool do the two axes yourself, one after the other, and keep them separate; with it you may run them as parallel sub-agents. Run the repo's tests and linters in the worktree. `mergeable: CONFLICTING` is a `[must-fix]` (the PR conflicts with its base). GitHub computes it lazily; `review-state.sh` already reads again twice while it is `UNKNOWN`. If it is still `UNKNOWN`, say so in your summary and do not claim there are no conflicts.
 
 **Round 2 or later** (`round > 0`): verify what the coder did.
 - `handledIsNew: true`: read `handledComment` (the coder's `Review items handled:` summary, `pr-feedback.sh` hides it) and the unresolved threads, and check each item.
@@ -61,7 +61,7 @@ JSON
 
 `path` and `line` go together; `line` is the line number in the **new** version of the file and must lie inside the diff (GitHub rejects others; the script then posts everything in the review body). A finding without a location is listed in the body. The review is a plain comment review titled `Review round <k> of <max>` (GitHub does not allow approving or requesting changes on a PR of your own account, the tags carry the meaning). A clean review has `"findings": []`.
 
-It is refused when another review was posted meanwhile (`--round` no longer matches) or the PR head moved (`--commit` no longer matches): then start over from step 1.
+It is refused when another review was posted meanwhile (`--round` no longer matches) or the PR head moved (`--commit` no longer matches): remove the worktree (`$W remove "$dir"`) and start over from step 1, with a fresh read of the state, a new fetch, a new worktree and a new `sha`. A refused post does not use up a round.
 
 ## 5. Move the issue
 
@@ -72,7 +72,7 @@ It is refused when another review was posted meanwhile (`--round` no longer matc
 
 ## 6. Park for the user (round cap reached, or a disputed must-fix)
 
-Do not post another review. Park the issue as the project-board skill describes (`needs-info`, a comment, `$B move <n> Triage`). The comment lists the open items, **every other open `[must-fix]` too**, and for a dispute both positions (your finding, the coder's reason, your view). The triager leaves it alone; the user decides and removes the label. The open PR stays linked. Remove the worktree (`$W remove "$dir"`).
+Do not post another review. Park the issue as the project-board skill describes (`needs-info`, a comment, `$B move <n> Triage`). The comment lists the open items, **every other open `[must-fix]` too**, and for a dispute both positions (your finding, the coder's reason, your view). The triager leaves it alone; the user decides and removes the label. The open PR stays linked. Remove the worktree if you made one (`$W remove "$dir"`).
 
 ## No board
 

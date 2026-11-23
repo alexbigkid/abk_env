@@ -19,7 +19,7 @@ source "$SCRIPT_DIR/review-stub-lib.sh"
 
 STUB_DIR="$TEST_TMP/stub"
 make_gh_stub "$TEST_TMP/bin"
-export STUB_DIR GH_REPO="o/r" PATH="$TEST_TMP/bin:$PATH"
+export STUB_DIR GH_REPO="o/r" PATH="$TEST_TMP/bin:$PATH" REVIEW_STATE_RETRY_WAIT=0
 
 # Run the whole suite with the current shell.
 run_suite() {
@@ -61,13 +61,32 @@ run_suite() {
     check_that "the old comment is still returned" [ "$(jq -r '.handledComment != null' <<<"$OUT")" = "true" ]
     set_pr 1 no 0
     run_script 5
-    check_that "a comment that only starts like the marker (no tag) is not a handled comment" [ "$(jq -r .handledComment <<<"$OUT")" = "null" ]
-    check_that "without a handled comment it is null" [ "$(jq -r .handledComment <<<"$OUT")" = "null" ]
+    check_that "without a handled comment it is null (a human comment that only starts like the marker does not count)" [ "$(jq -r .handledComment <<<"$OUT")" = "null" ]
     check_that "without a handled comment it is not new" [ "$(jq -r .handledIsNew <<<"$OUT")" = "false" ]
+    set_pr 2 edited 0
+    run_script 5
+    check_that "an edited summary counts as an answer (its edit time is used)" [ "$(jq -r .handledIsNew <<<"$OUT")" = "true" ]
+    check_that "handledAt is the time of the edit" [ "$(jq -r .handledAt <<<"$OUT")" = "2026-11-23T22:00:00Z" ]
     set_pr 0 new 0
     run_script 5
     check_that "a handled comment before any review counts as new" [ "$(jq -r .handledIsNew <<<"$OUT")" = "true" ]
 
+    set_pr 1 no 0 UNKNOWN
+    rm -f "$STUB_DIR/queries.log"
+    run_script 5
+    check_that "an UNKNOWN mergeable state is read again twice, then reported as it is" [ "$(jq -r .mergeable <<<"$OUT")" = "UNKNOWN" ]
+    check_that "that made three detail queries in all" [ "$(grep -c 'pullRequest(number' "$STUB_DIR/queries.log")" = "3" ]
+    set_pr 1 no 0 MERGEABLE
+    mv "$STUB_DIR/details.json" "$STUB_DIR/details.next"
+    set_pr 1 no 0 UNKNOWN
+    rm -f "$STUB_DIR/queries.log"
+    run_script 5
+    check_that "when the state becomes known on the re-read, that answer is used" [ "$(jq -r .mergeable <<<"$OUT")" = "MERGEABLE" ]
+    check_that "and the re-read stops there (two detail queries)" [ "$(grep -c 'pullRequest(number' "$STUB_DIR/queries.log")" = "2" ]
+    set_pr 1 no 0 MERGEABLE
+    rm -f "$STUB_DIR/queries.log"
+    run_script 5
+    check_that "a known state is read once" [ "$(grep -c 'pullRequest(number' "$STUB_DIR/queries.log")" = "1" ]
     set_pr 1 no 0 CONFLICTING
     run_script 5
     check_that "merge conflicts are reported" [ "$(jq -r .mergeable <<<"$OUT")" = "CONFLICTING" ]

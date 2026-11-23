@@ -23,7 +23,7 @@ HANDLED_MARKER="Review items handled:"
 HANDLED_TAG='<!-- abk:review-items-handled -->'
 
 # Print the review state of the open pull request that closes an issue as JSON, or {"pr": null}.
-# Two GraphQL requests; the 50 most recently updated open PRs, the newest 50 reviews and 30 comments,
+# Two GraphQL requests; the 50 most recently updated open PRs, the newest 50 reviews and 50 comments,
 # and 50 threads are read.
 load_pr_state() {
     local issue=$1 prs pr details
@@ -41,7 +41,7 @@ load_pr_state() {
         query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){
           id headRefOid mergeable
           reviews(last:50){nodes{body createdAt}}
-          comments(last:30){nodes{body createdAt}}
+          comments(last:50){nodes{body createdAt lastEditedAt}}
           reviewThreads(first:50){nodes{isResolved}}}}}')
     jq -c --argjson pr "$pr" --argjson max "$MAX_REVIEW_ROUNDS" --arg round_tag "$ROUND_TAG" --arg handled_tag "$HANDLED_TAG" '
         .data.repository.pullRequest as $p
@@ -49,9 +49,10 @@ load_pr_state() {
         | ($round_reviews | length) as $rounds
         | ($round_reviews | map(.createdAt) | max) as $last_review
         | ([$p.comments.nodes[] | select(.body | contains($handled_tag))] | last) as $handled
+        | (if $handled == null then null else ($handled.lastEditedAt // $handled.createdAt) end) as $handled_at
         | {pr: $pr.number, id: $p.id, url: $pr.url, branch: $pr.headRefName, base: $pr.baseRefName, headSha: $p.headRefOid,
            mergeable: $p.mergeable, round: $rounds, max: $max, capped: ($rounds >= $max), lastReviewAt: $last_review,
-           handledAt: ($handled.createdAt // null), handledComment: ($handled.body // null),
-           handledIsNew: ($handled != null and ($last_review == null or $handled.createdAt > $last_review)),
+           handledAt: $handled_at, handledComment: ($handled.body // null),
+           handledIsNew: ($handled != null and ($last_review == null or $handled_at > $last_review)),
            unresolvedThreads: ([$p.reviewThreads.nodes[] | select(.isResolved | not)] | length)}' <<<"$details"
 }

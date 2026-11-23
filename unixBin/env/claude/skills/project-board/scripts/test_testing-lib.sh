@@ -8,8 +8,8 @@
 set -uo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-# shellcheck disable=SC1091  # testing-lib.sh belongs to the project-board skill
-source "$SCRIPT_DIR/../../project-board/scripts/testing-lib.sh"
+# shellcheck disable=SC1091  # testing-lib.sh is next to this script
+source "$SCRIPT_DIR/testing-lib.sh"
 handle_test_help "$@"
 
 # shellcheck disable=SC2034  # printed by check in testing-lib.sh
@@ -18,7 +18,7 @@ RUNNER="test_testing-lib"
 # Print "<passed> <failed>" after running a check in a fresh harness: the check name, then its command.
 harness_result() {
     # shellcheck disable=SC2016  # the single quotes are on purpose: the subshell expands them
-    bash -c 'source "$1/../../project-board/scripts/testing-lib.sh"; shift; check_that "x" "$@" >/dev/null; echo "$PASSED $FAILED"' _ "$SCRIPT_DIR" "$@"
+    bash -c 'source "$1/testing-lib.sh"; shift; check_that "x" "$@" >/dev/null; echo "$PASSED $FAILED"' _ "$SCRIPT_DIR" "$@"
 }
 
 check_that "a true condition is counted as passed" [ "$(harness_result true)" = "1 0" ]
@@ -40,7 +40,6 @@ detector_flags_a_chain() {
     ! no_chained_checks "$TEST_TMP/chained.sh"
 }
 check_that "the chain detector really flags a chained check_that" detector_flags_a_chain
-check_that "no test script chains conditions after check_that" no_chained_checks "$SCRIPT_DIR"/test_*.sh
-check_that "no test script of the other skills does either" no_chained_checks "$SCRIPT_DIR"/../../*/scripts/test_*.sh
+check_that "no test script of any skill chains conditions after check_that" no_chained_checks "$SCRIPT_DIR"/../../*/scripts/test_*.sh
 
 finish
