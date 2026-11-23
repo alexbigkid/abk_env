@@ -21,7 +21,7 @@ R=~/.claude/skills/project-board/scripts/blockers.sh
 
 ## 2. Understand each issue and the code
 
-Claim the Triage issues you work on: `$B claim Triager <n> <n> ...`. Read each issue and its comments (`gh issue view <n> --json title,body,labels,comments`; `--comments` prints nothing in a non-interactive shell, and `gh issue view` takes one issue per call), `CONTEXT.md` and `docs/adr/` if present, then explore the code with Grep, Glob and Read, and `git log` for recent work. Go through the checklist in RUBRICS.md. Write down per issue: what exists already, what it touches, what it needs from other issues. If the code shows the issue is already implemented, do not queue it: leave it in Triage, comment where you found it and recommend closing it in the report (you cannot close issues).
+Claim the Triage issues you work on: `$B claim Triager <n> <n> ...`. An issue already claimed by Triager is a leftover of an interrupted run of yours: take it as your own and go on (claiming again is harmless). Read each issue and its comments (`gh issue view <n> --json title,body,labels,comments`; `--comments` prints nothing in a non-interactive shell, and `gh issue view` takes one issue per call), `CONTEXT.md` and `docs/adr/` if present, then explore the code with Grep, Glob and Read, and `git log` for recent work. Go through the checklist in RUBRICS.md. Write down per issue: what exists already, what it touches, what it needs from other issues. If the code shows the issue is already implemented, do not queue it: leave it in Triage, comment where you found it and recommend closing it in the report (you cannot close issues).
 
 ## 3. Fix the relationships
 

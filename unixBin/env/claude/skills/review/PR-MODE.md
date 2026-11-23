@@ -21,6 +21,8 @@ $B claim Reviewer <n>
 $S <n>          # pr, branch, base, headSha, mergeable, round, max, capped, handledComment, handledIsNew, unresolvedThreads
 ```
 
+`headReviewed: true`: your review of this very commit is already posted, the coder has not answered it, and an earlier run was cut off before the move. Do not review again (and do not claim a new round): read the counts in the title of your last review (`gh pr view <pr> --json reviews --jq '[.reviews[] | select(.body | contains("<!-- abk:review-round -->"))] | last | .body' | head -1`, "`<n> must-fix, <m> suggestion`") and go to step 5: `<n>` above 0 is the first bullet, otherwise the second.
+
 Note the `round` and keep it; you pass it back when you post. `"pr": null`: no open PR, `$B release <n>` and report. `capped: true`: go straight to step 6, do not review. The cap `MAX_REVIEW_ROUNDS` is defined once in `scripts/review-lib.sh`; never write the number elsewhere. The claim is the lock between two reviewers; the pins in step 4 catch the rest.
 
 ## 2. Read the PR without touching the user's checkout
