@@ -10,7 +10,7 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC1091  # lib.sh belongs to the project-board skill
 source "$SCRIPT_DIR/../../project-board/scripts/lib.sh"
-# shellcheck disable=SC1091  # git over HTTPS like the agents' git commands (with-https.sh does the same)
+# shellcheck disable=SC1090,SC1091  # git over HTTPS like the agents' git commands (with-https.sh does the same)
 source "${HTTPS_ENV_SCRIPT:-$SCRIPT_DIR/../../code-issue/scripts/https-env.sh}"
 
 usage() {
