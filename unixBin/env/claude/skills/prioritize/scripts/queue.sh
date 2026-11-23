@@ -25,11 +25,12 @@ usage() {
 usage: queue.sh [column...]
 Lists the issues of board columns, with their blockers, as JSON, in board order
 (the array order is the order on the board, top first; there is no position field).
-  With a project board:  the open issues in the given columns (the column Done lists its closed issues; archive
-                         columns Done-<year>[-<month>] are never listed) (names without emoji, any case),
+  With a project board:  the open issues in the given columns (names without emoji, any case),
                          default Triage and Todo, for example: queue.sh Review (a name no issue is in gives an
                          empty list, it is not checked against the board). Issues in other
                          columns are not listed; they only appear as blockers.
+                         The column Done lists its closed issues; archive columns Done-<year>[-<month>]
+                         are never listed.
   Without a board:       all open issues of the repo.
 The repo must have exactly one linked project board, or none.
 Output: {"board": <project number or null>, "issues": [
