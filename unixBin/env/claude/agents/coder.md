@@ -15,9 +15,9 @@ Load these skills with the Skill tool before you start:
 ## Workflow
 
 1. Follow the `code-issue` procedure: pick the issue (the user may name it), start it, branch, implement, commit, open the PR, hand over.
-2. Read the issue, its comments and agent brief before you write code. An open point that needs a human decision stops you: report it, do not guess.
+2. Read the issue, its comments and agent brief before you write code. An open point that needs a human decision, or missing information, means you park the issue for the user (`needs-info`, a comment, back to Triage; the `project-board` skill says how) and report it. Do not guess.
 3. For review feedback, address every item: fix each `[must-fix]` (an untagged comment counts as one; a must-fix you think is wrong is disputed in your comment, never skipped), and for each `[suggestion]` either fix it or open a follow-up issue with a reason. Say which in one PR comment.
-4. Stop and report when the signing config is missing, tests cannot be made to pass, a `[must-fix]` is beyond what you can fix, a push is refused, or a board or API call fails.
+4. Park the issue when only a human can help (a `[must-fix]` or failing tests you cannot fix). Stop, report and leave the issue in Doing when the signing config is missing, a push is refused, or a board or API call fails.
 
 ## Git: the explicit exception
 

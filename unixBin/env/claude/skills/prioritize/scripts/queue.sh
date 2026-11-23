@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #------------------------------------------------------------------------------
-# queue.sh - list the issues to prioritize (Triage and Todo), with their blockers.
+# queue.sh - list the issues of board columns (default Triage and Todo), with their blockers.
 # Needs: gh (scopes: repo, project), jq. Run "queue.sh --help" for details.
 #------------------------------------------------------------------------------
 set -euo pipefail
@@ -10,8 +10,7 @@ set -euo pipefail
 source "$(dirname "$0")/../../project-board/scripts/lib.sh"
 
 STATUS_FIELD="Status"
-TRIAGE_COLUMN="triage"
-TODO_COLUMN="todo"
+DEFAULT_COLUMNS=(triage todo)
 RANKED_MARKER="Queue position:"
 
 # Issue fields shared by the board and the no-board query.
@@ -20,11 +19,13 @@ ISSUE_FIELDS='number title state body repository{nameWithOwner} labels(first:20)
 
 usage() {
     cat <<USAGE
-usage: queue.sh
-Lists the issues to prioritize, with their blockers, as JSON, in board order
+usage: queue.sh [column...]
+Lists the issues of board columns, with their blockers, as JSON, in board order
 (the array order is the order on the board, top first; there is no position field).
-  With a project board:  the open issues in the Triage and Todo columns. Issues in Doing,
-                         Review, Testing and Done are not listed; they only appear as blockers.
+  With a project board:  the open issues in the given columns (names without emoji, any case),
+                         default Triage and Todo, for example: queue.sh Review (a name no issue is in gives an
+                         empty list, it is not checked against the board). Issues in other
+                         columns are not listed; they only appear as blockers.
   Without a board:       all open issues of the repo.
 The repo must have exactly one linked project board, or none.
 Output: {"board": <project number or null>, "issues": [
@@ -43,7 +44,8 @@ USAGE
 case "${1:-}" in
     --help|-h) usage; exit 0 ;;
 esac
-[ $# -eq 0 ] || usage_error
+if [ $# -eq 0 ]; then set -- "${DEFAULT_COLUMNS[@]}"; fi
+wanted_columns=$(printf '%s\n' "$@" | tr '[:upper:]' '[:lower:]' | jq -R . | jq -sc .)
 resolve_repo
 
 # shellcheck disable=SC2016  # $vars in the queries are GraphQL variables, not shell
@@ -89,13 +91,13 @@ else
     done
 fi
 
-jq --argjson board "$board" --arg repo "$REPO" --arg triage "$TRIAGE_COLUMN" --arg todo "$TODO_COLUMN" --arg marker "$RANKED_MARKER" '
+jq --argjson board "$board" --arg repo "$REPO" --argjson wanted "$wanted_columns" --arg marker "$RANKED_MARKER" '
     def column: (.status.name // "") | '"$JQ_STRIP_PREFIX"';
     def key: "\(.repository.nameWithOwner)#\(.number)";
     (map(select(.content.number != null) | {key: (.content | key), value: (column | if . == "" then null else . end)}) | from_entries) as $columns
     | {board: $board, issues: [
         .[] | select(.content.repository.nameWithOwner == $repo and .content.state == "OPEN"
-                     and ($board == null or (column | ascii_downcase | IN($triage, $todo))))
+                     and ($board == null or (column | ascii_downcase | IN($wanted[]))))
         | .content as $c
         | {number: $c.number, title: $c.title, column: (column | if . == "" then null else . end), labels: [$c.labels.nodes[].name],
            hasAcceptance: ($c.body | test("acceptance criteria"; "i")),

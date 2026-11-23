@@ -70,11 +70,16 @@ jobs:
                 echo "SHELL = $SHELL"
                 ./test_uninstall.sh "tools_"
 
-            - name: skill script tests (every shell found)
+            - name: skill script tests (all test_*.sh, every shell found)
               shell: bash {0}
               run: |
                 command -v gpg >/dev/null || brew install gnupg
-                ./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh
+                failed=0
+                for t in ./unixBin/env/claude/skills/*/scripts/test_*.sh; do
+                    echo "######## $t"
+                    /bin/bash "$t" || failed=1
+                done
+                exit $failed
 
     Ubuntu:
         name: Ubuntu ${{ matrix.version }}
@@ -134,11 +139,16 @@ jobs:
                 echo "SHELL = $SHELL"
                 ./test_uninstall.sh "tools_"
 
-            - name: skill script tests (every shell found)
+            - name: skill script tests (all test_*.sh, every shell found)
               shell: bash {0}
               run: |
                 command -v gpg >/dev/null || sudo apt-get install -y gnupg
-                ./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh
+                failed=0
+                for t in ./unixBin/env/claude/skills/*/scripts/test_*.sh; do
+                    echo "######## $t"
+                    /bin/bash "$t" || failed=1
+                done
+                exit $failed
 
     WSL:
         name: WSL Ubuntu ${{ matrix.version }}
@@ -193,10 +203,15 @@ jobs:
                 echo "SHELL = $SHELL"
                 /bin/bash ./test_uninstall.sh "wsl"
 
-            - name: skill script tests (every shell found, WSL)
+            - name: skill script tests (all test_*.sh, every shell found, WSL)
               shell: wsl-bash {0}
               run: |
-                /bin/bash ./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh
+                failed=0
+                for t in ./unixBin/env/claude/skills/*/scripts/test_*.sh; do
+                    echo "######## $t"
+                    /bin/bash "$t" || failed=1
+                done
+                exit $failed
 
     handle-release-tags:
         name: Handle Release Tags
