@@ -64,7 +64,12 @@ $B move <n> Review          # clears your claim
 
 ## 6. Review feedback
 
-The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item and either change the code or open a follow-up issue (`gh issue create`, with the body `Follow-up of #<n> (PR #<pr>): ...`, then place it in Triage as described under Follow-up issues). Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>` or `follow-up #<m>`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`.
+The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item. The reviewer starts each comment with a tag; an untagged comment (for example from the user) counts as `[must-fix]`.
+
+- `[must-fix]`: change the code in this PR; it cannot be deferred. If you think it is wrong, do not skip it: answer `disputed (<reason>)` in the summary below. A dispute goes to the user; do not wait for it in a loop.
+- `[suggestion]`: you choose. Fix it now when it is cheap and in scope, or open a follow-up issue (see Follow-up issues) and give the reason.
+
+Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>`, `follow-up #<m> (<reason>)` or `disputed (<reason>)`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`.
 
 ## Follow-up issues
 
