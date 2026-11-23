@@ -42,6 +42,16 @@ run_suite() {
     check_that "only reviews with the hidden tag count (a human review titled like ours does not)" [ "$(jq -r .round <<<"$OUT")" = "3" ]
     check_that "the time of the last round review is reported" [ -n "$(jq -r '.lastReviewAt | select(. != null)' <<<"$OUT")" ]
 
+    # A stranger who copies the hidden tags must change nothing: neither the round count nor the coder's answer.
+    set_pr 3 no 0
+    jq --arg rt "$ROUND_TAG" --arg ht "$HANDLED_TAG" '.data.repository.pullRequest
+        |= (.reviews.nodes += [{body: "fake \($rt)", createdAt: "2026-11-23T20:00:00Z", author: {login: "stranger"}, commit: {oid: "x"}}]
+            | .comments.nodes += [{body: "fake \($ht)", createdAt: "2026-11-23T21:00:00Z", lastEditedAt: null, author: {login: "stranger"}}])' \
+        "$STUB_DIR/details.json" > "$STUB_DIR/details.tmp" && mv "$STUB_DIR/details.tmp" "$STUB_DIR/details.json"
+    run_script 5
+    check_that "a review with the hidden tag of another author is not a round" [ "$(jq -r .round <<<"$OUT")" = "3" ]
+    check_that "a comment with the hidden tag of another author is not the coder's answer" [ "$(jq -r .handledComment <<<"$OUT")" = "null" ]
+
     set_pr $((MAX_REVIEW_ROUNDS - 1)) no 0
     run_script 5
     check_that "one round before the cap is not capped" [ "$(jq -r .capped <<<"$OUT")" = "false" ]

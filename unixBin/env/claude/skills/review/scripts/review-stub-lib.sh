@@ -29,7 +29,7 @@ if [ "$1 $2" = "api graphql" ] && [[ "$args" == *"--input"* ]]; then
             if [ "$n" -eq 0 ]; then echo "gh: Line must be part of the diff (HTTP 422)" >&2; exit 1; fi
             cat "$dir/post-ok.json" ;;
         reject-inline-but-posted)
-            jq '.data.repository.pullRequest.reviews.nodes += [{body: "Review round 99\n\n<!-- abk:review-round -->", createdAt: "2026-11-23T23:00:00Z"}]' "$dir/details.json" > "$dir/details.tmp" && mv "$dir/details.tmp" "$dir/details.json"
+            jq '.data.repository.pullRequest.reviews.nodes += [{body: "Review round 99\n\n<!-- abk:review-round -->", createdAt: "2026-11-23T23:00:00Z", author: {login: "o"}}]' "$dir/details.json" > "$dir/details.tmp" && mv "$dir/details.tmp" "$dir/details.json"
             echo "gh: Line must be part of the diff (HTTP 422)" >&2
             exit 1 ;;
         reject-timeline) echo "gh: The timeline service is unavailable (HTTP 422)" >&2; exit 1 ;;
@@ -71,5 +71,6 @@ set_pr() {
                              + (if $handled == "new" then [summary("2026-11-23T22:00:00Z"; null)] else [] end)
                              + (if $handled == "old" then [summary("2026-11-23T05:00:00Z"; null)] else [] end)
                              + (if $handled == "edited" then [summary("2026-11-23T05:00:00Z"; "2026-11-23T22:00:00Z")] else [] end))},
-          reviewThreads: {nodes: ([range(0; $threads) | {isResolved: false}] + [{isResolved: true}])}}}}}' > "$STUB_DIR/details.json"
+          reviewThreads: {nodes: ([range(0; $threads) | {isResolved: false}] + [{isResolved: true}])}}}}}
+        | .data.repository.pullRequest |= (.reviews.nodes |= map(. + {author: {login: "o"}}) | .comments.nodes |= map(. + {author: {login: "o"}}))' > "$STUB_DIR/details.json"
 }
