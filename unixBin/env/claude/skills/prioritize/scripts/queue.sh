@@ -15,7 +15,7 @@ RANKED_MARKER="Queue position:"
 
 # Issue fields shared by the board and the no-board query.
 AGENT_FIELD="Agent"
-ISSUE_FIELDS='number title state closedAt body repository{nameWithOwner} labels(first:20){nodes{name}}
+ISSUE_FIELDS='number title state author{login} closedAt body repository{nameWithOwner} labels(first:20){nodes{name}}
     issueFieldValues(first:10){nodes{... on IssueFieldSingleSelectValue{name field{... on IssueFieldSingleSelect{name}}}}}
     closedByPullRequestsReferences(first:5){nodes{number state}}
     blockedBy(first:20){nodes{number state repository{nameWithOwner}}} blocking(first:20){nodes{number repository{nameWithOwner}}}'
@@ -34,9 +34,10 @@ Lists the issues of board columns, with their blockers, as JSON, in board order
   Without a board:       all open issues of the repo.
 The repo must have exactly one linked project board, or none.
 Output: {"board": <project number or null>, "issues": [
-  {"number", "title", "closedAt", "column", "labels", "agent", "openPrs", "hasAcceptance", "ranked",
+  {"number", "title", "closedAt", "column", "author", "trusted", "labels", "agent", "openPrs", "hasAcceptance", "ranked",
    "blockedBy": [{"number", "state", "status", "repo"}], "blocking": [numbers]}]}
-"agent" is the Agent issue field (the claim of a running agent) or null; "openPrs" are the numbers of the open
+"author" is the login that wrote the issue; "trusted" is true when it is the repository owner or a login in the
+comma list ABK_TRUSTED_LOGINS (the agents act only on trusted issues). "agent" is the Agent issue field (the claim of a running agent) or null; "openPrs" are the numbers of the open
 pull requests that close the issue. "status" is the board column of a blocker (null without a board or when the
 blocker is not on the board). "ranked" is true when the issue already has a
 "$RANKED_MARKER" comment; it is read without a board only and is false with a board.
@@ -53,6 +54,7 @@ esac
 if [ $# -eq 0 ]; then set -- "${DEFAULT_COLUMNS[@]}"; fi
 wanted_columns=$(printf '%s\n' "$@" | tr '[:upper:]' '[:lower:]' | jq -R . | jq -sc .)
 resolve_repo
+trusted=$(trusted_logins)
 
 # shellcheck disable=SC2016  # $vars in the queries are GraphQL variables, not shell
 first_page=$(gql -f owner="$OWNER" -f name="$REPO_NAME" -f query='
@@ -97,7 +99,7 @@ else
     done
 fi
 
-jq --argjson board "$board" --arg agent_field "$AGENT_FIELD" --arg repo "$REPO" --argjson wanted "$wanted_columns" --arg marker "$RANKED_MARKER" '
+jq --argjson board "$board" --arg agent_field "$AGENT_FIELD" --arg repo "$REPO" --argjson wanted "$wanted_columns" --arg marker "$RANKED_MARKER" --argjson trusted "$trusted" '
     def column: (.status.name // "") | '"$JQ_STRIP_PREFIX"';
     def key: "\(.repository.nameWithOwner)#\(.number)";
     (map(select(.content.number != null) | {key: (.content | key), value: (column | if . == "" then null else . end)}) | from_entries) as $columns
@@ -105,7 +107,8 @@ jq --argjson board "$board" --arg agent_field "$AGENT_FIELD" --arg repo "$REPO" 
         .[] | select(.content.repository.nameWithOwner == $repo and (.content.state == "OPEN" or ($board != null and (column | ascii_downcase) == "done"))
                      and ($board == null or (column | ascii_downcase | IN($wanted[]))))
         | .content as $c
-        | {number: $c.number, title: $c.title, closedAt: $c.closedAt, column: (column | if . == "" then null else . end), labels: [$c.labels.nodes[].name],
+        | {number: $c.number, title: $c.title, closedAt: $c.closedAt, column: (column | if . == "" then null else . end),
+           author: $c.author.login, trusted: (($c.author.login // "") | ascii_downcase | IN($trusted[])), labels: [$c.labels.nodes[].name],
            agent: ([$c.issueFieldValues.nodes[] | select(.field.name? == $agent_field) | .name] | first),
            openPrs: [$c.closedByPullRequestsReferences.nodes[] | select(.state == "OPEN") | .number],
            hasAcceptance: ($c.body | test("acceptance criteria"; "i")),

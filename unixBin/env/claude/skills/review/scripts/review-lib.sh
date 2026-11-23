@@ -22,7 +22,8 @@ ROUND_TAG='<!-- abk:review-round -->'
 HANDLED_MARKER="Review items handled:"
 HANDLED_TAG='<!-- abk:review-items-handled -->'
 
-# Print the review state of the open pull request that closes an issue as JSON, or {"pr": null}.
+# Print the review state of the open pull request that closes an issue as JSON, or {"pr": null}. Only reviews and
+# comments of trusted authors (the owner, ABK_TRUSTED_LOGINS) count; text of anyone else is never read as a state.
 # Two GraphQL requests; the 50 most recently updated open PRs, the newest 50 reviews and 50 comments,
 # and 50 threads are read.
 load_pr_state() {
@@ -40,16 +41,17 @@ load_pr_state() {
     details=$(gql -f owner="$OWNER" -f name="$REPO_NAME" -F number="$(jq -r .number <<<"$pr")" -f query='
         query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){
           id headRefOid mergeable
-          reviews(last:50){nodes{body createdAt commit{oid}}}
-          comments(last:50){nodes{body createdAt lastEditedAt}}
+          reviews(last:50){nodes{body createdAt author{login} commit{oid}}}
+          comments(last:50){nodes{body createdAt lastEditedAt author{login}}}
           reviewThreads(first:50){nodes{isResolved}}}}}')
-    jq -c --argjson pr "$pr" --argjson max "$MAX_REVIEW_ROUNDS" --arg round_tag "$ROUND_TAG" --arg handled_tag "$HANDLED_TAG" '
+    jq -c --argjson pr "$pr" --argjson max "$MAX_REVIEW_ROUNDS" --arg round_tag "$ROUND_TAG" --arg handled_tag "$HANDLED_TAG" --argjson trusted "$(trusted_logins)" '
+        def trusted: (.author.login // "") | ascii_downcase | IN($trusted[]);
         .data.repository.pullRequest as $p
-        | [$p.reviews.nodes[] | select(.body | contains($round_tag))] as $round_reviews
+        | [$p.reviews.nodes[] | select(trusted and (.body | contains($round_tag)))] as $round_reviews
         | ($round_reviews | length) as $rounds
         | ($round_reviews | map(.createdAt) | max) as $last_review
         | ($round_reviews | any(.commit.oid == $p.headRefOid)) as $head_reviewed
-        | ([$p.comments.nodes[] | select(.body | contains($handled_tag))] | last) as $handled
+        | ([$p.comments.nodes[] | select(trusted and (.body | contains($handled_tag)))] | last) as $handled
         | (if $handled == null then null else ($handled.lastEditedAt // $handled.createdAt) end) as $handled_at
         | ($handled != null and ($last_review == null or $handled_at > $last_review)) as $handled_is_new
         | {pr: $pr.number, id: $p.id, url: $pr.url, branch: $pr.headRefName, base: $pr.baseRefName, headSha: $p.headRefOid,

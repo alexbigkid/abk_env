@@ -26,8 +26,8 @@ export STUB_DIR QUEUE_SCRIPT="$STUB_DIR/queue.sh"
 
 # Build one issue: number, column, agent ("" = none), labels (comma list), blockers ("n:STATE,..."), open PRs (comma list).
 issue() {
-    jq -nc --argjson n "$1" --arg column "$2" --arg agent "$3" --arg labels "$4" --arg blockers "$5" --arg prs "$6" --arg closed "${7:-}" '
-        {number: $n, column: $column, closedAt: (if $closed == "" then null else $closed end), agent: (if $agent == "" then null else $agent end),
+    jq -nc --argjson n "$1" --arg column "$2" --arg agent "$3" --arg labels "$4" --arg blockers "$5" --arg prs "$6" --arg closed "${7:-}" --arg author "${8:-}" '
+        {number: $n, column: $column, author: (if $author == "" then "owner" else $author end), trusted: ($author == ""), closedAt: (if $closed == "" then null else $closed end), agent: (if $agent == "" then null else $agent end),
          labels: ($labels | split(",") | map(select(. != ""))),
          openPrs: ($prs | split(",") | map(select(. != "") | tonumber)),
          blockedBy: ($blockers | split(",") | map(select(. != "") | split(":") | {number: (.[0] | tonumber), state: .[1]}))}'
@@ -177,6 +177,36 @@ run_suite() {
     run_script
     answer_is "only archive columns left: all done" '.action == "done"'
     unset NEXT_ACTION_TODAY
+
+    # An issue of another author (trusted false) is never started; it waits for the owner. The 8th argument of issue() is the author.
+    board "$(issue 1 Todo "" "" "" "" "" stranger)"
+    run_script
+    answer_is "an issue of another author in Todo is not started" '.action == "waiting"'
+    answer_is "and it is listed as waiting with the reason" '.issues[0].why == "not written by the owner (stranger)"'
+    board "$(issue 1 Todo "" "" "" "" "" stranger)" "$(issue 2 Todo "" "" "" "")"
+    run_script
+    answer_is "the next issue of the owner is taken instead" '.agent == "coder" and .issue == 2'
+    board "$(issue 1 Triage "" "" "" "" "" stranger)"
+    run_script
+    answer_is "an issue of another author in Triage does not start the triager" '.action == "waiting"'
+    board "$(issue 1 Triage "" "" "" "" "" stranger)" "$(issue 2 Triage "" "" "" "")"
+    run_script
+    answer_is "the triager's issues leave out the other author" '.agent == "triager" and .issues == [2]'
+    board "$(issue 1 Review "" "" "" "30" "" stranger)"
+    run_script
+    answer_is "an issue of another author in Review does not start the reviewer" '.action == "waiting"'
+    board "$(issue 1 Testing "" "" "" "30" "" stranger)"
+    run_script
+    answer_is "an issue of another author in Testing does not start the tester" '.action == "waiting"'
+    board "$(issue 1 Doing "Coder" "" "" "" "" stranger)"
+    run_script
+    answer_is "an issue of another author is not resumed, not even with a claim" '.action == "waiting"'
+    board "$(issue 1 Doing "" "" "" "" "" stranger)"
+    run_script
+    answer_is "an issue of another author in Doing is left alone" '.action == "waiting"'
+    board "$(issue 1 Todo "" needs-info "" "" "" stranger)"
+    run_script
+    answer_is "the author reason comes before needs-info" '.issues[0].why | startswith("not written by the owner")'
 
     printf '%s\n' '{"board": null, "issues": []}' > "$STUB_DIR/queue.json"
     run_script
