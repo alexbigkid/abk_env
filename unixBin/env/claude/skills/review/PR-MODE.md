@@ -1,6 +1,6 @@
 # PR mode (the reviewer agent)
 
-Review the pull request of an issue that is in the **Review** column: the same two axes (Standards, Spec) as in [SKILL.md](SKILL.md), but the result is **one review on the PR** with tagged findings and a board move. You never change code, commit, merge or close anything.
+Review the pull request of an issue that is in the **Review** column: the same three axes (Standards, Spec, Quality) as in [SKILL.md](SKILL.md), but the result is **one review on the PR** with tagged findings and a board move. You never change code, commit, merge or close anything.
 
 ```bash
 Q=~/.claude/skills/prioritize/scripts/queue.sh
@@ -36,24 +36,26 @@ Always remove the worktree when you are done, also when you stop early or fail: 
 
 ## 3. Review
 
-Standards and Spec as in SKILL.md (sources of standards, the issue as spec: `gh issue view <n>`). Without the Agent tool do the two axes yourself, one after the other, and keep them separate; with it you may run them as parallel sub-agents. Run the repo's tests and linters in the worktree. `mergeable: CONFLICTING` is a `[must-fix]` (the PR conflicts with its base). GitHub computes it lazily; `review-state.sh` already reads again twice while it is `UNKNOWN`. If it is still `UNKNOWN`, say so in your summary and do not claim there are no conflicts.
+Standards, Spec and Quality as in SKILL.md (sources of standards, the issue as spec: `gh issue view <n>`, the Quality criteria from `dev-guidelines`). Without the Agent tool do the three axes yourself, one after the other, and keep them separate; with it you may run them as parallel sub-agents. Run the repo's tests and linters in the worktree. `mergeable: CONFLICTING` is a `[must-fix]` (the PR conflicts with its base). GitHub computes it lazily; `review-state.sh` already reads again twice while it is `UNKNOWN`. If it is still `UNKNOWN`, say so in your summary and do not claim there are no conflicts.
 
 **Round 2 or later** (`round > 0`): verify what the coder did.
 - `handledIsNew: true`: read `handledComment` (the coder's `Review items handled:` summary, `pr-feedback.sh` hides it) and the unresolved threads, and check each item.
 - `handledIsNew: false` (no comment since your last review, the coder gave no answer): ignore the old comment; every earlier `[must-fix]` is open unless the code shows it fixed.
 - A `[must-fix]` must be really fixed in the code.
-- A deferred `[suggestion]` is accepted only if its follow-up issue exists and has acceptance criteria (`gh issue view <m>`); otherwise re-mark it `[must-fix]`.
+- A deferred `[suggestion]` is accepted only if its follow-up issue exists and has acceptance criteria (`gh issue view <m>`); otherwise re-mark it `[must-fix]`. Exception: a Quality `judgement call` the coder declines with a reason in its summary stays a `[suggestion]` and is accepted.
 - `disputed (<reason>)` on a must-fix: do not argue it again, go to step 6.
 
 **Classify every finding**, no untagged ones:
 - `[must-fix]`: the acceptance criteria are not met, a bug, a security problem, a broken or missing test for the change, or a hard standard violation.
 - `[suggestion]`: style, an alternative design, optional hardening, extra tests beyond the scope.
+- **Quality findings** are `[suggestion]` by default. They are `[must-fix]` only for clear waste (for example quadratic work over data that grows, one API call per item where one batched call is possible) or a change that is untestable by design. The Quality sub-agent marks each finding `clear` or `judgement call`: `clear` becomes `[must-fix]`, `judgement call` becomes `[suggestion]`.
+- **Concurrency advice** (multi-threading, multiprocessing) only where the gain is real; otherwise do not mention it.
 
 ## 4. Post one review
 
 ```bash
 $P <n> --round <round> --commit "$sha" <<'JSON'
-{"summary": "## Standards\n...\n## Spec\n...",
+{"summary": "## Standards\n...\n## Spec\n...\n## Quality\n...",
  "findings": [{"tag": "must-fix", "body": "...", "path": "scripts/a.sh", "line": 12},
               {"tag": "suggestion", "body": "..."}]}
 JSON
@@ -80,4 +82,4 @@ The board commands print `SKIPPED`; do steps 2 to 4 for the issue the user names
 
 ## Report
 
-Issue, PR, round `k of max`, number of must-fix and suggestions, your decision (Todo, Testing or parked for the user) and every disputed or deferred item with its status.
+Issue, PR, round `k of max`, number of must-fix and suggestions per axis, your decision (Todo, Testing or parked for the user) and every disputed or deferred item with its status.
