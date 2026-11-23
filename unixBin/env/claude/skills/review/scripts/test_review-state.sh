@@ -71,6 +71,16 @@ run_suite() {
     run_script 5
     check_that "a handled comment before any review counts as new" [ "$(jq -r .handledIsNew <<<"$OUT")" = "true" ]
 
+    set_pr 2 no 0 MERGEABLE true
+    run_script 5
+    check_that "a round review on the current head commit is reported (only the board move can be missing)" [ "$(jq -r .headReviewed <<<"$OUT")" = "true" ]
+    set_pr 2 no 0 MERGEABLE false
+    run_script 5
+    check_that "reviews of older commits do not count: the head is not reviewed yet" [ "$(jq -r .headReviewed <<<"$OUT")" = "false" ]
+    set_pr 0 no 0
+    run_script 5
+    check_that "a PR without round reviews has an unreviewed head (a human review without the tag does not count)" [ "$(jq -r .headReviewed <<<"$OUT")" = "false" ]
+
     set_pr 1 no 0 UNKNOWN
     rm -f "$STUB_DIR/queries.log"
     run_script 5

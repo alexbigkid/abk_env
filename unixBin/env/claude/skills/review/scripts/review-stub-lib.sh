@@ -50,7 +50,7 @@ STUB
 # Describe the open PR of issue 5 for the stub: the number of review rounds already posted, the handled comment
 # of the coder (no; new = after the last round; old = before the first round; edited = created before the first
 # round but edited after the last one), how many review threads are unresolved, and the mergeable state (default
-# MERGEABLE). Use "none" as first argument for no open PR at all. Besides the rounds, the PR has a human review
+# MERGEABLE) and whether the last round review is on the current head commit (default false). Use "none" as first argument for no open PR at all. Besides the rounds, the PR has a human review
 # and a human comment that start like the reviewer's title and the coder's marker but have no hidden tag.
 set_pr() {
     if [ "$1" = "none" ]; then
@@ -60,11 +60,11 @@ set_pr() {
     echo '{"data":{"repository":{"pullRequests":{"nodes":[
         {"number":99,"url":"https://x/99","headRefName":"F/9/other","baseRefName":"main","closingIssuesReferences":{"nodes":[{"number":9}]}},
         {"number":7,"url":"https://example.invalid/pr/7","headRefName":"F/5/test","baseRefName":"main","closingIssuesReferences":{"nodes":[{"number":5}]}}]}}}}' > "$STUB_DIR/prs.json"
-    jq -n --argjson rounds "$1" --arg handled "$2" --argjson threads "$3" --arg mergeable "${4:-MERGEABLE}" --arg head "$HEAD_SHA" \
+    jq -n --argjson rounds "$1" --arg handled "$2" --argjson threads "$3" --arg mergeable "${4:-MERGEABLE}" --argjson reviewed_head "${5:-false}" --arg head "$HEAD_SHA" \
         --arg tag "$ROUND_TAG" --arg htag "$HANDLED_TAG" --argjson max "$MAX_REVIEW_ROUNDS" '
         def summary($created; $edited): {body: "Review items handled:\n- item: fixed in abc\n\n\($htag)", createdAt: $created, lastEditedAt: $edited};
         {data: {repository: {pullRequest: {id: "PR_node", headRefOid: $head, mergeable: $mergeable,
-          reviews: {nodes: ([range(0; $rounds) | {body: "Review round \(. + 1) of \($max): 1 must-fix, 0 suggestion\n\n\($tag)", createdAt: "2026-11-23T1\(. % 10):00:00Z"}]
+          reviews: {nodes: ([range(0; $rounds) | {body: "Review round \(. + 1) of \($max): 1 must-fix, 0 suggestion\n\n\($tag)", createdAt: "2026-11-23T1\(. % 10):00:00Z", commit: {oid: (if . == $rounds - 1 and $reviewed_head then $head else "0000000000000000000000000000000000000000" end)}}]
                             + [{body: "Review round 7 of \($max): a human wrote this title, no tag", createdAt: "2026-11-23T09:00:00Z"}])},
           comments: {nodes: ([{body: "an ordinary comment", createdAt: "2026-11-23T08:00:00Z", lastEditedAt: null},
                               {body: "Review items handled: a human typed this, no tag", createdAt: "2026-11-23T23:30:00Z", lastEditedAt: null}]

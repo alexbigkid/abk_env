@@ -64,7 +64,7 @@ $B move <n> Review          # clears your claim
 
 ## 6. Review feedback
 
-The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item. The reviewer starts each comment with a tag; an untagged comment (for example from the user) counts as `[must-fix]`.
+The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints the open threads, PR comments and reviews. Check out the branch (`$H git fetch origin && git checkout <branch> && $H git pull`), then take **every** item. A run that was cut off may have done part of it: when `$P` lists nothing to handle, only the hand-off is missing (`$B move <n> Review`, step 5 was cut off after the PR was opened); an item that the branch already fixes (see `git log`) is answered `fixed in <sha>` without redoing it. The reviewer starts each comment with a tag; an untagged comment (for example from the user) counts as `[must-fix]`.
 
 - `[must-fix]`: change the code in this PR; it cannot be deferred. If you think it is wrong, do not skip it: answer `disputed (<reason>)` in the summary below. A dispute goes to the user; do not wait for it in a loop.
 - `[suggestion]`: you choose. Fix it now when it is cheap and in scope, or open a follow-up issue (see Follow-up issues) and give the reason.

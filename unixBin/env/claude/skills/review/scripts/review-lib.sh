@@ -40,7 +40,7 @@ load_pr_state() {
     details=$(gql -f owner="$OWNER" -f name="$REPO_NAME" -F number="$(jq -r .number <<<"$pr")" -f query='
         query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){
           id headRefOid mergeable
-          reviews(last:50){nodes{body createdAt}}
+          reviews(last:50){nodes{body createdAt commit{oid}}}
           comments(last:50){nodes{body createdAt lastEditedAt}}
           reviewThreads(first:50){nodes{isResolved}}}}}')
     jq -c --argjson pr "$pr" --argjson max "$MAX_REVIEW_ROUNDS" --arg round_tag "$ROUND_TAG" --arg handled_tag "$HANDLED_TAG" '
@@ -48,10 +48,11 @@ load_pr_state() {
         | [$p.reviews.nodes[] | select(.body | contains($round_tag))] as $round_reviews
         | ($round_reviews | length) as $rounds
         | ($round_reviews | map(.createdAt) | max) as $last_review
+        | ($round_reviews | any(.commit.oid == $p.headRefOid)) as $head_reviewed
         | ([$p.comments.nodes[] | select(.body | contains($handled_tag))] | last) as $handled
         | (if $handled == null then null else ($handled.lastEditedAt // $handled.createdAt) end) as $handled_at
         | {pr: $pr.number, id: $p.id, url: $pr.url, branch: $pr.headRefName, base: $pr.baseRefName, headSha: $p.headRefOid,
-           mergeable: $p.mergeable, round: $rounds, max: $max, capped: ($rounds >= $max), lastReviewAt: $last_review,
+           mergeable: $p.mergeable, round: $rounds, max: $max, capped: ($rounds >= $max), lastReviewAt: $last_review, headReviewed: $head_reviewed,
            handledAt: $handled_at, handledComment: ($handled.body // null),
            handledIsNew: ($handled != null and ($last_review == null or $handled_at > $last_review)),
            unresolvedThreads: ([$p.reviewThreads.nodes[] | select(.isResolved | not)] | length)}' <<<"$details"

@@ -29,6 +29,9 @@ The `test_install.sh` script validates:
 - Shell environment configuration is added to `.bashrc`/`.zshrc`
 - Symbolic links are created properly in `unixBin/env/`
 
+### Issue workflow orchestrator
+- `unixBin/env/claude/skills/orchestrate/scripts/orchestrate.sh [--once|--dry-run]` - Run the agents (triager, coder, reviewer, tester) one at a time from Triage to Done; `next-action.sh` prints what runs next. A failed agent run (for example no tokens left) stops it; start it again to resume. See the `orchestrate` skill
+
 The CI pipeline also runs `unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh` on macOS, Ubuntu and WSL (self-contained tests of the coder's signed-commit script: throwaway GPG key, local remotes, once per shell found).
 
 ### Version Management

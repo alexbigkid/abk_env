@@ -14,7 +14,10 @@ DEFAULT_COLUMNS=(triage todo)
 RANKED_MARKER="Queue position:"
 
 # Issue fields shared by the board and the no-board query.
+AGENT_FIELD="Agent"
 ISSUE_FIELDS='number title state body repository{nameWithOwner} labels(first:20){nodes{name}}
+    issueFieldValues(first:10){nodes{... on IssueFieldSingleSelectValue{name field{... on IssueFieldSingleSelect{name}}}}}
+    closedByPullRequestsReferences(first:5){nodes{number state}}
     blockedBy(first:20){nodes{number state repository{nameWithOwner}}} blocking(first:20){nodes{number repository{nameWithOwner}}}'
 
 usage() {
@@ -29,9 +32,10 @@ Lists the issues of board columns, with their blockers, as JSON, in board order
   Without a board:       all open issues of the repo.
 The repo must have exactly one linked project board, or none.
 Output: {"board": <project number or null>, "issues": [
-  {"number", "title", "column", "labels", "hasAcceptance", "ranked",
+  {"number", "title", "column", "labels", "agent", "openPrs", "hasAcceptance", "ranked",
    "blockedBy": [{"number", "state", "status", "repo"}], "blocking": [numbers]}]}
-"status" is the board column of a blocker (null without a board or when the
+"agent" is the Agent issue field (the claim of a running agent) or null; "openPrs" are the numbers of the open
+pull requests that close the issue. "status" is the board column of a blocker (null without a board or when the
 blocker is not on the board). "ranked" is true when the issue already has a
 "$RANKED_MARKER" comment; it is read without a board only and is false with a board.
 "repo" (owner/name) is only present for a blocker of another repository, which is
@@ -91,7 +95,7 @@ else
     done
 fi
 
-jq --argjson board "$board" --arg repo "$REPO" --argjson wanted "$wanted_columns" --arg marker "$RANKED_MARKER" '
+jq --argjson board "$board" --arg agent_field "$AGENT_FIELD" --arg repo "$REPO" --argjson wanted "$wanted_columns" --arg marker "$RANKED_MARKER" '
     def column: (.status.name // "") | '"$JQ_STRIP_PREFIX"';
     def key: "\(.repository.nameWithOwner)#\(.number)";
     (map(select(.content.number != null) | {key: (.content | key), value: (column | if . == "" then null else . end)}) | from_entries) as $columns
@@ -100,6 +104,8 @@ jq --argjson board "$board" --arg repo "$REPO" --argjson wanted "$wanted_columns
                      and ($board == null or (column | ascii_downcase | IN($wanted[]))))
         | .content as $c
         | {number: $c.number, title: $c.title, column: (column | if . == "" then null else . end), labels: [$c.labels.nodes[].name],
+           agent: ([$c.issueFieldValues.nodes[] | select(.field.name? == $agent_field) | .name] | first),
+           openPrs: [$c.closedByPullRequestsReferences.nodes[] | select(.state == "OPEN") | .number],
            hasAcceptance: ($c.body | test("acceptance criteria"; "i")),
            ranked: (($c.comments.nodes // []) | any(.body | contains($marker))),
            blockedBy: [$c.blockedBy.nodes[] | {number, state, status: $columns[key]}
