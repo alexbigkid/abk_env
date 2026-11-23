@@ -29,6 +29,8 @@ The `test_install.sh` script validates:
 - Shell environment configuration is added to `.bashrc`/`.zshrc`
 - Symbolic links are created properly in `unixBin/env/`
 
+The CI pipeline also runs `unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh` on macOS, Ubuntu and WSL (self-contained tests of the coder's signed-commit script: throwaway GPG key, local remotes, once per shell found).
+
 ### Version Management
 - `./unixBin/setGitAliases.sh` - Writes all git aliases (incl. `rel-*` release triggers) to the global `~/.gitconfig`, overwriting same-named aliases; `git alias` lists them
 - `git rel-patch` - Trigger patch version release pipeline

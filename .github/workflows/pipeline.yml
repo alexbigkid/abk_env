@@ -70,6 +70,12 @@ jobs:
                 echo "SHELL = $SHELL"
                 ./test_uninstall.sh "tools_"
 
+            - name: skill script tests (every shell found)
+              shell: bash {0}
+              run: |
+                command -v gpg >/dev/null || brew install gnupg
+                ./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh
+
     Ubuntu:
         name: Ubuntu ${{ matrix.version }}
         runs-on: ubuntu-${{ matrix.version }}
@@ -128,6 +134,12 @@ jobs:
                 echo "SHELL = $SHELL"
                 ./test_uninstall.sh "tools_"
 
+            - name: skill script tests (every shell found)
+              shell: bash {0}
+              run: |
+                command -v gpg >/dev/null || sudo apt-get install -y gnupg
+                ./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh
+
     WSL:
         name: WSL Ubuntu ${{ matrix.version }}
         runs-on: windows-latest
@@ -160,12 +172,12 @@ jobs:
               shell: wsl-bash {0}
               run: |
                 sudo apt update
-                sudo apt install -y bash
+                sudo apt install -y bash gnupg
                 echo "--------Available tools after install-------"
                 which bash || echo "bash not found"
                 bash --version || echo "bash version check failed"
                 echo "--------Setting execute permissions-------"
-                chmod +x ./test_install.sh ./test_uninstall.sh ./unixBin/*.sh
+                chmod +x ./test_install.sh ./test_uninstall.sh ./unixBin/*.sh ./unixBin/env/claude/skills/*/scripts/*.sh
 
             - name: bash install tools (WSL)
               shell: wsl-bash {0}
@@ -180,6 +192,11 @@ jobs:
                 export SHELL=$(which bash)
                 echo "SHELL = $SHELL"
                 /bin/bash ./test_uninstall.sh "wsl"
+
+            - name: skill script tests (every shell found, WSL)
+              shell: wsl-bash {0}
+              run: |
+                /bin/bash ./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh
 
     handle-release-tags:
         name: Handle Release Tags

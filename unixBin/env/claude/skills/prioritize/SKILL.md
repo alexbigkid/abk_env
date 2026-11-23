@@ -17,7 +17,7 @@ R=~/.claude/skills/project-board/scripts/blockers.sh
 
 ## 1. Read the queue
 
-`$Q` returns JSON: the issues in Triage and Todo in board order (number, title, `column`, labels, `hasAcceptance`, `ranked`, `blockedBy` with each blocker's `state` and board `status`, `blocking`). With no board (`board: null`) it returns all open issues; skip those with `ranked: true` (already ranked; `ranked` is always false with a board). The repo must have one linked board or none.
+`$Q` returns JSON with the issues in Triage and Todo in board order, top first. Issues further along the board (Done, Doing, ...) are not listed; they only show up as blockers. Per issue: number, title, `column`, labels, `hasAcceptance`, `ranked`, `blockedBy` (each blocker's `state` and board `status`) and `blocking`. With no board (`board: null`) it returns all open issues; skip those with `ranked: true` (already ranked; `ranked` is always false with a board). The repo must have one linked board or none.
 
 ## 2. Understand each issue and the code
 
@@ -57,7 +57,7 @@ $B apply <<'PLAN'
 PLAN
 ```
 
-Release the claims of the issues you left in Triage: `$B release <n> ...`. Then put the whole queue in rank order with one call, existing Todo issues included: `$B order <n1> <n2> <n3> ...` (first = top, the coder takes the top). Check with `$Q` that Todo shows that order. Post the comments (RUBRICS.md); `N` in `Queue position: #k of N` is the number of issues in the final queue (placed ones only).
+Release the claims of the issues you left in Triage: `$B release <n> ...`. Then put the whole queue in rank order with one call, existing Todo issues included: `$B order <n1> <n2> <n3> ...` (first = top, the coder takes the top). Check with `$Q` that Todo shows that order. Post the comments (RUBRICS.md; when you re-rank an issue that already has a `Queue position:` comment, start the new one with the line `Re-ranked, supersedes the earlier queue comment.`); `N` in `Queue position: #k of N` is the number of issues in the final queue (placed ones only).
 
 ## No board
 

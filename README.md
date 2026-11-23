@@ -358,6 +358,7 @@ Things to know:
 * Secrets stay on each machine: config files are built from local environment variables (e.g. <code>ANTHROPIC_API_KEY</code>, <code>GITHUB_TOKEN</code>) and never stored in git.
 * Not covered: <code>~/.claude/settings.json</code>, plugins, MCP auth and history - set those up per machine.
 * Reset does not bring back the original local files - they were merged into the repo during setup and are still there.
+* The coder agent's commit script has self-contained tests (throwaway key, local remotes): <code>./unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh</code>. CI runs them too.
 
 More details: see the "Claude Environment Setup" section in [CLAUDE.md](CLAUDE.md).
 
