@@ -5,7 +5,9 @@
 # testing-lib.sh - small test harness shared by the test_*.sh scripts of the skills.
 # Sourced, not executed. Provides: check, check_that, run_script, for_each_shell, finish, handle_test_help
 # and a throwaway temp dir (TEST_TMP, removed on exit; set TEST_CLEANUP_HOOK to a function name to run
-# something before the removal). The stub gh for the review tests is in review/scripts/review-stub-lib.sh.
+# something before the removal), and make_read_gh_stub with GH_STUB_READS: a stub gh that answers
+# the read queries with canned files (used by the code-issue and review tests). The stub gh of the
+# review tests, built on it, is in review/scripts/review-stub-lib.sh.
 # NOTE: check_that takes ONE condition. Never chain with && (the chained part is not counted);
 # test_testing-lib.sh fails on such lines.
 #------------------------------------------------------------------------------

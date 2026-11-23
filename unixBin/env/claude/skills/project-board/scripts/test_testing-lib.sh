@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #------------------------------------------------------------------------------
-# test_testing-lib.sh - tests for testing-lib.sh, the harness of the review script tests, and a guard
+# test_testing-lib.sh - tests for testing-lib.sh, the harness of the skills' script tests, and a guard
 # that no test script chains conditions after check_that with && (the chained part would never be counted).
 # usage: test_testing-lib.sh        (exit code 0 = all passed)
 #------------------------------------------------------------------------------
