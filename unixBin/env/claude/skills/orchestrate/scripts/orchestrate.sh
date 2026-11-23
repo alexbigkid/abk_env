@@ -18,7 +18,8 @@ WORKTREE_SCRIPT=${WORKTREE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-workt
 CLAUDE_BIN=${CLAUDE_BIN:-claude}
 ALLOWED_TOOLS_FILE=${ORCHESTRATE_ALLOWED_TOOLS:-$SCRIPT_DIR/allowed-tools.conf}
 LOCK_DIR=${ORCHESTRATE_LOCK_DIR:-${TMPDIR:-/tmp}/abk-orchestrate.lock}
-BUDGET_USD=${ORCHESTRATE_BUDGET_USD:-5}
+BUDGET_USD=${ORCHESTRATE_BUDGET_USD:-1}
+USAGE_LOG=${ORCHESTRATE_USAGE_LOG:-$HOME/.claude/orchestrate-usage.log}
 MAX_DISPATCHES=${ORCHESTRATE_MAX_DISPATCHES:-50}
 # Appended to every prompt. Verified with real headless probes: the permission check refuses a command that sets a variable
 # (X=..., X=~/..., $(...)) and a heredoc that contains JSON ({" ), but runs a literal path with a text heredoc.
@@ -34,7 +35,8 @@ the loop asks again, until everything is Done or waits for you. One agent at a t
   --dry-run  print the next action and stop, start nothing
   --once     do one dispatch and stop
 Guards: a lock (only one orchestrator), the allowlist of each agent ($(basename "$ALLOWED_TOOLS_FILE")), a budget cap per run
-(\$ORCHESTRATE_BUDGET_USD, default $BUDGET_USD), at most \$ORCHESTRATE_MAX_DISPATCHES dispatches per start (default $MAX_DISPATCHES).
+(\$ORCHESTRATE_BUDGET_USD, default $BUDGET_USD), an optional model per agent (model-<agent> lines in the allowlist file),
+a usage line per run (also appended to $USAGE_LOG), at most \$ORCHESTRATE_MAX_DISPATCHES dispatches per start (default $MAX_DISPATCHES).
 The same action twice in a row (no progress) parks the issue for you instead of running it again.
 A review that reached the round cap is parked without starting the reviewer (unless its last review is posted and only the move is missing).
 A failed agent run (no tokens, an error) stops everything with exit $EXIT_AGENT_FAILED: the claim stays, start it again to resume.
@@ -74,6 +76,30 @@ allowed_tools() {
             if (substr(entry[i], 1, 7) == "Bash(~/") out = out ",Bash(" ENVIRON["HOME"] "/" substr(entry[i], 8)
         }
         print out }'
+}
+
+# Print the model of an agent ("model-<agent>: <alias>" in the allowlist file); nothing when there is no line.
+model_of() {
+    { grep "^model-$1: " "$ALLOWED_TOOLS_FILE" || true; } | head -n 1 | sed "s/^model-$1: //"
+}
+
+# Print the result text of a run (the JSON field result; the raw output when it is no JSON), then one usage line, also
+# appended to the usage log. Only fields that exist in the JSON are shown.
+report_run() {
+    local out=$1 agent=$2 issue=$3 seconds=$4 usage line
+    if ! jq -e . >/dev/null 2>&1 <<<"$out"; then printf '%s\n' "$out"; return 0; fi
+    jq -r '.result // empty' <<<"$out"
+    usage=$(jq -r '[(if .usage.input_tokens != null then "in=\(.usage.input_tokens)" else empty end),
+        (if .usage.output_tokens != null then "out=\(.usage.output_tokens)" else empty end),
+        (if .usage.cache_creation_input_tokens != null or .usage.cache_read_input_tokens != null then "cache=\((.usage.cache_creation_input_tokens // 0) + (.usage.cache_read_input_tokens // 0))" else empty end),
+        (if .total_cost_usd != null then "cost=$\(.total_cost_usd)" else empty end)] | join(" ")' <<<"$out")
+    line="usage: $agent ${issue:+#$issue }${seconds}s${usage:+ $usage}"
+    if [ "$(jq -r '.is_error // false' <<<"$out")" = true ]; then
+        line="$line error=$(jq -r '[.subtype, .terminal_reason] | map(select(. != null)) | join("/")' <<<"$out")"
+    fi
+    echo "$line"
+    mkdir -p "$(dirname "$USAGE_LOG")"
+    printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line" >> "$USAGE_LOG"
 }
 
 # Park the issues of an action for the user, with the reason as comment.
@@ -146,8 +172,13 @@ while :; do
     previous=$action
 
     echo "== run $dispatches: $agent ${issue:+#$issue }($(jq -r .reason <<<"$action"))"
+    model=$(model_of "$agent")
+    model_args=()
+    [ -z "$model" ] || model_args=(--model "$model")
     agent_rc=0
-    "$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" ${extra_dirs[@]+"${extra_dirs[@]}"} || agent_rc=$?
+    started=$SECONDS
+    run_out=$("$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" --output-format json ${model_args[@]+"${model_args[@]}"} ${extra_dirs[@]+"${extra_dirs[@]}"}) || agent_rc=$?
+    report_run "$run_out" "$agent" "$issue" "$((SECONDS - started))"
     if [ "$agent_rc" -ne 0 ]; then
         echo "agent $agent failed (exit $agent_rc) on ${issue:+#$issue}${issue:-its column}; its claim stays; start the orchestrator again to resume" >&2
         exit "$EXIT_AGENT_FAILED"
