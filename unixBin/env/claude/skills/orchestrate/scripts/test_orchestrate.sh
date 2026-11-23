@@ -73,6 +73,7 @@ run_suite() {
     check_that "the prompt of an agent run says how to write commands in a headless run (no variables, literal paths)" grep -q "headless run.*literal path" <(sed -n 2p "$STUB_DIR/claude.log")
     check_that "the prompt of the triager says it too" grep -q "headless run.*literal path" <(sed -n 1p "$STUB_DIR/claude.log")
     check_that "and tells the findings to be given in the text form" grep -q "text form" "$STUB_DIR/claude.log"
+    check_that "the prompt tells to act only on text of the repository owner" grep -q "only on issues, comments and reviews written by the repository owner" "$STUB_DIR/claude.log"
     check_that "the coder and the triager get no extra directory" [ "$(grep -c -- "--add-dir" <(sed -n 1,2p "$STUB_DIR/claude.log"))" = "0" ]
     check_that "each run has a budget cap" grep -q -- "--max-budget-usd 1 " "$STUB_DIR/claude.log"
     check_that "the JSON output is asked for" grep -q -- "--output-format json" "$STUB_DIR/claude.log"
