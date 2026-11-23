@@ -13,7 +13,9 @@ SCRIPT_UNDER_TEST=${REVIEW_WORKTREE_UNDER_TEST:-$SCRIPT_DIR/review-worktree.sh}
 source "$SCRIPT_DIR/../../project-board/scripts/testing-lib.sh"
 handle_test_help "$@"
 
-export GIT_CONFIG_GLOBAL="$TEST_TMP/gitconfig" GIT_CONFIG_NOSYSTEM=1 REVIEW_WORKTREE_ROOT="$TEST_TMP/wt-root"
+export GIT_CONFIG_GLOBAL="$TEST_TMP/gitconfig" GIT_CONFIG_NOSYSTEM=1 REVIEW_WORKTREE_ROOT="$TEST_TMP/wt-link"
+mkdir -p "$TEST_TMP/wt-real"
+ln -s "$TEST_TMP/wt-real" "$TEST_TMP/wt-link"   # a root behind a symlink, like /var -> /private/var on macOS
 CASE_NO=0
 
 # Create a repo with a fetched remote branch F/5/test (one extra file on it) and go into it.
@@ -88,7 +90,12 @@ run_suite() {
     run_script prune extra
     check_that "prune takes no argument" [ "$RC" -ne 0 ]
     run_script root
-    check_that "root prints the worktree root" [ "$OUT" = "$REVIEW_WORKTREE_ROOT" ]
+    check_that "root prints the physical path, not the symlink" [ "$OUT" = "$(cd "$TEST_TMP/wt-real" && pwd -P)" ]
+    root=$OUT
+    run_script add F/5/test
+    check_that "root is the parent directory of an add result" [ "$(dirname "$OUT")" = "$root" ]
+    check_that "root is a prefix of an add result" [ "${OUT#"$root"/}" != "$OUT" ]
+    run_script prune
     run_script root extra
     check_that "root takes no argument" [ "$RC" -ne 0 ]
     run_script

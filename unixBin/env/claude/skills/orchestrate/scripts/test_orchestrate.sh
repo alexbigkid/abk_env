@@ -312,7 +312,7 @@ run_suite() {
 
     check_that "the real allowlist file has a line for every agent" [ "$(grep -c -E '^(triager|coder|reviewer|tester): ' "$SCRIPT_DIR/allowed-tools.conf")" = "4" ]
 
-    check_that "no agent may run an interpreter (bash, zsh, sh): it would allow any command" [ "$(grep -c -E 'Bash\((bash|zsh|sh)[: )]' "$SCRIPT_DIR/allowed-tools.conf")" = "0" ]
+    check_that "no agent may run an interpreter (bash, zsh, sh): it would allow any command" [ "$(grep -c -E 'Bash\((bash|zsh|sh|dash|ksh|env|python3?|node|perl|ruby|xargs|sudo|eval|exec|nohup|time)[: )]' "$SCRIPT_DIR/allowed-tools.conf")" = "0" ]
     for agent in coder reviewer tester; do
         check_that "the $agent may run run-unit-tests.sh by its literal path" grep -q -E "^$agent: .*Bash\(~/.claude/skills/project-board/scripts/run-unit-tests.sh:\*\)" "$SCRIPT_DIR/allowed-tools.conf"
     done
