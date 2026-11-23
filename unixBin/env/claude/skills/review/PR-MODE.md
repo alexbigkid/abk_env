@@ -48,7 +48,7 @@ Standards, Spec and Quality as in SKILL.md (sources of standards, the issue as s
 **Classify every finding**, no untagged ones:
 - `[must-fix]`: the acceptance criteria are not met, a bug, a security problem, a broken or missing test for the change, or a hard standard violation.
 - `[suggestion]`: style, an alternative design, optional hardening, extra tests beyond the scope.
-- **Quality findings** are `[suggestion]` by default. They are `[must-fix]` only for clear waste (for example quadratic work over data that grows, one API call per item where one batched call is possible) or a change that is untestable by design. Advise multi-threading or multiprocessing only where the gain is real; otherwise do not mention it.
+- **Quality findings** are `[suggestion]` by default. They are `[must-fix]` only for clear waste (for example quadratic work over data that grows, one API call per item where one batched call is possible) or a change that is untestable by design. The Quality sub-agent marks each finding `clear` or `judgement call`: `clear` becomes `[must-fix]`, `judgement call` becomes `[suggestion]`. Advise multi-threading or multiprocessing only where the gain is real; otherwise do not mention it.
 
 ## 4. Post one review
 

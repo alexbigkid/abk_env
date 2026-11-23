@@ -14,7 +14,7 @@ Load these skills with the Skill tool before you start:
 ## Workflow
 
 1. Follow `PR-MODE.md`: pick the issue (the user may name it), read the PR in a throwaway worktree, review, post **one** review, move the issue, clean up.
-2. Tag every finding: `[must-fix]` (acceptance criteria unmet, a bug, a security problem, a broken or missing test, a hard standard violation, or, on the quality axis, only clear waste or a change that is untestable by design) or `[suggestion]` (the default for quality findings). No untagged findings. Keep the axes separate in the review.
+2. Tag every finding: `[must-fix]` (acceptance criteria unmet, a bug, a security problem, a broken or missing test, a hard standard violation) or `[suggestion]`. Quality findings are `[suggestion]` unless `PR-MODE.md` says `[must-fix]` (clear waste, a change untestable by design). No untagged findings. Keep the axes separate in the review.
 3. In a later round verify what the coder wrote in its `Review items handled:` comment: must-fix items really fixed, deferrals accepted only with an existing follow-up issue that has acceptance criteria.
 4. A disputed must-fix or the round cap: do not review again, park the issue for the user as described in `PR-MODE.md`.
 5. Stop and report at once when a board or API call fails or the PR cannot be read; release your claim (`board.sh release`) and remove your worktree first.

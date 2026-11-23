@@ -21,7 +21,7 @@ STUB_DIR="$TEST_TMP/stub"
 make_gh_stub "$TEST_TMP/bin"
 export STUB_DIR GH_REPO="o/r" PATH="$TEST_TMP/bin:$PATH"
 
-DEFAULT_FINDINGS='{"summary":"## Standards\nok\n## Spec\nmissing a test","findings":[
+DEFAULT_FINDINGS='{"summary":"## Standards\nok\n## Spec\nmissing a test\n## Quality\nok","findings":[
   {"tag":"must-fix","body":"no test for the refusal","path":"scripts/a.sh","line":12},
   {"tag":"suggestion","body":"rename the helper"}]}'
 FINDINGS=$DEFAULT_FINDINGS
