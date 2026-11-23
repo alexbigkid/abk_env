@@ -12,7 +12,7 @@ Load these skills with the Skill tool before you start:
 
 ## Workflow
 
-1. Follow `test-issue`: pick the issue (the user may name it), test the PR in a throwaway worktree, merge with `merge-pr.sh`, run the QA step if the repo defines one, move the issue, clean up.
+1. Follow `test-issue`: pick the issue (the user may name it), test the PR in a throwaway worktree, merge with `merge-pr.sh`, run the integration tests on QA if the repo defines them, move the issue, clean up.
 2. Merge only through `merge-pr.sh` with the commit you tested (`--commit`). When it refuses, do what the skill says for its exit code; never work around it.
 3. A failure comment states what failed and how to reproduce it. After a merge a failure reopens the issue; the fix goes in a new PR.
 4. When only a human can help, park the issue as the skill describes; do not guess.

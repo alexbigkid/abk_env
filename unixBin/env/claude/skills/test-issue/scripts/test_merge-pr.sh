@@ -16,6 +16,7 @@ handle_test_help "$@"
 source "$SCRIPT_DIR/../../review/scripts/review-lib.sh"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/../../review/scripts/review-stub-lib.sh"
+MAX_CHECKS=$(sed -n 's/^MAX_CHECKS=//p' "$SCRIPT_DIR/merge-pr.sh")
 
 STUB_DIR="$TEST_TMP/stub"
 MERGE_SHA="1111111111111111111111111111111111111111"
@@ -42,7 +43,7 @@ STUB
 
 # Set the checks of the PR: a JSON array of contexts (CheckRun or StatusContext nodes).
 set_checks() {
-    jq -n --argjson nodes "$1" '{data: {repository: {pullRequest: {title: "Add the thing", commits: {nodes: [{commit: {statusCheckRollup: {contexts: {nodes: $nodes}}}}]}}}}}' > "$STUB_DIR/checks.json"
+    jq -n --argjson nodes "$1" '{data: {repository: {pullRequest: {title: "Add the thing", commits: {nodes: [{commit: {statusCheckRollup: {contexts: {pageInfo: {hasNextPage: false}, nodes: $nodes}}}}]}}}}}' > "$STUB_DIR/checks.json"
 }
 
 # Set the state GitHub reports after the merge: MERGED or OPEN, and whether the merge commit is signed.
@@ -52,19 +53,19 @@ set_merge_commit() {
 }
 
 # Build a CheckRun node: name, status, conclusion, required.
-run() { jq -n --arg n "$1" --arg s "$2" --arg c "$3" --argjson r "$4" '{__typename: "CheckRun", name: $n, status: $s, conclusion: (if $c == "" then null else $c end), isRequired: $r}'; }
+check_run_node() { jq -n --arg n "$1" --arg s "$2" --arg c "$3" --argjson r "$4" '{__typename: "CheckRun", name: $n, status: $s, conclusion: (if $c == "" then null else $c end), isRequired: $r}'; }
 
 # Reset the stub to a PR that can be merged: all checks green, MERGEABLE, merge commit signed.
-reset() {
+reset_stub() {
     rm -f "$STUB_DIR/merge.log" "$STUB_DIR/merged" "$STUB_DIR/merge-refused" "$STUB_DIR/queries.log"
     set_pr 0 no 0
-    set_checks "[$(run build COMPLETED SUCCESS true)]"
+    set_checks "[$(check_run_node build COMPLETED SUCCESS true)]"
     set_merge_commit MERGED true
 }
 
 # Run the whole suite with the current shell.
 run_suite() {
-    reset
+    reset_stub
     run_script 5 --commit "$HEAD_SHA"
     check_that "a green mergeable PR is merged" [ "$RC" -eq 0 ]
     check_that "the success line names the merge commit and that it is verified" [ "$OUT" = "merged: $MERGE_SHA verified=true" ]
@@ -73,25 +74,25 @@ run_suite() {
     check_that "the merge title is the PR title with its number" grep -q -- "--subject Add the thing (#7)" "$STUB_DIR/merge.log"
     check_that "it never rebases" [ "$(grep -c -- "--rebase" "$STUB_DIR/merge.log")" = "0" ]
 
-    reset
+    reset_stub
     run_script 5 --commit "$HEAD_SHA" --dry-run
     check_that "dry run succeeds" [ "$RC" -eq 0 ]
-    check_that "dry run says what it would merge" grep -q "^would merge: PR #7" <<<"$OUT"
+    check_that "dry run says what it would merge" grep -q "^would merge: PR #7 at $HEAD_SHA (1 gating checks green)" <<<"$OUT"
     check_that "dry run does not merge" [ ! -f "$STUB_DIR/merge.log" ]
 
-    reset
+    reset_stub
     set_pr none no 0
     run_script 5 --commit "$HEAD_SHA"
     check_that "refuses without an open PR" [ "$RC" -eq 1 ]
     check_that "says why" grep -q "no open pull request" <<<"$OUT"
 
-    reset
+    reset_stub
     run_script 5 --commit "0000000000000000000000000000000000000000"
     check_that "refuses when the PR head is not the tested commit" [ "$RC" -eq 1 ]
     check_that "says to test again" grep -q "test again" <<<"$OUT"
     check_that "nothing was merged for a moved head" [ ! -f "$STUB_DIR/merge.log" ]
 
-    reset
+    reset_stub
     set_pr 0 no 0 CONFLICTING
     run_script 5 --commit "$HEAD_SHA"
     check_that "refuses a conflicting PR" [ "$RC" -eq 1 ]
@@ -100,31 +101,31 @@ run_suite() {
     run_script 5 --commit "$HEAD_SHA"
     check_that "refuses a PR whose mergeable state is unknown" [ "$RC" -eq 1 ]
 
-    reset
-    set_checks "[$(run build COMPLETED SUCCESS true), $(run lint COMPLETED FAILURE true)]"
+    reset_stub
+    set_checks "[$(check_run_node build COMPLETED SUCCESS true), $(check_run_node lint COMPLETED FAILURE true)]"
     run_script 5 --commit "$HEAD_SHA"
     check_that "a failed required check gives exit 2" [ "$RC" -eq 2 ]
     check_that "the failed check is named" grep -q "checks failed: lint" <<<"$OUT"
     check_that "nothing was merged with a failed check" [ ! -f "$STUB_DIR/merge.log" ]
 
-    reset
-    set_checks "[$(run build IN_PROGRESS "" true)]"
+    reset_stub
+    set_checks "[$(check_run_node build IN_PROGRESS "" true)]"
     run_script 5 --commit "$HEAD_SHA"
     check_that "a running required check gives exit 3" [ "$RC" -eq 3 ]
     check_that "the running check is named" grep -q "still running: build" <<<"$OUT"
     check_that "nothing was merged with a running check" [ ! -f "$STUB_DIR/merge.log" ]
 
-    reset
-    set_checks "[$(run build COMPLETED SUCCESS true), $(run optional COMPLETED FAILURE false), $(run slow IN_PROGRESS "" false)]"
+    reset_stub
+    set_checks "[$(check_run_node build COMPLETED SUCCESS true), $(check_run_node optional COMPLETED FAILURE false), $(check_run_node slow IN_PROGRESS "" false)]"
     run_script 5 --commit "$HEAD_SHA"
     check_that "failed or running checks that are not required do not block when some are required" [ "$RC" -eq 0 ]
 
-    reset
-    set_checks "[$(run build COMPLETED SUCCESS false), $(run lint COMPLETED TIMED_OUT false)]"
+    reset_stub
+    set_checks "[$(check_run_node build COMPLETED SUCCESS false), $(check_run_node lint COMPLETED TIMED_OUT false)]"
     run_script 5 --commit "$HEAD_SHA"
     check_that "when no check is marked required every check gates the merge" [ "$RC" -eq 2 ]
 
-    reset
+    reset_stub
     set_checks '[{"__typename":"StatusContext","context":"ci/legacy","state":"ERROR","isRequired":true}]'
     run_script 5 --commit "$HEAD_SHA"
     check_that "a failed commit status counts like a failed check run" [ "$RC" -eq 2 ]
@@ -132,37 +133,50 @@ run_suite() {
     run_script 5 --commit "$HEAD_SHA"
     check_that "a pending commit status counts as running" [ "$RC" -eq 3 ]
 
-    reset
-    set_checks "[$(run build COMPLETED SKIPPED true), $(run docs COMPLETED NEUTRAL true)]"
+    reset_stub
+    set_checks "[$(check_run_node build COMPLETED SKIPPED true), $(check_run_node docs COMPLETED NEUTRAL true)]"
     run_script 5 --commit "$HEAD_SHA"
     check_that "skipped and neutral checks do not block" [ "$RC" -eq 0 ]
 
-    reset
+    reset_stub
     set_checks '[]'
     run_script 5 --commit "$HEAD_SHA"
     check_that "a PR without any check can be merged (nothing gates it)" [ "$RC" -eq 0 ]
 
-    reset
+    reset_stub
     jq -n '{data: {repository: {pullRequest: {title: "t", commits: {nodes: [{commit: {statusCheckRollup: null}}]}}}}}' > "$STUB_DIR/checks.json"
     run_script 5 --commit "$HEAD_SHA"
     check_that "a commit without a check rollup can be merged" [ "$RC" -eq 0 ]
 
-    reset
+    reset_stub
     set_merge_commit MERGED false
     run_script 5 --commit "$HEAD_SHA"
     check_that "a merge commit that is not verified gives exit 4" [ "$RC" -eq 4 ]
     check_that "the output says verified=false" grep -q "verified=false" <<<"$OUT"
 
-    reset
+    reset_stub
     touch "$STUB_DIR/merge-refused"
     run_script 5 --commit "$HEAD_SHA"
     check_that "a refused merge is an error" [ "$RC" -eq 1 ]
     check_that "it says the merge was refused" grep -q "was refused" <<<"$OUT"
 
-    reset
+    reset_stub
     set_merge_commit OPEN true
     run_script 5 --commit "$HEAD_SHA"
     check_that "a PR that GitHub does not report as merged is an error" [ "$RC" -eq 1 ]
+
+    reset_stub
+    set_checks "[$(check_run_node build COMPLETED SUCCESS true)]"
+    jq '.data.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.contexts.pageInfo.hasNextPage = true' "$STUB_DIR/checks.json" > "$STUB_DIR/checks.tmp" && mv "$STUB_DIR/checks.tmp" "$STUB_DIR/checks.json"
+    run_script 5 --commit "$HEAD_SHA"
+    check_that "more checks than can be read is an error, not a green light" [ "$RC" -eq 1 ]
+    check_that "it says why" grep -q "more than $MAX_CHECKS checks" <<<"$OUT"
+    check_that "nothing was merged when the checks cannot all be judged" [ ! -f "$STUB_DIR/merge.log" ]
+
+    reset_stub
+    run_script 5 --dry-run --commit "$HEAD_SHA"
+    check_that "the options may come in any order" [ "$RC" -eq 0 ]
+    check_that "and the dry run still does not merge" [ ! -f "$STUB_DIR/merge.log" ]
 
     run_script
     check_that "no arguments is a usage error" [ "$RC" -eq 1 ]
@@ -172,6 +186,12 @@ run_suite() {
     check_that "a non-numeric issue is refused" [ "$RC" -eq 1 ]
     run_script 5 --commit "$HEAD_SHA" --force
     check_that "an unknown option is refused" [ "$RC" -eq 1 ]
+    run_script 5 --commit "$HEAD_SHA" --dry-run extra
+    check_that "an extra argument is refused" [ "$RC" -eq 1 ]
+    run_script 5 --dry-run --dry-run --dry-run
+    check_that "a missing --commit is refused" [ "$RC" -eq 1 ]
+    run_script 5 --commit
+    check_that "--commit without a value is refused" [ "$RC" -eq 1 ]
     run_script --help
     check_that "--help prints the usage and exits 0" [ "$RC" -eq 0 ]
 }
