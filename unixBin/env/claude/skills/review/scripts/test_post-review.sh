@@ -59,6 +59,29 @@ run_suite() {
     check_that "dry-run: the finding without a location is listed in the body" [ "$(jq -r '.variables.input.body | contains("- [suggestion] rename the helper")' <<<"$OUT")" = "true" ]
     check_that "dry-run: the summary is in the body" [ "$(jq -r '.variables.input.body | contains("missing a test")' <<<"$OUT")" = "true" ]
 
+    # The same review as text (no JSON: a headless permission check refuses a heredoc with JSON in it).
+    FINDINGS=$(printf '%s\n' '## Standards' 'ok' '## Spec' 'missing a test' '@must-fix scripts/a.sh:12' 'no test for the refusal' '@suggestion' 'rename the helper')
+    post_pinned 2 --dry-run
+    check_that "text findings: dry-run succeeds" [ "$RC" -eq 0 ]
+    check_that "text findings: the located finding becomes an inline thread, with its tag" [ "$(jq -c '.variables.input.threads' <<<"$OUT")" = '[{"path":"scripts/a.sh","line":12,"side":"RIGHT","body":"[must-fix] no test for the refusal"}]' ]
+    check_that "text findings: the finding without a location is listed in the body" [ "$(jq -r '.variables.input.body | contains("- [suggestion] rename the helper")' <<<"$OUT")" = "true" ]
+    check_that "text findings: the summary is everything before the first finding" [ "$(jq -r '.variables.input.body | contains("## Spec\nmissing a test")' <<<"$OUT")" = "true" ]
+    check_that "text findings: the title counts them" [ "$(jq -r '.variables.input.body | split("\n")[0]' <<<"$OUT")" = "$ROUND_MARKER 3 of $MAX_REVIEW_ROUNDS: 1 must-fix, 1 suggestion" ]
+    FINDINGS=$(printf '%s\n' 'all good' '@suggestion scripts/a.sh:7' 'line one' 'line two')
+    post_pinned 2 --dry-run
+    check_that "text findings: a body may span lines" [ "$(jq -r '.variables.input.threads[0].body' <<<"$OUT")" = "$(printf '[suggestion] line one\nline two')" ]
+    FINDINGS=$(printf '%s\n' 'no findings, a clean review')
+    post_pinned 2 --dry-run
+    check_that "text findings: a clean review has only a summary" [ "$RC" -eq 0 ]
+    check_that "text findings: and counts 0 and 0" [ "$(jq -r '.variables.input.body | split("\n")[0]' <<<"$OUT")" = "$ROUND_MARKER 3 of $MAX_REVIEW_ROUNDS: 0 must-fix, 0 suggestion" ]
+    FINDINGS=$(printf '%s\n' 'summary' '@must-fix scripts/a.sh' 'a location needs a line number')
+    post_pinned 2 --dry-run
+    check_that "text findings: a location without a line number is refused" [ "$RC" -ne 0 ]
+    FINDINGS=$(printf '%s\n' 'summary' '@must-fix scripts/a.sh:3')
+    post_pinned 2 --dry-run
+    check_that "text findings: a finding without text is refused" [ "$RC" -ne 0 ]
+    FINDINGS=$DEFAULT_FINDINGS
+
     make_gh_stub "$TEST_TMP/bin"
     set_pr 2 no 0
     post_pinned 2
@@ -134,10 +157,13 @@ run_suite() {
     check_that "the refusal says there is no open pull request" grep -q "no open pull request" <<<"$OUT"
 
     set_pr 0 no 0
-    FINDINGS='not json'
+    FINDINGS='{"summary": "broken'
     post_pinned 0
     check_that "invalid JSON is refused" [ "$RC" -ne 0 ]
     check_that "the reason of jq is shown" grep -q "parse error" <<<"$OUT"
+    FINDINGS='all fine, nothing to report'
+    post_pinned 0 --dry-run
+    check_that "text without findings is a clean review (the text is the summary)" [ "$RC" -eq 0 ]
     FINDINGS='{"findings":[{"tag":"nice-to-have","body":"x"}]}'
     post_pinned 0
     check_that "an unknown tag is refused" [ "$RC" -ne 0 ]

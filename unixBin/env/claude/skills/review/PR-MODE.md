@@ -56,14 +56,23 @@ Standards, Spec and Quality as in SKILL.md (sources of standards, the issue as s
 ## 4. Post one review
 
 ```bash
-$P <n> --round <round> --commit "$sha" <<'JSON'
-{"summary": "## Standards\n...\n## Spec\n...\n## Quality\n...",
- "findings": [{"tag": "must-fix", "body": "...", "path": "scripts/a.sh", "line": 12},
-              {"tag": "suggestion", "body": "..."}]}
-JSON
+$P <n> --round <round> --commit "$sha" <<'FINDINGS'
+## Standards
+...
+## Spec
+...
+## Quality
+...
+@must-fix scripts/a.sh:12
+the text of the finding, any number of lines
+@suggestion
+a finding without a location
+FINDINGS
 ```
 
-`path` and `line` go together; `line` is the line number in the **new** version of the file and must lie inside the diff (GitHub rejects others; the script then posts everything in the review body). A finding without a location is listed in the body. The review is a plain comment review titled `Review round <k> of <max>` (GitHub does not allow approving or requesting changes on a PR of your own account, the tags carry the meaning). A clean review has `"findings": []`.
+The text before the first `@` line is the summary; a finding starts with `@must-fix <file>:<line>` (or `@suggestion`, with or without a location) and runs to the next `@` line. Use this text form, not JSON: a headless run refuses a heredoc that contains JSON (`{"`). The JSON form of the usage still works where the shell is not restricted. A clean review has only the summary.
+
+`file:line` go together; `line` is the line number in the **new** version of the file and must lie inside the diff (GitHub rejects others; the script then posts everything in the review body). A finding without a location is listed in the body. The review is a plain comment review titled `Review round <k> of <max>` (GitHub does not allow approving or requesting changes on a PR of your own account, the tags carry the meaning). 
 
 It is refused when another review was posted meanwhile (`--round` no longer matches) or the PR head moved (`--commit` no longer matches): remove the worktree (`$W remove "$dir"`) and start over from step 1, with a fresh read of the state, a new fetch, a new worktree and a new `sha`. A refused post does not use up a round.
 

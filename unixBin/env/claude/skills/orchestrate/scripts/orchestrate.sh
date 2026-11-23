@@ -19,6 +19,9 @@ ALLOWED_TOOLS_FILE=${ORCHESTRATE_ALLOWED_TOOLS:-$SCRIPT_DIR/allowed-tools.conf}
 LOCK_DIR=${ORCHESTRATE_LOCK_DIR:-${TMPDIR:-/tmp}/abk-orchestrate.lock}
 BUDGET_USD=${ORCHESTRATE_BUDGET_USD:-5}
 MAX_DISPATCHES=${ORCHESTRATE_MAX_DISPATCHES:-50}
+# Appended to every prompt. Verified with real headless probes: the permission check refuses a command that sets a variable
+# (X=..., X=~/..., $(...)) and a heredoc that contains JSON ({" ), but runs a literal path with a text heredoc.
+HEADLESS_NOTE="This is a headless run and its permission check refuses a command that sets or expands a shell variable or uses \$(...), and a heredoc that contains JSON. So call the scripts by their full literal path (~/.claude/skills/<skill>/scripts/<script>), write every value (issue number, commit, directory) out literally in each command, and give the findings of a review to post-review.sh in the text form of its usage, not as JSON."
 EXIT_AGENT_FAILED=2
 EXIT_LIMIT=3
 
@@ -61,8 +64,14 @@ allowed_tools() {
     line=$(grep "^$1: " "$ALLOWED_TOOLS_FILE" || true)
     [ -n "$line" ] || die "no allowlist for agent '$1' in $ALLOWED_TOOLS_FILE"
     # The agents call the scripts through a variable (B=~/.claude/...; $B ...): the permission check then matches only the
-    # expanded home path, so every ~/ path is allowed in both forms.
-    printf '%s\n' "${line#"$1": }" | sed -E "s#Bash\(~/([^)]*)\)#Bash(~/\1),Bash($HOME/\1)#g"
+    # expanded home path, so every Bash(~/...) entry is allowed in both forms (awk, so no character of $HOME is special).
+    printf '%s\n' "${line#"$1": }" | awk -v home="$HOME" '{
+        n = split($0, entry, ", "); out = ""
+        for (i = 1; i <= n; i++) {
+            out = out (i > 1 ? "," : "") entry[i]
+            if (substr(entry[i], 1, 7) == "Bash(~/") out = out ",Bash(" home "/" substr(entry[i], 8)
+        }
+        print out }'
 }
 
 # Park the issues of an action for the user, with the reason as comment.
@@ -79,9 +88,9 @@ prompt_for() {
     agent=$(jq -r .agent <<<"$1")
     issue=$(jq -r '.issue // empty' <<<"$1")
     if [ -z "$issue" ]; then
-        echo "Triage the issues that wait in the Triage column ($(jq -r '.issues | map("#\(.)") | join(" ")' <<<"$1")). Follow your skill and report."
+        echo "Triage the issues that wait in the Triage column ($(jq -r '.issues | map("#\(.)") | join(" ")' <<<"$1")). Follow your skill and report. $HEADLESS_NOTE"
     else
-        echo "Work on issue #$issue ($(jq -r .reason <<<"$1")). Follow your skill and report. You are the $agent."
+        echo "Work on issue #$issue ($(jq -r .reason <<<"$1")). Follow your skill and report. You are the $agent. $HEADLESS_NOTE"
     fi
 }
 
