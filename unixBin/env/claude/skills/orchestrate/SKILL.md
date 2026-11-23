@@ -34,6 +34,8 @@ The first row that has work wins:
 
 - **Lock**: a second orchestrator refuses to start; do not run agents by hand meanwhile.
 - **Permissions**: each agent gets only the tools listed for it in `scripts/allowed-tools.conf`; widen that file when an agent reports a denied command. It is a first layer, not a sandbox: `bash` and `zsh` are allowed so that tests can run, which also allows any command through them (see the note in the file and issue #9).
+- **Headless commands**: the permission check of a headless run refuses a command that sets or expands a shell variable (`X=...`, `~` or `$HOME` in an assignment, `$(...)`) and a heredoc that contains JSON; it runs a literal path with a text heredoc (verified with real probes). The driver therefore adds a note to every prompt: call scripts by their full literal path, write values literally, give review findings in the text form of `post-review.sh`.
+- **Worktree directory**: a headless run refuses `cd` outside its session directories. Review worktrees are therefore created in one dedicated root (`review-worktree.sh root`) and the driver adds exactly that directory (`--add-dir`) for the reviewer and the tester.
 - **Budget**: `ORCHESTRATE_BUDGET_USD` (default 5) per agent run; `ORCHESTRATE_MAX_DISPATCHES` (default 50) per start.
 - **No progress**: the same action twice in a row (the board did not change) parks the issue(s) with `scripts/park.sh` (label `needs-info`, a comment, back to Triage) instead of running it again.
 - **Round cap**: a Review issue at `MAX_REVIEW_ROUNDS` is parked without starting the reviewer (`review-state.sh` reads the cap from its single definition).

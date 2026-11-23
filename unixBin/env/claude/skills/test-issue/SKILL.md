@@ -16,6 +16,8 @@ M=~/.claude/skills/test-issue/scripts/merge-pr.sh
 H=~/.claude/skills/code-issue/scripts/with-https.sh     # git over HTTPS: no SSH, no YubiKey
 ```
 
+In a headless run (the orchestrator) write the literal paths instead of these variables.
+
 ## 1. Pick the issue
 
 The user may name one. Otherwise take the first issue in Testing that is not waiting for a human:

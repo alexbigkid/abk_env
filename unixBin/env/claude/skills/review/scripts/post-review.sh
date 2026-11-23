@@ -15,12 +15,38 @@ DRY_RUN_FLAG="--dry-run"
 ROUND_FLAG="--round"
 COMMIT_FLAG="--commit"
 INLINE_REJECTED_PATTERN="(line|path|thread)[^.]*(diff|resolve|invalid|exist)"
+FINDING_MARK_MUST_FIX="@must-fix"
+FINDING_MARK_SUGGESTION="@suggestion"
+
+# Print the findings given as text (see the usage) as the JSON the rest of the script works with.
+text_to_json() {
+    jq -Rs --arg must "$FINDING_MARK_MUST_FIX" --arg sugg "$FINDING_MARK_SUGGESTION" '
+        def trim: sub("^\\s+"; "") | sub("\\s+$"; "");
+        split("\n")
+        | reduce .[] as $line ({summary: [], findings: []};
+            if ($line | startswith($must) or startswith($sugg)) then
+                ($line | capture("^(?<mark>\\S+)(?: +(?<loc>\\S+))? *$")) as $m
+                | .findings += [{tag: ($m.mark | ltrimstr("@")), loc: $m.loc, body: []}]
+            elif (.findings | length) == 0 then .summary += [$line]
+            else .findings[-1].body += [$line] end)
+        | {summary: (.summary | join("\n") | trim),
+           findings: [.findings[] | {tag, body: (.body | join("\n") | trim)}
+                      + (if .loc == null then {} elif (.loc | test("^.+:[0-9]+$") | not) then error("the location of a finding must be <file>:<line>") else {path: (.loc | sub(":[0-9]+$"; "")), line: (.loc | capture(":(?<n>[0-9]+)$").n | tonumber)} end)]}'
+}
+
 # shellcheck disable=SC2016  # $input is a GraphQL variable, not shell
 MUTATION='mutation($input: AddPullRequestReviewInput!){addPullRequestReview(input:$input){pullRequestReview{id url}}}'
 
 usage() {
     cat <<USAGE
-usage: post-review.sh <issue-number> $ROUND_FLAG <k> $COMMIT_FLAG <sha> [$DRY_RUN_FLAG]      (the findings come as JSON on stdin)
+usage: post-review.sh <issue-number> $ROUND_FLAG <k> $COMMIT_FLAG <sha> [$DRY_RUN_FLAG]      (the findings come on stdin)
+Findings as TEXT (use this one in a heredoc: a headless permission check refuses a heredoc with JSON in it):
+  <markdown summary of the review: all lines before the first finding>
+  $FINDING_MARK_MUST_FIX <file>:<line>        a finding with a location, its text on the following lines
+  <text, any number of lines>
+  $FINDING_MARK_SUGGESTION                      a finding without a location
+  <text>
+Findings as JSON (when the shell is not restricted; a first character "{" selects it):
 {"summary": "<markdown summary of the review>",
  "findings": [{"tag": "must-fix" | "suggestion", "body": "<text>", "path": "<file>", "line": <n>}, ...]}
 "path" and "line" go together: "line" is the line number in the NEW version of the file and must lie
@@ -76,6 +102,10 @@ done
 [[ "$commit_pin" =~ ^[0-9a-f]{7,40}$ ]] || die "$COMMIT_FLAG needs the commit you reviewed (7 to 40 lower-case hex digits)"
 
 input=$(cat)
+case "$input" in
+    "{"*) ;;
+    *) input=$(text_to_json <<<"$input") || die "the findings text is malformed: a finding line is $FINDING_MARK_MUST_FIX <file>:<line> or $FINDING_MARK_SUGGESTION" ;;
+esac
 if ! check_error=$(jq -e 'type == "object" and (.findings | type == "array")
     and all(.findings[]; (.tag | IN("must-fix", "suggestion")) and (.body | type == "string" and length > 0)
         and ((has("path") and has("line")) or ((has("path") | not) and (has("line") | not)))

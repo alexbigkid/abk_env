@@ -11,6 +11,8 @@ W=~/.claude/skills/review/scripts/review-worktree.sh
 H=~/.claude/skills/code-issue/scripts/with-https.sh     # git over HTTPS: no SSH, no YubiKey
 ```
 
+In a headless run (the orchestrator) write the literal paths instead of these variables.
+
 ## 1. Pick the issue and read its state
 
 The user may name an issue (always without a board). With a board take the first issue in Review that is not waiting for a human:
@@ -44,7 +46,7 @@ Standards, Spec and Quality as in SKILL.md (sources of standards, the issue as s
 - `handledIsNew: true`: read `handledComment` (the coder's `Review items handled:` summary, `pr-feedback.sh` hides it) and the unresolved threads, and check each item.
 - `handledIsNew: false` (no comment since your last review, the coder gave no answer): ignore the old comment; every earlier `[must-fix]` is open unless the code shows it fixed.
 - A `[must-fix]` must be really fixed in the code.
-- A deferred `[suggestion]` is accepted only if its follow-up issue exists and has acceptance criteria (`gh issue view <m>`); otherwise re-mark it `[must-fix]`. Exception: a Quality `judgement call` the coder declines with a reason in its summary stays a `[suggestion]` and is accepted.
+- A `[suggestion]` is settled when the coder fixed it, declined it (`declined (<reason>)`, accepted as given) or deferred it to a follow-up issue that exists and has acceptance criteria (`gh issue view <m>`). A deferral without such an issue is re-marked `[must-fix]`.
 - `disputed (<reason>)` on a must-fix: do not argue it again, go to step 6.
 
 **Classify every finding**, no untagged ones:
@@ -56,21 +58,31 @@ Standards, Spec and Quality as in SKILL.md (sources of standards, the issue as s
 ## 4. Post one review
 
 ```bash
-$P <n> --round <round> --commit "$sha" <<'JSON'
-{"summary": "## Standards\n...\n## Spec\n...\n## Quality\n...",
- "findings": [{"tag": "must-fix", "body": "...", "path": "scripts/a.sh", "line": 12},
-              {"tag": "suggestion", "body": "..."}]}
-JSON
+$P <n> --round <round> --commit "$sha" <<'FINDINGS'
+## Standards
+...
+## Spec
+...
+## Quality
+...
+@must-fix scripts/a.sh:12
+the text of the finding, any number of lines
+@suggestion
+a finding without a location
+FINDINGS
 ```
 
-`path` and `line` go together; `line` is the line number in the **new** version of the file and must lie inside the diff (GitHub rejects others; the script then posts everything in the review body). A finding without a location is listed in the body. The review is a plain comment review titled `Review round <k> of <max>` (GitHub does not allow approving or requesting changes on a PR of your own account, the tags carry the meaning). A clean review has `"findings": []`.
+The text before the first `@` line is the summary; a finding starts with `@must-fix <file>:<line>` (or `@suggestion`, with or without a location) and runs to the next `@` line. Use this text form, not JSON: a headless run refuses a heredoc that contains JSON (`{"`). The JSON form of the usage still works where the shell is not restricted. A clean review has only the summary.
+
+`file:line` go together; `line` is the line number in the **new** version of the file and must lie inside the diff (GitHub rejects others; the script then posts everything in the review body). A finding without a location is listed in the body. The review is a plain comment review titled `Review round <k> of <max>` (GitHub does not allow approving or requesting changes on a PR of your own account, the tags carry the meaning).
 
 It is refused when another review was posted meanwhile (`--round` no longer matches) or the PR head moved (`--commit` no longer matches): remove the worktree (`$W remove "$dir"`) and start over from step 1, with a fresh read of the state, a new fetch, a new worktree and a new `sha`. A refused post does not use up a round.
 
 ## 5. Move the issue
 
 - Any `[must-fix]` open, or a deferral you did not accept: `$B move <n> Todo`, then `$B order <n>` so the rework comes first.
-- Nothing open (only suggestions, or accepted deferrals): `$B move <n> Testing`.
+- Round 1 with any finding at all, also only `[suggestion]`s: the same move to Todo, so the coder evaluates each suggestion once (fix, decline with a reason, or follow-up issue). `round` is 0 in the state you read for your first review.
+- Otherwise (nothing open; suggestions you add in a later round do not send it back, the coder has had its pass): `$B move <n> Testing`.
 
 `move` clears your claim. Then `$W remove "$dir"`.
 

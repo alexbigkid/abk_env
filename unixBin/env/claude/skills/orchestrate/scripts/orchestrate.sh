@@ -14,11 +14,15 @@ source "$SCRIPT_DIR/../../project-board/scripts/lib.sh"
 NEXT_ACTION=${NEXT_ACTION_SCRIPT:-$SCRIPT_DIR/next-action.sh}
 PARK=${PARK_SCRIPT:-$SCRIPT_DIR/park.sh}
 REVIEW_STATE=${REVIEW_STATE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-state.sh}
+WORKTREE_SCRIPT=${WORKTREE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-worktree.sh}
 CLAUDE_BIN=${CLAUDE_BIN:-claude}
 ALLOWED_TOOLS_FILE=${ORCHESTRATE_ALLOWED_TOOLS:-$SCRIPT_DIR/allowed-tools.conf}
 LOCK_DIR=${ORCHESTRATE_LOCK_DIR:-${TMPDIR:-/tmp}/abk-orchestrate.lock}
 BUDGET_USD=${ORCHESTRATE_BUDGET_USD:-5}
 MAX_DISPATCHES=${ORCHESTRATE_MAX_DISPATCHES:-50}
+# Appended to every prompt. Verified with real headless probes: the permission check refuses a command that sets a variable
+# (X=..., X=~/..., $(...)) and a heredoc that contains JSON ({" ), but runs a literal path with a text heredoc.
+HEADLESS_NOTE="This is a headless run and its permission check refuses a command that sets or expands a shell variable or uses \$(...), and a heredoc that contains JSON. So call the scripts by their full literal path (~/.claude/skills/<skill>/scripts/<script>), write every value (issue number, commit, directory) out literally in each command, and give the findings of a review to post-review.sh in the text form of its usage, not as JSON."
 EXIT_AGENT_FAILED=2
 EXIT_LIMIT=3
 
@@ -55,12 +59,21 @@ take_lock() {
 # Release the lock.
 release_lock() { rm -f "$LOCK_DIR/pid"; rmdir "$LOCK_DIR" 2>/dev/null || true; }
 
-# Print the allowlist of an agent (the line after "<agent>: " in the allowlist file).
+# Print the allowlist of an agent (the line after "<agent>: " in the allowlist file), comma separated.
 allowed_tools() {
     local line
     line=$(grep "^$1: " "$ALLOWED_TOOLS_FILE" || true)
     [ -n "$line" ] || die "no allowlist for agent '$1' in $ALLOWED_TOOLS_FILE"
-    printf '%s\n' "${line#"$1": }"
+    # The agents call the scripts through a variable (B=~/.claude/...; $B ...): the permission check then matches only the
+    # expanded home path, so every Bash(~/...) entry is allowed in both forms (awk reads HOME from ENVIRON: -v would process
+    # backslash escapes in the value).
+    printf '%s\n' "${line#"$1": }" | awk '{
+        n = split($0, entry, ", "); out = ""
+        for (i = 1; i <= n; i++) {
+            out = out (i > 1 ? "," : "") entry[i]
+            if (substr(entry[i], 1, 7) == "Bash(~/") out = out ",Bash(" ENVIRON["HOME"] "/" substr(entry[i], 8)
+        }
+        print out }'
 }
 
 # Park the issues of an action for the user, with the reason as comment.
@@ -77,9 +90,9 @@ prompt_for() {
     agent=$(jq -r .agent <<<"$1")
     issue=$(jq -r '.issue // empty' <<<"$1")
     if [ -z "$issue" ]; then
-        echo "Triage the issues that wait in the Triage column ($(jq -r '.issues | map("#\(.)") | join(" ")' <<<"$1")). Follow your skill and report."
+        echo "Triage the issues that wait in the Triage column ($(jq -r '.issues | map("#\(.)") | join(" ")' <<<"$1")). Follow your skill and report. $HEADLESS_NOTE"
     else
-        echo "Work on issue #$issue ($(jq -r .reason <<<"$1")). Follow your skill and report. You are the $agent."
+        echo "Work on issue #$issue ($(jq -r .reason <<<"$1")). Follow your skill and report. You are the $agent. $HEADLESS_NOTE"
     fi
 }
 
@@ -124,13 +137,17 @@ while :; do
         continue
     fi
     tools=$(allowed_tools "$agent")
+    extra_dirs=()
+    case "$agent" in
+        reviewer|tester) extra_dirs=(--add-dir "$("$WORKTREE_SCRIPT" root)") ;;
+    esac
     dispatches=$((dispatches + 1))
     if [ "$dispatches" -gt "$MAX_DISPATCHES" ]; then echo "dispatch limit ($MAX_DISPATCHES) reached, stopping" >&2; exit "$EXIT_LIMIT"; fi
     previous=$action
 
     echo "== run $dispatches: $agent ${issue:+#$issue }($(jq -r .reason <<<"$action"))"
     agent_rc=0
-    "$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" || agent_rc=$?
+    "$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" ${extra_dirs[@]+"${extra_dirs[@]}"} || agent_rc=$?
     if [ "$agent_rc" -ne 0 ]; then
         echo "agent $agent failed (exit $agent_rc) on ${issue:+#$issue}${issue:-its column}; its claim stays; start the orchestrator again to resume" >&2
         exit "$EXIT_AGENT_FAILED"

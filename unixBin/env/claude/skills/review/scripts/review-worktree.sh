@@ -12,10 +12,12 @@ source "$(dirname "$0")/../../project-board/scripts/lib.sh"
 
 REMOTE="origin"
 WORKTREE_PREFIX="review-wt"
+WORKTREE_ROOT=${REVIEW_WORKTREE_ROOT:-${TMPDIR:-/tmp}/abk-review-worktrees}
 
 usage() {
     cat <<USAGE
 usage: review-worktree.sh add <branch>      create a detached worktree of $REMOTE/<branch>, print its path
+       review-worktree.sh root              print the directory all worktrees are created in (a headless run needs it as an extra allowed directory: cd outside the session directories is refused)
        review-worktree.sh remove <path>     remove such a worktree (only paths this script created)
        review-worktree.sh prune             remove all leftovers of earlier runs (worktrees and empty temp dirs)
 The branch must be fetched first: with-https.sh git fetch $REMOTE <branch>
@@ -27,7 +29,8 @@ cmd_add() {
     local branch=$1 dir
     git rev-parse --verify -q "refs/remotes/$REMOTE/$branch" >/dev/null ||
         die "$REMOTE/$branch is not fetched; run: with-https.sh git fetch $REMOTE $branch"
-    dir=$(mktemp -d "${TMPDIR:-/tmp}/$WORKTREE_PREFIX.XXXXXX")
+    mkdir -p "$WORKTREE_ROOT"
+    dir=$(mktemp -d "$WORKTREE_ROOT/$WORKTREE_PREFIX.XXXXXX")
     dir=$(cd "$dir" && pwd -P)
     git worktree add -q --detach "$dir" "refs/remotes/$REMOTE/$branch" || { rmdir "$dir" 2>/dev/null; die "cannot create the worktree"; }
     echo "$dir"
@@ -55,7 +58,7 @@ cmd_prune() {
         if git worktree remove --force "$dir"; then count=$((count + 1)); fi
     done < <(git worktree list --porcelain | sed -n 's/^worktree //p' | grep "/$WORKTREE_PREFIX\." || true)
     git worktree prune
-    find "${TMPDIR:-/tmp}" -maxdepth 1 -type d -name "$WORKTREE_PREFIX.*" -empty -exec rmdir {} + 2>/dev/null || true
+    find "$WORKTREE_ROOT" -maxdepth 1 -type d -name "$WORKTREE_PREFIX.*" -empty -exec rmdir {} + 2>/dev/null || true
     echo "pruned: $count review worktree(s)"
 }
 
@@ -64,10 +67,12 @@ case "${1:-}" in
     add)    [ $# -eq 2 ] || usage_error ;;
     remove) [ $# -eq 2 ] || usage_error ;;
     prune)  [ $# -eq 1 ] || usage_error ;;
+    root)   [ $# -eq 1 ] || usage_error ;;
     *)      usage_error ;;
 esac
 case "$1" in
     add)    cmd_add "$2" ;;
     remove) cmd_remove "$2" ;;
     prune)  cmd_prune ;;
+    root)   echo "$WORKTREE_ROOT" ;;
 esac

@@ -15,6 +15,8 @@ B=~/.claude/skills/project-board/scripts/board.sh
 R=~/.claude/skills/project-board/scripts/blockers.sh
 ```
 
+In a headless run (the orchestrator) write the literal paths instead of these variables.
+
 ## 1. Read the queue
 
 `$Q` returns JSON with the issues in Triage and Todo in board order, top first. Issues further along the board (Done, Doing, ...) are not listed; they only show up as blockers. Per issue: number, title, `column`, labels, `hasAcceptance`, `ranked`, `blockedBy` (each blocker's `state` and board `status`) and `blocking`. With no board (`board: null`) it returns all open issues; skip those with `ranked: true` (already ranked; `ranked` is always false with a board). The repo must have one linked board or none.

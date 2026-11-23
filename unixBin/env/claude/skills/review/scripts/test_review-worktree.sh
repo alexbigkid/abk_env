@@ -13,7 +13,7 @@ SCRIPT_UNDER_TEST=${REVIEW_WORKTREE_UNDER_TEST:-$SCRIPT_DIR/review-worktree.sh}
 source "$SCRIPT_DIR/../../project-board/scripts/testing-lib.sh"
 handle_test_help "$@"
 
-export GIT_CONFIG_GLOBAL="$TEST_TMP/gitconfig" GIT_CONFIG_NOSYSTEM=1
+export GIT_CONFIG_GLOBAL="$TEST_TMP/gitconfig" GIT_CONFIG_NOSYSTEM=1 REVIEW_WORKTREE_ROOT="$TEST_TMP/wt-root"
 CASE_NO=0
 
 # Create a repo with a fetched remote branch F/5/test (one extra file on it) and go into it.
@@ -51,6 +51,7 @@ run_suite() {
     wt=$OUT
     check_that "add succeeds" [ "$RC" -eq 0 ]
     check_that "add prints a directory that exists" [ -d "$wt" ]
+    check_that "the worktree is created in the worktree root (the directory a headless run is allowed to enter)" [ "$(dirname "$wt")" = "$(cd "$REVIEW_WORKTREE_ROOT" && pwd -P)" ]
     check_that "the worktree has the files of the PR branch" [ -f "$wt/pr.txt" ]
     check_that "the worktree is at the tip of the remote branch" [ "$(git -C "$wt" rev-parse HEAD)" = "$(git rev-parse origin/F/5/test)" ]
     check_that "the worktree is detached" [ -z "$(git -C "$wt" branch --show-current)" ]
@@ -64,7 +65,7 @@ run_suite() {
     run_script add F/5/not-fetched
     check_that "an unfetched branch is refused" [ "$RC" -ne 0 ]
     check_that "the refusal has the fetch hint" grep -q "git fetch" <<<"$OUT"
-    check_that "the refused add leaves no directory behind" [ -z "$(find "${TMPDIR:-/tmp}" -maxdepth 1 -name 'review-wt.*' -newer "$TEST_TMP/gitconfig" 2>/dev/null | head -1)" ]
+    check_that "the refused add leaves no directory behind" [ -z "$(find "$REVIEW_WORKTREE_ROOT" -maxdepth 1 -name 'review-wt.*' -empty 2>/dev/null | head -1)" ]
     run_script remove "$TEST_TMP"
     check_that "removing a path the script did not create is refused" [ "$RC" -ne 0 ]
     check_that "that path is still there" [ -d "$TEST_TMP" ]
@@ -86,6 +87,10 @@ run_suite() {
     check_that "prune with nothing to do says so" [ "$OUT" = "pruned: 0 review worktree(s)" ]
     run_script prune extra
     check_that "prune takes no argument" [ "$RC" -ne 0 ]
+    run_script root
+    check_that "root prints the worktree root" [ "$OUT" = "$REVIEW_WORKTREE_ROOT" ]
+    run_script root extra
+    check_that "root takes no argument" [ "$RC" -ne 0 ]
     run_script
     check_that "no argument is a usage error" [ "$RC" -ne 0 ]
     run_script add

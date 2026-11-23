@@ -25,13 +25,14 @@ make_stubs() {
         'if [ -f "$STUB_DIR/actions/$n.json" ]; then cat "$STUB_DIR/actions/$n.json"; else echo "{\"action\":\"done\"}"; fi' > "$STUB_DIR/next-action.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$*" >> "$STUB_DIR/claude.log"' 'exit "$(cat "$STUB_DIR/claude-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/claude"
     printf '%s\n' '#!/usr/bin/env bash' 'printf "park %s | %s\n" "$1" "$2" >> "$STUB_DIR/park.log"' > "$STUB_DIR/park.sh"
+    printf '%s\n' '#!/usr/bin/env bash' 'echo /stub/worktree-root' > "$STUB_DIR/review-worktree.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo "{\"capped\": $(cat "$STUB_DIR/capped" 2>/dev/null || echo false), \"headReviewed\": $(cat "$STUB_DIR/head-reviewed" 2>/dev/null || echo false)}"' > "$STUB_DIR/review-state.sh"
-    chmod +x "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
+    chmod +x "$STUB_DIR/review-worktree.sh" "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
 }
 make_stubs
-printf '%s\n' "coder: Read Edit" "reviewer: Read" "tester: Read" "triager: Read Grep" > "$STUB_DIR/allowed.conf"
+printf '%s\n' "coder: Read, Edit, Bash(~/.claude/skills/x/run.sh:*), Bash(gh issue view:*)" "reviewer: Read" "tester: Read" "triager: Read, Grep" > "$STUB_DIR/allowed.conf"
 export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" \
-    REVIEW_STATE_SCRIPT="$STUB_DIR/review-state.sh" ORCHESTRATE_ALLOWED_TOOLS="$STUB_DIR/allowed.conf" \
+    REVIEW_STATE_SCRIPT="$STUB_DIR/review-state.sh" WORKTREE_SCRIPT="$STUB_DIR/review-worktree.sh" ORCHESTRATE_ALLOWED_TOOLS="$STUB_DIR/allowed.conf" \
     ORCHESTRATE_LOCK_DIR="$TEST_TMP/lock" GH_REPO="o/r"
 
 # Reset the stubs: no actions, no logs, claude succeeds, nothing capped, no lock.
@@ -65,7 +66,13 @@ run_suite() {
     check_that "the second run is the coder" grep -q -- "--agent coder" <(sed -n 2p "$STUB_DIR/claude.log")
     check_that "the run is headless (-p)" grep -q -- "^-p " "$STUB_DIR/claude.log"
     check_that "the prompt names the issue" grep -q "#12" <(sed -n 2p "$STUB_DIR/claude.log")
-    check_that "the allowlist of the agent is passed" grep -q -- "--allowedTools Read Edit " <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "the allowlist of the agent is passed, comma separated (an entry may contain spaces)" grep -q -- "--allowedTools Read,Edit,.*Bash(gh issue view:\*) " <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "a ~/ script path is allowed in the literal form" grep -q -- "Bash(~/.claude/skills/x/run.sh:\*)" <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "and in the expanded home form (what the permission check sees when a variable holds the path)" grep -q -- "Bash($HOME/.claude/skills/x/run.sh:\*)" <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "the prompt of an agent run says how to write commands in a headless run (no variables, literal paths)" grep -q "headless run.*literal path" <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "the prompt of the triager says it too" grep -q "headless run.*literal path" <(sed -n 1p "$STUB_DIR/claude.log")
+    check_that "and tells the findings to be given in the text form" grep -q "text form" "$STUB_DIR/claude.log"
+    check_that "the coder and the triager get no extra directory" [ "$(grep -c -- "--add-dir" <(sed -n 1,2p "$STUB_DIR/claude.log"))" = "0" ]
     check_that "each run has a budget cap" grep -q -- "--max-budget-usd 5" "$STUB_DIR/claude.log"
     check_that "the lock is released at the end" [ ! -d "$TEST_TMP/lock" ]
 
@@ -148,6 +155,11 @@ run_suite() {
     echo false > "$STUB_DIR/capped"
     run_script
     check_that "a review below the cap runs the reviewer" [ "$(lines_of "$STUB_DIR/claude.log")" = "1" ]
+    check_that "the reviewer may enter the worktree root (a headless run refuses cd outside its directories)" grep -q -- "--add-dir /stub/worktree-root" "$STUB_DIR/claude.log"
+    reset_stubs
+    act 1 tester 12 "in Testing"
+    run_script
+    check_that "the tester may enter the worktree root too" grep -q -- "--add-dir /stub/worktree-root" "$STUB_DIR/claude.log"
     reset_stubs
     act 1 coder 12 "top of Todo"
     echo true > "$STUB_DIR/capped"
