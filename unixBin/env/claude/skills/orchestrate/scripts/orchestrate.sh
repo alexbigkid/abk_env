@@ -16,6 +16,7 @@ PARK=${PARK_SCRIPT:-$SCRIPT_DIR/park.sh}
 REVIEW_STATE=${REVIEW_STATE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-state.sh}
 WORKTREE_SCRIPT=${WORKTREE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-worktree.sh}
 ARCHIVE_SCRIPT=${ARCHIVE_SCRIPT:-$SCRIPT_DIR/../../archive-done/scripts/archive-done.sh}
+CLEANUP_SCRIPT=${CLEANUP_SCRIPT:-$SCRIPT_DIR/cleanup-merged.sh}
 CLAUDE_BIN=${CLAUDE_BIN:-claude}
 ALLOWED_TOOLS_FILE=${ORCHESTRATE_ALLOWED_TOOLS:-$SCRIPT_DIR/allowed-tools.conf}
 LOCK_DIR=${ORCHESTRATE_LOCK_DIR:-${TMPDIR:-/tmp}/abk-orchestrate.lock}
@@ -40,6 +41,8 @@ Guards: a lock (only one orchestrator), the allowlist of each agent ($(basename 
 a usage line per run (also appended to $USAGE_LOG), at most \$ORCHESTRATE_MAX_DISPATCHES dispatches per start (default $MAX_DISPATCHES).
 The action "archive" (Done holds issues closed before this month) runs archive-done.sh, no agent; a failing script stops with exit $EXIT_AGENT_FAILED,
 the same archive action twice in a row stops with an error (there is no issue to park).
+After every successful run of the tester, cleanup-merged.sh <issue> runs (no agent): when its pull request is merged, the checkout goes back
+to an up-to-date default branch and only the merged branch is deleted; a failing script is reported and the loop goes on.
 The same action twice in a row (no progress) parks the issue for you instead of running it again.
 A review that reached the round cap is parked without starting the reviewer (unless its last review is posted and only the move is missing).
 A failed agent run (no tokens, an error) stops everything with exit $EXIT_AGENT_FAILED: the claim stays, start it again to resume.
@@ -193,6 +196,11 @@ while :; do
     if [ "$agent_rc" -ne 0 ]; then
         echo "agent $agent failed (exit $agent_rc) on ${issue:+#$issue}${issue:-its column}; its claim stays; start the orchestrator again to resume" >&2
         exit "$EXIT_AGENT_FAILED"
+    fi
+    if [ "$agent" = "tester" ] && [ -n "$issue" ]; then
+        # The script decides by the merged state of the pull request; a failure is reported and the loop goes on.
+        echo "== cleanup #$issue"
+        "$CLEANUP_SCRIPT" "$issue" || echo "cleanup-merged.sh failed for #$issue (see above); going on, a leftover branch is harmless" >&2
     fi
     if [ -n "$once" ]; then exit 0; fi
 done
