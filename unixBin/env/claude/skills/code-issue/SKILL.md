@@ -34,7 +34,7 @@ $B claim Coder <n>
 
 ## 3. Branch
 
-Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out instead of creating it:
+Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words; for an issue the tester reopened after a failed QA, whose first PR is merged: `{Type}/{n}/{short-name}-fix`), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out instead of creating it:
 
 ```bash
 $H gh issue develop <n> --name F/<n>/<short-name> --base main --checkout
@@ -42,7 +42,7 @@ $H gh issue develop <n> --name F/<n>/<short-name> --base main --checkout
 
 ## 4. Implement
 
-Test first (`/tdd`), then the code; run the repo's tests and linters; update the docs the change touches. Keep to the acceptance criteria, no extras.
+Test first (`/tdd`), then the code; run the repo's tests and linters; update the docs the change touches. Keep to the acceptance criteria, no extras. A change to a backend or frontend component comes with integration tests for it (backend: through the API; frontend: against the backend), and `docs/agents/qa-testing.md` lists them so the tester runs them on QA.
 
 ## 5. Commit, push, PR, hand-off
 
