@@ -29,6 +29,8 @@ The first row that has work wins:
 | 6 | no agent row applies and `Done` holds an issue closed before the current month (UTC) | `archive-done.sh` (no agent); the driver then decides again; a failing script stops it (exit 2), the same archive action twice in a row stops it with an error |
 | 7 | nothing | stop: all Done, or the rest waits for you |
 
+After every successful tester run the driver also runs `scripts/cleanup-merged.sh <issue>` (no agent, no board, user's own credentials; the tester still never pushes). It acts only when the pull request that closes the issue is `MERGED`, its merge commit is on the default branch and its head is the merged one. With a clean tree on the merged branch it switches to the default branch and pulls (fast-forward, over HTTPS); then it deletes only the merged branch, locally and on GitHub, each only when its tip is exactly the merged head commit (else kept and reported). The default branch and fork branches are refused. It runs before the archive step; a failing script is reported and the loop goes on. Leftovers of an interrupted run stay until you run it by hand for that issue.
+
 `needs-info` issues are never started. Without a board it prints `no-board` and starts nothing.
 
 ## Guards

@@ -28,17 +28,18 @@ make_stubs() {
     printf '%s\n' '#!/usr/bin/env bash' 'echo /stub/worktree-root' > "$STUB_DIR/review-worktree.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo "{\"capped\": $(cat "$STUB_DIR/capped" 2>/dev/null || echo false), \"headReviewed\": $(cat "$STUB_DIR/head-reviewed" 2>/dev/null || echo false)}"' > "$STUB_DIR/review-state.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo archived >> "$STUB_DIR/archive.log"' 'exit "$(cat "$STUB_DIR/archive-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/archive-done.sh"
-    chmod +x "$STUB_DIR/archive-done.sh" "$STUB_DIR/review-worktree.sh" "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
+    printf '%s\n' '#!/usr/bin/env bash' 'echo "cleanup $*" >> "$STUB_DIR/cleanup.log"' 'exit "$(cat "$STUB_DIR/cleanup-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/cleanup-merged.sh"
+    chmod +x "$STUB_DIR/cleanup-merged.sh" "$STUB_DIR/archive-done.sh" "$STUB_DIR/review-worktree.sh" "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
 }
 make_stubs
 printf '%s\n' "model-tester: haiku" "coder: Read, Edit, Bash(~/.claude/skills/x/run.sh:*), Bash(gh issue view:*)" "reviewer: Read" "tester: Read" "triager: Read, Grep" > "$STUB_DIR/allowed.conf"
-export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" ARCHIVE_SCRIPT="$STUB_DIR/archive-done.sh" \
+export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" ARCHIVE_SCRIPT="$STUB_DIR/archive-done.sh" CLEANUP_SCRIPT="$STUB_DIR/cleanup-merged.sh" \
     REVIEW_STATE_SCRIPT="$STUB_DIR/review-state.sh" WORKTREE_SCRIPT="$STUB_DIR/review-worktree.sh" ORCHESTRATE_ALLOWED_TOOLS="$STUB_DIR/allowed.conf" \
     ORCHESTRATE_USAGE_LOG="$TEST_TMP/usage.log" ORCHESTRATE_LOCK_DIR="$TEST_TMP/lock" GH_REPO="o/r"
 
 # Reset the stubs: no actions, no logs, claude succeeds, nothing capped, no lock.
 reset_stubs() {
-    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/archive.log" "$STUB_DIR/archive-rc" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/claude-out" "$TEST_TMP/usage.log" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
+    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/archive.log" "$STUB_DIR/archive-rc" "$STUB_DIR/cleanup.log" "$STUB_DIR/cleanup-rc" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/claude-out" "$TEST_TMP/usage.log" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
     rm -f "$TEST_TMP/lock/pid"; rmdir "$TEST_TMP/lock" 2>/dev/null
     return 0
 }
@@ -309,6 +310,34 @@ run_suite() {
     run_script
     check_that "an agent without an allowlist is an error" [ "$RC" -ne 0 ]
     check_that "and is not started" [ ! -f "$STUB_DIR/claude.log" ]
+
+    reset_stubs
+    act 1 tester 12 "in Testing"
+    act 2 coder 13 "x"
+    run_script
+    check_that "cleanup runs once, for the issue of the tester" [ "$(cat "$STUB_DIR/cleanup.log")" = "cleanup 12" ]
+    check_that "its report is announced" grep -q "== cleanup #12" <<<"$OUT"
+
+    reset_stubs
+    act 1 coder 12 "x"
+    act 2 reviewer 12 "y"
+    run_script
+    check_that "no cleanup after other agents" [ ! -f "$STUB_DIR/cleanup.log" ]
+
+    reset_stubs
+    act 1 tester 12 "in Testing"
+    echo 1 > "$STUB_DIR/claude-rc"
+    run_script
+    check_that "no cleanup after a failed tester run" [ ! -f "$STUB_DIR/cleanup.log" ]
+
+    reset_stubs
+    act 1 tester 12 "in Testing"
+    act 2 coder 13 "x"
+    echo 1 > "$STUB_DIR/cleanup-rc"
+    run_script
+    check_that "a failing cleanup: exit 0" [ "$RC" -eq 0 ]
+    check_that "a failing cleanup: the run goes on" [ "$(lines_of "$STUB_DIR/claude.log")" = "2" ]
+    check_that "a failing cleanup is reported" grep -q "cleanup-merged.sh failed" <<<"$OUT"
 
     check_that "the real allowlist file has a line for every agent" [ "$(grep -c -E '^(triager|coder|reviewer|tester): ' "$SCRIPT_DIR/allowed-tools.conf")" = "4" ]
 
