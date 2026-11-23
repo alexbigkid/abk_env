@@ -44,7 +44,13 @@ $H gh issue develop <n> --name F/<n>/<short-name> --base main --checkout
 
 ## 4. Implement
 
-Test first (`/tdd`), then the code; run the repo's tests and linters; update the docs the change touches. Keep to the acceptance criteria, no extras. A change to a backend or frontend component comes with integration tests for it (backend: through the API; frontend: against the backend), and `docs/agents/qa-testing.md` lists them so the tester runs them on QA.
+Test first (`/tdd`), then the code; run the linters; update the docs the change touches. Before the hand-over run **all unit tests**, not only the files you touched (a guard test of another skill can break through your change):
+
+```bash
+~/.claude/skills/project-board/scripts/run-unit-tests.sh      # one line per test file and a total; exit code 0 = all pass
+```
+
+Fix every failure. Put the totals into the PR section "Tested", and any file that was not run with the reason. Only unit tests (fast, no deployment, no network): you and the reviewer **never run integration tests**; they need the code on QA and the tester runs them (see below). In this repo the install tests at the root (`test_install.sh`, `test_uninstall.sh`) install real software and are not unit tests; the script does not run them. In another project run the unit test command its `CLAUDE.md` or testing document names; when none is documented, say so in the PR "Tested" section instead of guessing one. Keep to the acceptance criteria, no extras. A change to a backend or frontend component comes with integration tests for it (backend: through the API; frontend: against the backend), and `docs/agents/qa-testing.md` lists them so the tester runs them on QA.
 
 ## 5. Commit, push, PR, hand-off
 

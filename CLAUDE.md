@@ -32,7 +32,7 @@ The `test_install.sh` script validates:
 ### Issue workflow orchestrator
 - `unixBin/env/claude/skills/orchestrate/scripts/orchestrate.sh [--once|--dry-run]` - Run the agents (triager, coder, reviewer, tester) one at a time from Triage to Done; `next-action.sh` prints what runs next. A failed agent run (for example no tokens left) stops it; start it again to resume. See the `orchestrate` skill
 
-The CI pipeline also runs `unixBin/env/claude/skills/code-issue/scripts/test_commit-push.sh` on macOS, Ubuntu and WSL (self-contained tests of the coder's signed-commit script: throwaway GPG key, local remotes, once per shell found).
+- `unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh` - Run all skill unit tests (`skills/*/scripts/test_*.sh`, stubs only, no install tests): one line per file and a total, non-zero exit on a failure or when none is found. The coder, reviewer and tester use it and CI runs it on macOS, Ubuntu and WSL (includes `test_commit-push.sh`, a self-contained test of the coder's signed-commit script: throwaway GPG key, local remotes, once per shell found).
 
 ### Version Management
 - `./unixBin/setGitAliases.sh` - Writes all git aliases (incl. `rel-*` release triggers) to the global `~/.gitconfig`, overwriting same-named aliases; `git alias` lists them

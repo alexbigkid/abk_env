@@ -38,7 +38,7 @@ dir=$($W add <branch>)                  # throwaway worktree: never touch the us
 sha=$(git -C "$dir" rev-parse HEAD)     # the commit you test; the merge is pinned to it
 ```
 
-Go through every acceptance criterion of the issue (`gh issue view <n>`) against the PR and run what can run locally in the worktree: the repo's tests and linters, and the scripts the PR adds. Note for each criterion what you ran and saw. Remove the worktree when done, also when you stop early: `$W remove "$dir"`.
+Go through every acceptance criterion of the issue (`gh issue view <n>`) against the PR and run what can run locally in the worktree: all unit tests with `~/.claude/skills/project-board/scripts/run-unit-tests.sh <worktree>/unixBin/env/claude/skills` (worktree path written out literally; not a self-made loop), the linters, and the scripts the PR adds. Note for each criterion what you ran and saw. Remove the worktree when done, also when you stop early: `$W remove "$dir"`.
 
 A criterion you cannot judge, or an environment you cannot reach: park the issue (step 6) instead of guessing.
 

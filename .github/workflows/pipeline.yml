@@ -74,12 +74,7 @@ jobs:
               shell: bash {0}
               run: |
                 command -v gpg >/dev/null || brew install gnupg
-                failed=0
-                for t in ./unixBin/env/claude/skills/*/scripts/test_*.sh; do
-                    echo "######## $t"
-                    /bin/bash "$t" || failed=1
-                done
-                exit $failed
+                ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     Ubuntu:
         name: Ubuntu ${{ matrix.version }}
@@ -143,12 +138,7 @@ jobs:
               shell: bash {0}
               run: |
                 command -v gpg >/dev/null || sudo apt-get install -y gnupg
-                failed=0
-                for t in ./unixBin/env/claude/skills/*/scripts/test_*.sh; do
-                    echo "######## $t"
-                    /bin/bash "$t" || failed=1
-                done
-                exit $failed
+                ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     WSL:
         name: WSL Ubuntu ${{ matrix.version }}
@@ -206,12 +196,7 @@ jobs:
             - name: skill script tests (all test_*.sh, every shell found, WSL)
               shell: wsl-bash {0}
               run: |
-                failed=0
-                for t in ./unixBin/env/claude/skills/*/scripts/test_*.sh; do
-                    echo "######## $t"
-                    /bin/bash "$t" || failed=1
-                done
-                exit $failed
+                ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     handle-release-tags:
         name: Handle Release Tags
