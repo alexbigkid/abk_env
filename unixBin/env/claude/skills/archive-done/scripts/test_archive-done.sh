@@ -57,6 +57,8 @@ run_suite() {
     check_that "an issue of an earlier month moves into it" [ "$(column_of 1)" = "Done-2026-10" ]
     check_that "an issue of the current month stays in Done" [ "$(column_of 2)" = "✅ Done" ]
     check_that "another column is untouched, whatever its dates" [ "$(column_of 3)" = "Todo" ]
+    check_that "the other columns keep their ids and order" \
+        [ "$(jq -c '[.options[0:6][] | .id]' "$STUB_DIR/board.json")" = '["o1","o2","o3","o4","o5","o6"]' ]
     check_that "the output tells what happened" grep -q "moved: #1" <<<"$OUT"
     check_that "the option update sends the existing ids and the new column without id" \
         jq -e '.variables.input.singleSelectOptions | (map(.id) | .[0:6]) == ["o1","o2","o3","o4","o5","o6"] and (.[6] | has("id") | not) and .[6].name == "Done-2026-10" and .[6].color == "GRAY" and .[6].description == ""' >/dev/null <<<"$(grep '^{"query"' "$STUB_DIR/requests.log" | head -1)"
@@ -91,10 +93,19 @@ run_suite() {
     check_that "all issues of the old year are in it" [ "$(column_of 1) $(column_of 2) $(column_of 3)" = "Done-2026 Done-2026 Done-2026" ]
     check_that "an issue of the new year stays in Done" [ "$(column_of 4)" = "Done" ]
     check_that "the output tells about the removed columns" grep -q "removed column: Done-2026-10" <<<"$OUT"
+    check_that "the collapse request keeps all ids and adds Done-2026 without id" \
+        jq -e '.variables.input.singleSelectOptions | (map(.id) | .[0:6]) == ["o1","o2","o3","o4","o5","o6"] and (map(.name) | index("Done-2026-10") != null and index("Done-2026-09") != null) and (map(select(.name == "Done-2026")) | length == 1 and (.[0] | has("id") | not))' >/dev/null <<<"$(grep '^{"query"' "$STUB_DIR/requests.log" | sed -n 1p)"
+    check_that "the removal request keeps the other columns and drops the monthly ones" \
+        jq -e '.variables.input.singleSelectOptions | (map(.name) == ["Triage","Todo","Doing","Review","Testing","Done","Done-2026"]) and (.[0:6] | map(.id) == ["o1","o2","o3","o4","o5","o6"])' >/dev/null <<<"$(grep '^{"query"' "$STUB_DIR/requests.log" | sed -n 2p)"
 
     new_board '["Done-2026-10","Done-2025"]' '[["i1",1,"Done-2026-10","2026-10-05T10:00:00Z",null]]'
     ARCHIVE_TODAY=2027-01-05 run_script
     check_that "newest year first among the year columns" [ "$(columns)" = "Triage,Todo,Doing,Review,Testing,Done,Done-2026,Done-2025" ]
+
+    new_board '["Done-2026-10","Done-2026"]' '[["i1",1,"Done-2026",null,"2026-10-05"]]'
+    ARCHIVE_TODAY=2027-01-05 run_script
+    check_that "a re-run removes a monthly column left empty by an interrupted run" [ "$(columns)" = "Triage,Todo,Doing,Review,Testing,Done,Done-2026" ]
+    check_that "the resume keeps the issue in the year column" [ "$(column_of 1)" = "Done-2026" ]
 
     new_board '["Done-2026-10"]' '[["i1",1,"Done-2026-10","2026-10-05T10:00:00Z",null]]'
     export STUB_STALE=1
