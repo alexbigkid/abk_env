@@ -55,12 +55,14 @@ take_lock() {
 # Release the lock.
 release_lock() { rm -f "$LOCK_DIR/pid"; rmdir "$LOCK_DIR" 2>/dev/null || true; }
 
-# Print the allowlist of an agent (the line after "<agent>: " in the allowlist file).
+# Print the allowlist of an agent (the line after "<agent>: " in the allowlist file), comma separated.
 allowed_tools() {
     local line
     line=$(grep "^$1: " "$ALLOWED_TOOLS_FILE" || true)
     [ -n "$line" ] || die "no allowlist for agent '$1' in $ALLOWED_TOOLS_FILE"
-    printf '%s\n' "${line#"$1": }"
+    # The agents call the scripts through a variable (B=~/.claude/...; $B ...): the permission check then matches only the
+    # expanded home path, so every ~/ path is allowed in both forms.
+    printf '%s\n' "${line#"$1": }" | sed -E "s#Bash\(~/([^)]*)\)#Bash(~/\1),Bash($HOME/\1)#g"
 }
 
 # Park the issues of an action for the user, with the reason as comment.

@@ -29,7 +29,7 @@ make_stubs() {
     chmod +x "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
 }
 make_stubs
-printf '%s\n' "coder: Read Edit" "reviewer: Read" "tester: Read" "triager: Read Grep" > "$STUB_DIR/allowed.conf"
+printf '%s\n' "coder: Read, Edit, Bash(~/.claude/skills/x/run.sh:*), Bash(gh issue view:*)" "reviewer: Read" "tester: Read" "triager: Read, Grep" > "$STUB_DIR/allowed.conf"
 export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" \
     REVIEW_STATE_SCRIPT="$STUB_DIR/review-state.sh" ORCHESTRATE_ALLOWED_TOOLS="$STUB_DIR/allowed.conf" \
     ORCHESTRATE_LOCK_DIR="$TEST_TMP/lock" GH_REPO="o/r"
@@ -65,7 +65,9 @@ run_suite() {
     check_that "the second run is the coder" grep -q -- "--agent coder" <(sed -n 2p "$STUB_DIR/claude.log")
     check_that "the run is headless (-p)" grep -q -- "^-p " "$STUB_DIR/claude.log"
     check_that "the prompt names the issue" grep -q "#12" <(sed -n 2p "$STUB_DIR/claude.log")
-    check_that "the allowlist of the agent is passed" grep -q -- "--allowedTools Read Edit " <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "the allowlist of the agent is passed, comma separated (an entry may contain spaces)" grep -q -- "--allowedTools Read, Edit, .*Bash(gh issue view:\*) " <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "a ~/ script path is allowed in the literal form" grep -q -- "Bash(~/.claude/skills/x/run.sh:\*)" <(sed -n 2p "$STUB_DIR/claude.log")
+    check_that "and in the expanded home form (what the permission check sees when a variable holds the path)" grep -q -- "Bash($HOME/.claude/skills/x/run.sh:\*)" <(sed -n 2p "$STUB_DIR/claude.log")
     check_that "each run has a budget cap" grep -q -- "--max-budget-usd 5" "$STUB_DIR/claude.log"
     check_that "the lock is released at the end" [ ! -d "$TEST_TMP/lock" ]
 
