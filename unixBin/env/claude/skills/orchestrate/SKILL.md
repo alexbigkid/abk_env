@@ -36,12 +36,21 @@ The first row that has work wins:
 - **Permissions**: each agent gets only the tools listed for it in `scripts/allowed-tools.conf`; widen that file when an agent reports a denied command. It is a first layer, not a sandbox: `bash` and `zsh` are allowed so that tests can run, which also allows any command through them (see the note in the file and issue #9).
 - **Headless commands**: the permission check of a headless run refuses a command that sets or expands a shell variable (`X=...`, `~` or `$HOME` in an assignment, `$(...)`) and a heredoc that contains JSON; it runs a literal path with a text heredoc (verified with real probes). The driver therefore adds a note to every prompt: call scripts by their full literal path, write values literally, give review findings in the text form of `post-review.sh`.
 - **Worktree directory**: a headless run refuses `cd` outside its session directories. Review worktrees are therefore created in one dedicated root (`review-worktree.sh root`) and the driver adds exactly that directory (`--add-dir`) for the reviewer and the tester.
-- **Budget**: `ORCHESTRATE_BUDGET_USD` (default 5) per agent run; `ORCHESTRATE_MAX_DISPATCHES` (default 50) per start.
+- **Budget**: `ORCHESTRATE_BUDGET_USD` (default 1) per agent run (`--max-budget-usd`, notional API dollars; how it behaves with a subscription login is not verified yet); `ORCHESTRATE_MAX_DISPATCHES` (default 50) per start.
 - **No progress**: the same action twice in a row (the board did not change) parks the issue(s) with `scripts/park.sh` (label `needs-info`, a comment, back to Triage) instead of running it again.
 - **Round cap**: a Review issue at `MAX_REVIEW_ROUNDS` is parked without starting the reviewer (`review-state.sh` reads the cap from its single definition).
 - **Failure**: a failed agent run (no tokens, an error) stops everything with exit 2 and names the agent and issue. The claim stays; start the orchestrator again when you can, row 1 resumes it.
 
 The orchestrator never edits code, commits or merges; the agents do, within their own rules.
+
+## Model and usage
+
+- **Model per agent**: an optional line `model-<agent>: <alias>` in `scripts/allowed-tools.conf` is passed as `--model <alias>`; no line means the default model. Triager and tester use `haiku`; coder and reviewer keep the default. Change the values in the file.
+- **Usage per run**: the driver runs `claude -p --output-format json`, prints the agent's text (`result`), then one line: `usage: <agent> #<issue> <seconds>s in=<n> out=<n> cost=$<x>`. Only fields present in the JSON are shown. Each line is also appended, with a timestamp, to `~/.claude/orchestrate-usage.log` (`ORCHESTRATE_USAGE_LOG` changes it). Output that is not JSON is printed as is.
+
+## Small steps
+
+Use `orchestrate.sh --once`: one agent per start. Read its usage line (and `/usage` in an interactive session), then decide whether to start the next run.
 
 ## Tests
 

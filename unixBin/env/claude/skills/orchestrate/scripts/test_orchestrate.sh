@@ -23,21 +23,21 @@ make_stubs() {
     printf '%s\n' '#!/usr/bin/env bash' 'n=$(cat "$STUB_DIR/calls" 2>/dev/null || echo 0); n=$((n + 1)); echo "$n" > "$STUB_DIR/calls"' \
         '[ -f "$STUB_DIR/next-fails" ] && { echo "ERROR: board unreachable" >&2; exit 1; }' \
         'if [ -f "$STUB_DIR/actions/$n.json" ]; then cat "$STUB_DIR/actions/$n.json"; else echo "{\"action\":\"done\"}"; fi' > "$STUB_DIR/next-action.sh"
-    printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$*" >> "$STUB_DIR/claude.log"' 'exit "$(cat "$STUB_DIR/claude-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/claude"
+    printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$*" >> "$STUB_DIR/claude.log"' 'cat "$STUB_DIR/claude-out" 2>/dev/null' 'exit "$(cat "$STUB_DIR/claude-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/claude"
     printf '%s\n' '#!/usr/bin/env bash' 'printf "park %s | %s\n" "$1" "$2" >> "$STUB_DIR/park.log"' > "$STUB_DIR/park.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo /stub/worktree-root' > "$STUB_DIR/review-worktree.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo "{\"capped\": $(cat "$STUB_DIR/capped" 2>/dev/null || echo false), \"headReviewed\": $(cat "$STUB_DIR/head-reviewed" 2>/dev/null || echo false)}"' > "$STUB_DIR/review-state.sh"
     chmod +x "$STUB_DIR/review-worktree.sh" "$STUB_DIR/next-action.sh" "$STUB_DIR/claude" "$STUB_DIR/park.sh" "$STUB_DIR/review-state.sh"
 }
 make_stubs
-printf '%s\n' "coder: Read, Edit, Bash(~/.claude/skills/x/run.sh:*), Bash(gh issue view:*)" "reviewer: Read" "tester: Read" "triager: Read, Grep" > "$STUB_DIR/allowed.conf"
+printf '%s\n' "model-tester: haiku" "coder: Read, Edit, Bash(~/.claude/skills/x/run.sh:*), Bash(gh issue view:*)" "reviewer: Read" "tester: Read" "triager: Read, Grep" > "$STUB_DIR/allowed.conf"
 export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" \
     REVIEW_STATE_SCRIPT="$STUB_DIR/review-state.sh" WORKTREE_SCRIPT="$STUB_DIR/review-worktree.sh" ORCHESTRATE_ALLOWED_TOOLS="$STUB_DIR/allowed.conf" \
-    ORCHESTRATE_LOCK_DIR="$TEST_TMP/lock" GH_REPO="o/r"
+    ORCHESTRATE_USAGE_LOG="$TEST_TMP/usage.log" ORCHESTRATE_LOCK_DIR="$TEST_TMP/lock" GH_REPO="o/r"
 
 # Reset the stubs: no actions, no logs, claude succeeds, nothing capped, no lock.
 reset_stubs() {
-    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
+    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/claude-out" "$TEST_TMP/usage.log" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
     rm -f "$TEST_TMP/lock/pid"; rmdir "$TEST_TMP/lock" 2>/dev/null
     return 0
 }
@@ -73,8 +73,48 @@ run_suite() {
     check_that "the prompt of the triager says it too" grep -q "headless run.*literal path" <(sed -n 1p "$STUB_DIR/claude.log")
     check_that "and tells the findings to be given in the text form" grep -q "text form" "$STUB_DIR/claude.log"
     check_that "the coder and the triager get no extra directory" [ "$(grep -c -- "--add-dir" <(sed -n 1,2p "$STUB_DIR/claude.log"))" = "0" ]
-    check_that "each run has a budget cap" grep -q -- "--max-budget-usd 5" "$STUB_DIR/claude.log"
+    check_that "each run has a budget cap" grep -q -- "--max-budget-usd 1 " "$STUB_DIR/claude.log"
+    check_that "the JSON output is asked for" grep -q -- "--output-format json" "$STUB_DIR/claude.log"
+    check_that "an agent without a model line gets no --model" [ "$(grep -c -- "--model" "$STUB_DIR/claude.log")" = "0" ]
     check_that "the lock is released at the end" [ ! -d "$TEST_TMP/lock" ]
+
+    reset_stubs
+    act 1 coder 12 "x"
+    ORCHESTRATE_BUDGET_USD=3 run_script
+    check_that "the budget cap is overridable" grep -q -- "--max-budget-usd 3 " "$STUB_DIR/claude.log"
+
+    reset_stubs
+    act 1 tester 12 "in Testing"
+    run_script
+    check_that "an agent with a model line gets --model" grep -q -- "--model haiku" "$STUB_DIR/claude.log"
+
+    reset_stubs
+    act 1 coder 12 "x"
+    echo '{"result":"agent text","total_cost_usd":0.5,"usage":{"input_tokens":10,"output_tokens":20}}' > "$STUB_DIR/claude-out"
+    run_script
+    check_that "the agent text is printed" grep -q "^agent text$" <<<"$OUT"
+    check_that "one usage line follows: agent, issue, tokens, cost" grep -q 'usage: coder #12 [0-9]*s in=10 out=20 cost=\$0.5' <<<"$OUT"
+    check_that "it is appended to the log" grep -q 'usage: coder #12' "$TEST_TMP/usage.log"
+
+    reset_stubs
+    act 1 coder 12 "x"
+    echo '{"result":"only text"}' > "$STUB_DIR/claude-out"
+    run_script
+    check_that "missing usage fields are left out" grep -q 'usage: coder #12 [0-9]*s$' <<<"$OUT"
+
+    reset_stubs
+    act 1 coder 12 "x"
+    echo "plain text" > "$STUB_DIR/claude-out"
+    run_script
+    check_that "output that is no JSON is printed as is" grep -q "plain text" <<<"$OUT"
+
+    reset_stubs
+    act 1 coder 12 "x"
+    echo '{"result":"boom"}' > "$STUB_DIR/claude-out"
+    echo 1 > "$STUB_DIR/claude-rc"
+    run_script
+    check_that "a failed run still exits 2" [ "$RC" -eq 2 ]
+    check_that "and still shows its output" grep -q boom <<<"$OUT"
 
     reset_stubs
     echo '{"action":"waiting","issues":[{"number":9,"why":"needs your answer (needs-info)"}]}' > "$STUB_DIR/actions/1.json"
@@ -202,6 +242,8 @@ run_suite() {
     check_that "and is not started" [ ! -f "$STUB_DIR/claude.log" ]
 
     check_that "the real allowlist file has a line for every agent" [ "$(grep -c -E '^(triager|coder|reviewer|tester): ' "$SCRIPT_DIR/allowed-tools.conf")" = "4" ]
+
+    check_that "the real file gives triager and tester a cheaper model" [ "$(grep -c -E '^model-(triager|tester): ' "$SCRIPT_DIR/allowed-tools.conf")" = "2" ]
 
     run_script extra
     check_that "an unknown argument is a usage error" [ "$RC" -eq 1 ]
