@@ -15,10 +15,12 @@ usage() {
     cat <<USAGE
 usage: review-state.sh <issue-number>
 Prints, as JSON, the open pull request that closes the issue and where its review stands:
-{"pr", "url", "branch", "base", "headSha", "id",
- "round": <reviews of the reviewer so far>, "max": $MAX_REVIEW_ROUNDS, "capped": <round >= max>,
- "handledAt", "handledComment": the newest "$HANDLED_MARKER" comment of the coder (null if none),
+{"pr", "url", "branch", "base", "headSha", "id", "mergeable": MERGEABLE | CONFLICTING | UNKNOWN,
+ "round": <reviews of the reviewer so far>, "max": $MAX_REVIEW_ROUNDS, "capped": <round >= max>, "lastReviewAt",
+ "handledComment": the newest "$HANDLED_MARKER" comment of the coder, found by its hidden tag (null if none), "handledAt",
+ "handledIsNew": <the comment is newer than the last review; false = the coder did not answer this round>,
  "unresolvedThreads": <number>}
+Rounds are counted by the hidden tag at the end of the reviewer's reviews, not by their title.
 No open pull request: {"pr": null}. Cost: 1 GraphQL request without a PR, otherwise 2.
 USAGE
 }

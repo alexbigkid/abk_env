@@ -23,7 +23,8 @@ usage: queue.sh [column...]
 Lists the issues of board columns, with their blockers, as JSON, in board order
 (the array order is the order on the board, top first; there is no position field).
   With a project board:  the open issues in the given columns (names without emoji, any case),
-                         default Triage and Todo, for example: queue.sh Review. Issues in other
+                         default Triage and Todo, for example: queue.sh Review (a name no issue is in gives an
+                         empty list, it is not checked against the board). Issues in other
                          columns are not listed; they only appear as blockers.
   Without a board:       all open issues of the repo.
 The repo must have exactly one linked project board, or none.

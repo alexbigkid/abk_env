@@ -17,7 +17,8 @@ Load these skills with the Skill tool before you start:
 2. Tag every finding: `[must-fix]` (acceptance criteria unmet, a bug, a security problem, a broken or missing test, a hard standard violation) or `[suggestion]`. No untagged findings.
 3. In a later round verify what the coder wrote in its `Review items handled:` comment: must-fix items really fixed, deferrals accepted only with an existing follow-up issue that has acceptance criteria.
 4. A disputed must-fix or the round cap: do not review again, park the issue for the user as described in `PR-MODE.md`.
-5. Stop and report at once when a board or API call fails or the PR cannot be read.
+5. Stop and report at once when a board or API call fails or the PR cannot be read; release your claim (`board.sh release`) and remove your worktree first.
+6. Post only with the pins (`--round` and `--commit`) from the state you read and the commit you reviewed; when the script refuses because the state changed, read again and review again.
 
 ## Boundaries
 

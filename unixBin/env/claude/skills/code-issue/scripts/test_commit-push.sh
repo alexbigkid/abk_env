@@ -15,25 +15,11 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 SCRIPT_UNDER_TEST=${COMMIT_PUSH_UNDER_TEST:-$SCRIPT_DIR/commit-push.sh}
 BRANCH="F/4/test"
 CODER_NAME="ABK Coder Agent"
-MAX_TMP_PATH_LENGTH=60
-
-PASSED=0
-FAILED=0
 CASE_NO=0
-OUT=""
-RC=0
 
-# Print the usage.
-usage() {
-    echo "usage: $0"
-    echo "Tests commit-push.sh with a throwaway key and local remotes; exit code 0 = all passed."
-}
-
-case "${1:-}" in
-    --help|-h) usage; exit 0 ;;
-    "") ;;
-    *) usage >&2; exit 1 ;;
-esac
+# shellcheck disable=SC1091  # testing-lib.sh belongs to the project-board skill
+source "$SCRIPT_DIR/../../project-board/scripts/testing-lib.sh"
+handle_test_help "$@"
 
 for tool in git gpg; do
     command -v "$tool" >/dev/null || { echo "ERROR: $tool is required" >&2; exit 1; }
@@ -42,20 +28,10 @@ done
 #---------------------------
 # environment: temp dir, throwaway key, own git config
 #---------------------------
-TEST_TMP=$(mktemp -d "${TMPDIR:-/tmp}/cp-test.XXXXXX")
-if [ "${#TEST_TMP}" -gt "$MAX_TMP_PATH_LENGTH" ]; then   # gpg-agent sockets need a short path
-    rmdir "$TEST_TMP"
-    TEST_TMP=$(mktemp -d "/tmp/cp-test.XXXXXX")
-fi
-
-# Stop the throwaway gpg-agent and remove the temp dir (only a dir this script created).
-cleanup() {
-    GNUPGHOME="$TEST_TMP/g" gpgconf --kill gpg-agent 2>/dev/null
-    case "$TEST_TMP" in
-        */cp-test.*) [ -d "$TEST_TMP" ] && rm -rf "$TEST_TMP" ;;
-    esac
-}
-trap cleanup EXIT
+# Stop the throwaway gpg-agent (the harness then removes the temp dir).
+stop_gpg_agent() { GNUPGHOME="$TEST_TMP/g" gpgconf --kill gpg-agent 2>/dev/null; }
+# shellcheck disable=SC2034  # used by cleanup in testing-lib.sh
+TEST_CLEANUP_HOOK=stop_gpg_agent
 
 export GNUPGHOME="$TEST_TMP/g"
 mkdir -p "$GNUPGHOME"
@@ -72,25 +48,6 @@ git config --file "$GIT_CONFIG_GLOBAL" coder.email "coder-test@example.invalid"
 #---------------------------
 # helpers
 #---------------------------
-
-# Record the result of one check: the name and the exit code of the test expression.
-check() {
-    if [ "$2" -eq 0 ]; then
-        PASSED=$((PASSED + 1))
-    else
-        FAILED=$((FAILED + 1))
-        echo "FAIL [$RUNNER] $1"
-        echo "      output: $OUT"
-    fi
-}
-
-# Check a condition given as a command (for example: check_that "name" [ -z "$x" ]).
-check_that() {
-    local name=$1
-    shift
-    "$@"
-    check "$name" $?
-}
 
 # Run the script under test in the current repo with the current shell; sets OUT and RC.
 run_cp() {
@@ -166,7 +123,6 @@ others_unsigned_commit() {
 # the suite
 #---------------------------
 run_suite() {
-    echo "== running the suite with: $RUNNER"
 
     new_repo
     echo a > a.txt
@@ -288,19 +244,5 @@ run_suite() {
     check_that "nothing was pushed to the empty remote" [ "$(remote_sha)" = "none" ]
 }
 
-# The shells to test: every distinct one of /bin/bash, bash and zsh that exists.
-SEEN_SHELLS=()
-for candidate in /bin/bash bash zsh; do
-    resolved=$(command -v "$candidate" 2>/dev/null) || continue
-    duplicate=""
-    for seen in ${SEEN_SHELLS[@]+"${SEEN_SHELLS[@]}"}; do
-        if [ "$resolved" -ef "$seen" ]; then duplicate=1; fi
-    done
-    [ -z "$duplicate" ] || continue
-    SEEN_SHELLS+=("$resolved")
-    RUNNER=$resolved
-    run_suite
-done
-
-echo "== $PASSED passed, $FAILED failed"
-[ "$FAILED" -eq 0 ]
+for_each_shell run_suite
+finish

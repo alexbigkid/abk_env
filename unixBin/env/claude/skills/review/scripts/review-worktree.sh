@@ -17,6 +17,7 @@ usage() {
     cat <<USAGE
 usage: review-worktree.sh add <branch>      create a detached worktree of $REMOTE/<branch>, print its path
        review-worktree.sh remove <path>     remove such a worktree (only paths this script created)
+       review-worktree.sh prune             remove all leftovers of earlier runs (worktrees and empty temp dirs)
 The branch must be fetched first: with-https.sh git fetch $REMOTE <branch>
 USAGE
 }
@@ -28,7 +29,7 @@ cmd_add() {
         die "$REMOTE/$branch is not fetched; run: with-https.sh git fetch $REMOTE $branch"
     dir=$(mktemp -d "${TMPDIR:-/tmp}/$WORKTREE_PREFIX.XXXXXX")
     dir=$(cd "$dir" && pwd -P)
-    git worktree add -q --detach "$dir" "refs/remotes/$REMOTE/$branch" || die "cannot create the worktree"
+    git worktree add -q --detach "$dir" "refs/remotes/$REMOTE/$branch" || { rmdir "$dir" 2>/dev/null; die "cannot create the worktree"; }
     echo "$dir"
 }
 
@@ -46,13 +47,27 @@ cmd_remove() {
     echo "removed: $dir"
 }
 
+# Remove every review worktree of this repo and the empty temp dirs left by a failed or interrupted run.
+cmd_prune() {
+    local dir count=0
+    while read -r dir; do
+        [ -n "$dir" ] || continue
+        if git worktree remove --force "$dir"; then count=$((count + 1)); fi
+    done < <(git worktree list --porcelain | sed -n 's/^worktree //p' | grep "/$WORKTREE_PREFIX\." || true)
+    git worktree prune
+    find "${TMPDIR:-/tmp}" -maxdepth 1 -type d -name "$WORKTREE_PREFIX.*" -empty -exec rmdir {} + 2>/dev/null || true
+    echo "pruned: $count review worktree(s)"
+}
+
 case "${1:-}" in
     --help|-h) usage; exit 0 ;;
     add)    [ $# -eq 2 ] || usage_error ;;
     remove) [ $# -eq 2 ] || usage_error ;;
+    prune)  [ $# -eq 1 ] || usage_error ;;
     *)      usage_error ;;
 esac
 case "$1" in
     add)    cmd_add "$2" ;;
     remove) cmd_remove "$2" ;;
+    prune)  cmd_prune ;;
 esac
