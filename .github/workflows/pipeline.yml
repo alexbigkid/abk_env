@@ -3,13 +3,12 @@ on:
     push:
         branches:
             - main
-        tags:
-            - 'rel-patch'
-            - 'rel-minor'
-            - 'rel-major'
+    pull_request:
+        branches:
+            - main
 
 permissions:
-    contents: write  # Needed for handle-release-tags job to push tags
+    contents: read
 
 # Prevent duplicate runs - prioritize by commit SHA
 concurrency:
@@ -21,6 +20,7 @@ env:
 
 jobs:
     MacOS:
+        if: github.event_name == 'push' || startsWith(github.head_ref, 'release/')
         name: MacOS ${{ matrix.version }}
         runs-on: macos-${{ matrix.version }}
         strategy:
@@ -77,6 +77,7 @@ jobs:
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     Ubuntu:
+        if: github.event_name == 'push' || startsWith(github.head_ref, 'release/')
         name: Ubuntu ${{ matrix.version }}
         runs-on: ubuntu-${{ matrix.version }}
         strategy:
@@ -141,6 +142,7 @@ jobs:
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     WSL:
+        if: github.event_name == 'push' || startsWith(github.head_ref, 'release/')
         name: WSL Ubuntu ${{ matrix.version }}
         runs-on: windows-latest
         strategy:
@@ -197,19 +199,3 @@ jobs:
               shell: wsl-bash {0}
               run: |
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
-
-    handle-release-tags:
-        name: Handle Release Tags
-        needs: [MacOS, Ubuntu, WSL]
-        runs-on: ubuntu-latest
-        if: always() && !cancelled()  # Run whether tests pass or fail, but not if cancelled due to concurrency
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v6
-              with:
-                fetch-depth: 0
-                token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
-                persist-credentials: true
-
-            - name: Handle release tags
-              run: ./.github/scripts/handle_release_tags.sh "${{ needs.MacOS.result }}" "${{ needs.Ubuntu.result }}" "${{ needs.WSL.result }}" "${{ github.ref_name }}"

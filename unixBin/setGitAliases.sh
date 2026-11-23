@@ -12,9 +12,10 @@
 #   - File lists: staged, unstaged, untracked, ignored
 #   - Env tags: adt/rdt (dev), aqt/rqt (qa), art/rrt (release) - add/remove
 #     the tag locally and on origin
-#   - Release triggers: rel-patch, rel-minor, rel-major (main branch only).
-#     Pull + push, then force-push a temporary rel-* tag that starts the
-#     GitHub Actions release pipeline (tests -> version bump -> vX.Y.Z tag).
+#   - Releases: rel-patch, rel-minor, rel-major run unixBin/gitRelease.sh, which
+#     opens the pull request "Release vX.Y.Z" (bumps VERSION); add --auto-merge
+#     to merge it on green checks. After the merge the workflow release-tag.yml
+#     creates the tag vX.Y.Z.
 #   - core.pager: diff-so-fancy if installed, otherwise the pager is unset
 #
 # Notes:
@@ -65,44 +66,10 @@ git config --global alias.stash-staged '!bash -c "git stash --keep-index; git st
 git config --global alias.move-staged '!bash -c "git stash-staged;git commit -m "temp"; git stash; git reset --hard HEAD^; git stash pop"'
 git config --global alias.sinceDate '!f() { git log --pretty=format:"%Cred%h %Cgreen%cd%Creset | %s%C(auto)%d %Cgreen[%an]%Creset" --date=local --since="$1"; }; f'
 
-git config --global alias.rel-major "!f() { \
-  BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
-  if [ \"\$BRANCH\" = \"main\" ]; then \
-    git pull && git push && \
-    git tag -f rel-major -m 'release: rel-major' && \
-    git push -f origin rel-major && \
-    git tag -d rel-major && \
-    $HOME_BIN_DIR/alexIsAwesome.sh;
-  else \
-    echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
-  fi; \
-}; f"
-
-git config --global alias.rel-minor "!f() { \
-  BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
-  if [ \"\$BRANCH\" = \"main\" ]; then \
-    git pull && git push && \
-    git tag -f rel-minor -m 'release: rel-minor' && \
-    git push -f origin rel-minor && \
-    git tag -d rel-minor && \
-    $HOME_BIN_DIR/alexIsAwesome.sh;
-  else \
-    echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
-  fi; \
-}; f"
-
-git config --global alias.rel-patch "!f() { \
-  BRANCH=\"\$(git rev-parse --abbrev-ref HEAD)\"; \
-  if [ \"\$BRANCH\" = \"main\" ]; then \
-    git pull && git push && \
-    git tag -f rel-patch -m 'release: rel-patch' && \
-    git push -f origin rel-patch && \
-    git tag -d rel-patch && \
-    $HOME_BIN_DIR/alexIsAwesome.sh;
-  else \
-    echo \"❌ Error: Must be on 'main' branch (currently on: \$BRANCH)\"; \
-  fi; \
-}; f"
+# Releases: open a release pull request (extra arguments such as --auto-merge are passed on)
+git config --global alias.rel-major "!$HOME_BIN_DIR/gitRelease.sh major"
+git config --global alias.rel-minor "!$HOME_BIN_DIR/gitRelease.sh minor"
+git config --global alias.rel-patch "!$HOME_BIN_DIR/gitRelease.sh patch"
 
 
 if command -v diff-so-fancy &>/dev/null; then

@@ -9,7 +9,7 @@
 #------------------------------------------------------------------------------
 set -uo pipefail
 
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd -P)
 
 case "${1:-}" in
     --help|-h) sed -n '4,8p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
@@ -20,6 +20,9 @@ if [ ! -d "$SKILLS_DIR" ]; then
     echo "error: not a directory: $SKILLS_DIR" >&2
     exit 1
 fi
+# With the default dir the tests of the scripts in unixBin (unixBin/test_*.sh) run too.
+EXTRA_DIR=""
+if [ -z "${1:-}" ]; then EXTRA_DIR="$SKILLS_DIR/../../.."; fi
 
 files=0
 total_passed=0
@@ -52,7 +55,10 @@ while read -r test_file; do
         echo "$output"
         any_failed=1
     fi
-done < <(find "$SKILLS_DIR" -path '*/scripts/test_*.sh' -type f | sort)
+done < <({
+    find "$SKILLS_DIR" -path '*/scripts/test_*.sh' -type f
+    if [ -n "$EXTRA_DIR" ]; then find "$EXTRA_DIR" -maxdepth 1 -name 'test_*.sh' -type f; fi
+} | sort)
 
 if [ "$files" -eq 0 ]; then
     echo "error: no test file found in $SKILLS_DIR" >&2

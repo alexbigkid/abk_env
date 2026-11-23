@@ -36,9 +36,10 @@ The `test_install.sh` script validates:
 
 ### Version Management
 - `./unixBin/setGitAliases.sh` - Writes all git aliases (incl. `rel-*` release triggers) to the global `~/.gitconfig`, overwriting same-named aliases; `git alias` lists them
-- `git rel-patch` - Trigger patch version release pipeline
-- `git rel-minor` - Trigger minor version release pipeline
-- `git rel-major` - Trigger major version release pipeline
+- `git rel-patch` - Open a release pull request with the next patch version (`unixBin/gitRelease.sh patch`)
+- `git rel-minor` - Open a release pull request with the next minor version
+- `git rel-major` - Open a release pull request with the next major version
+- Add `--auto-merge` (e.g. `git rel-patch --auto-merge`) to squash-merge the release pull request when its checks are green
 
 ### Password Stores (pass)
 - `./unixBin/setPass.sh` - Clone/update pass stores (`passabk` → `~/.psws_abk/secrets` from repo `psws_abk`, `passta` → `~/.psws_ta/secrets` from repo `psws_ta`), create/allow each store's `.envrc`, check `.gpg-id` recipients, link `~/.envrc_common` → `unixBin/env/envrc_common` (store functions for direnv `source_env`). Store list: `PASS_STORES` in both set/reset scripts
@@ -337,18 +338,11 @@ The system integrates with shell configuration by:
 
 The repository uses semantic versioning (major.minor.patch) with automated release management:
 
-1. **Trigger Release**: Use `git rel-patch`, `git rel-minor`, or `git rel-major`
-2. **Automated Pipeline Process**:
-   - Git aliases push temporary tag (`rel-patch`, `rel-minor`, `rel-major`)
-   - GitHub Actions detects tag and triggers testing pipeline
-   - **Runs installation tests** on macOS (15, 26), Ubuntu (22.04, 24.04, 26.04) and WSL Ubuntu (22.04, 24.04, 26.04)
-   - Tests both bash and zsh shells with install/uninstall validation
-   - **If tests pass**: `handle_release_tags.sh` bumps version, updates `VERSION` file
-   - Commits version change to main branch
-   - Creates final version tag (e.g., `v1.0.1`)
-   - Cleans up temporary trigger tag
-   - **If tests fail**: No release is created, temporary tags are cleaned up
-3. **Setup**: Run `./unixBin/setGitAliases.sh` to configure git aliases
+1. **Start the release**: on a clean, up-to-date `main` run `git rel-patch`, `git rel-minor`, or `git rel-major` (`unixBin/gitRelease.sh`). It refuses when a release pull request is already open, creates `release/vX.Y.Z`, bumps `VERSION` in a signed commit, pushes and opens the pull request "Release vX.Y.Z" (body: commits since the last tag). The pipeline never pushes to `main`.
+2. **Checks**: the pipeline runs the install/uninstall tests on macOS (15, 26), Ubuntu (22.04, 24.04, 26.04) and WSL Ubuntu (22.04, 24.04, 26.04), bash and zsh, for pull requests from `release/**` branches (make these checks required). Other pull requests do not run the matrix.
+3. **Merge**: you merge the pull request (squash), or it merges itself with `--auto-merge`.
+4. **Tag**: the workflow `release-tag.yml` creates the tag `vX.Y.Z` on the merge commit, only when the merged pull request came from `release/**` and changed `VERSION`.
+5. **Setup**: Run `./unixBin/setGitAliases.sh` to configure git aliases
 
 **Release Types:**
 - **Patch** (x.y.Z): Bug fixes, minor improvements
