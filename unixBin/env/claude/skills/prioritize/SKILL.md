@@ -45,7 +45,7 @@ Choose Priority, Size and Estimate with RUBRICS.md. Issues already in Todo keep 
 
 Let **S** be the ready Triage issues plus the issues already in Todo.
 
-1. A blocker outside S is **settled** when it is closed, or its column is Done, Doing, Review or Testing. An open blocker that is not on the board, not ready, XL or left in Triage is not settled.
+1. A blocker outside S is **settled** when it is closed, or its column is Done, an archive column (`Done-<year>` or `Done-<year>-<month>`), Doing, Review or Testing. An open blocker that is not on the board, not ready, XL or left in Triage is not settled.
 2. Fill the places one at a time. An issue may take the next place only when every blocker is settled or already placed. Among those pick by: higher Priority, then the one that blocks more issues, then smaller Size, then lower number. So a blocker in Todo always comes before its dependents.
 3. An issue that never gets a place (unsettled blocker, cycle) is not queued. A Triage issue stays in Triage; one already in Todo goes back (`$B move <n> triage`). Say why in its comment and in the report.
 

@@ -8,7 +8,8 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 QUEUE_SCRIPT=${QUEUE_SCRIPT:-$SCRIPT_DIR/../../prioritize/scripts/queue.sh}
-BOARD_COLUMNS=(Triage Todo Doing Review Testing)
+BOARD_COLUMNS=(Triage Todo Doing Review Testing Done)
+TODAY=${NEXT_ACTION_TODAY:-$(date -u +%F)}
 LABEL_PARKED="needs-info"
 
 usage() {
@@ -17,6 +18,8 @@ usage: next-action.sh
 Reads the board once and prints what runs next, as one JSON object:
   {"action": "run", "agent": "triager|coder|reviewer|tester", "issue": <number or null>, "reason": "..."}
                          (the triager has no issue; "issues" lists the ones in its column or claimed by it)
+  {"action": "archive", "reason": "..."}                 no agent is due and Done holds issues closed before the current month
+                         (UTC; NEXT_ACTION_TODAY=YYYY-MM-DD replaces today for tests): archive-done.sh runs, no agent
   {"action": "waiting", "issues": [{"number", "why"}]}   nothing can run, these wait for you
   {"action": "done"}                                     no open issue is left on the board
   {"action": "no-board", "reason": "..."}                the repo has no board: the columns are the state
@@ -27,6 +30,7 @@ The first row that has work wins (one agent runs at a time):
   3. an issue in Testing: tester
   4. an issue in Review with an open pull request: reviewer
   5. the top issue in Todo whose blockers are all closed: coder
+  6. Done holds an issue closed before this month: archive (after all agent rows, before waiting and done)
 Issues with $LABEL_PARKED are never started (except an interrupted run, row 1). Repo from the current directory or GH_REPO.
 USAGE
 }
@@ -37,13 +41,16 @@ esac
 [ $# -eq 0 ] || { usage >&2; exit 1; }
 
 queue=$("$QUEUE_SCRIPT" "${BOARD_COLUMNS[@]}")
-jq -c --arg parked "$LABEL_PARKED" '
+jq -c --arg parked "$LABEL_PARKED" --arg today "$TODAY" '
     def run($agent; $issue; $reason): {action: "run", agent: $agent, issue: $issue, reason: $reason};
     def is_parked: .labels | index($parked);
     def open_blockers: [.blockedBy[] | select(.state != "CLOSED") | .number];
     def triager_issues($q): [$q.issues[] | select(.agent == "Triager" or (.column == "Triage" and (is_parked | not))) | .number];
     def first_in($column): [.issues[] | select(.column == $column and (is_parked | not))] | first;
-    . as $q
+    def is_done: .column == "Done";
+    . as $all
+    | ([$all.issues[] | select(is_done and .closedAt != null and .closedAt[0:7] < $today[0:7])] | length) as $old_done
+    | ($all | .issues |= map(select(.column == null or (.column | startswith("Done") | not)))) as $q
     | if $q.board == null then {action: "no-board", reason: "without a board the columns are missing; name the issue and the agent yourself"}
       else
         ([$q.issues[] | select(.agent != null)] | first) as $claimed
@@ -60,6 +67,7 @@ jq -c --arg parked "$LABEL_PARKED" '
           elif $testing != null then run("tester"; $testing.number; "in Testing")
           elif $review != null then run("reviewer"; $review.number; "in Review with an open pull request")
           elif $todo != null then run("coder"; $todo.number; "top of Todo, blockers closed")
+          elif $old_done > 0 then {action: "archive", reason: "\($old_done) issue(s) in Done were closed before this month"}
           elif ($q.issues | length) == 0 then {action: "done"}
           else {action: "waiting", issues: [$q.issues[] | {number, why:
                   (if is_parked then "needs your answer (\($parked))"

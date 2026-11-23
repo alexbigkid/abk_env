@@ -15,6 +15,7 @@ NEXT_ACTION=${NEXT_ACTION_SCRIPT:-$SCRIPT_DIR/next-action.sh}
 PARK=${PARK_SCRIPT:-$SCRIPT_DIR/park.sh}
 REVIEW_STATE=${REVIEW_STATE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-state.sh}
 WORKTREE_SCRIPT=${WORKTREE_SCRIPT:-$SCRIPT_DIR/../../review/scripts/review-worktree.sh}
+ARCHIVE_SCRIPT=${ARCHIVE_SCRIPT:-$SCRIPT_DIR/../../archive-done/scripts/archive-done.sh}
 CLAUDE_BIN=${CLAUDE_BIN:-claude}
 ALLOWED_TOOLS_FILE=${ORCHESTRATE_ALLOWED_TOOLS:-$SCRIPT_DIR/allowed-tools.conf}
 LOCK_DIR=${ORCHESTRATE_LOCK_DIR:-${TMPDIR:-/tmp}/abk-orchestrate.lock}
@@ -37,6 +38,8 @@ the loop asks again, until everything is Done or waits for you. One agent at a t
 Guards: a lock (only one orchestrator), the allowlist of each agent ($(basename "$ALLOWED_TOOLS_FILE")), a budget cap per run
 (\$ORCHESTRATE_BUDGET_USD, default $BUDGET_USD), an optional model per agent (model-<agent> lines in the allowlist file),
 a usage line per run (also appended to $USAGE_LOG), at most \$ORCHESTRATE_MAX_DISPATCHES dispatches per start (default $MAX_DISPATCHES).
+The action "archive" (Done holds issues closed before this month) runs archive-done.sh, no agent; a failing script stops with exit $EXIT_AGENT_FAILED,
+the same archive action twice in a row stops with an error (there is no issue to park).
 The same action twice in a row (no progress) parks the issue for you instead of running it again.
 A review that reached the round cap is parked without starting the reviewer (unless its last review is posted and only the move is missing).
 A failed agent run (no tokens, an error) stops everything with exit $EXIT_AGENT_FAILED: the claim stays, start it again to resume.
@@ -144,6 +147,14 @@ while :; do
         waiting) echo "nothing can run; waiting for you:"; jq -r '.issues[] | "  #\(.number): \(.why)"' <<<"$action"; exit 0 ;;
         no-board) jq -r '"no board: \(.reason)"' <<<"$action"; exit 0 ;;
         run) ;;
+        archive)
+            if [ -n "$dry_run" ]; then printf '%s\n' "$action"; exit 0; fi
+            [ "$action" != "$previous" ] || die "the archive action came twice in a row: archive-done.sh did not change the board: $action"
+            previous=$action
+            echo "== archive: $(jq -r .reason <<<"$action")"
+            "$ARCHIVE_SCRIPT" || { echo "archive-done.sh failed; start the orchestrator again to retry" >&2; exit "$EXIT_AGENT_FAILED"; }
+            [ -z "$once" ] || exit 0
+            continue ;;
         *) die "unexpected answer of the state machine: $action" ;;
     esac
     if [ -n "$dry_run" ]; then printf '%s\n' "$action"; exit 0; fi

@@ -26,8 +26,8 @@ export STUB_DIR QUEUE_SCRIPT="$STUB_DIR/queue.sh"
 
 # Build one issue: number, column, agent ("" = none), labels (comma list), blockers ("n:STATE,..."), open PRs (comma list).
 issue() {
-    jq -nc --argjson n "$1" --arg column "$2" --arg agent "$3" --arg labels "$4" --arg blockers "$5" --arg prs "$6" '
-        {number: $n, column: $column, agent: (if $agent == "" then null else $agent end),
+    jq -nc --argjson n "$1" --arg column "$2" --arg agent "$3" --arg labels "$4" --arg blockers "$5" --arg prs "$6" --arg closed "${7:-}" '
+        {number: $n, column: $column, closedAt: (if $closed == "" then null else $closed end), agent: (if $agent == "" then null else $agent end),
          labels: ($labels | split(",") | map(select(. != ""))),
          openPrs: ($prs | split(",") | map(select(. != "") | tonumber)),
          blockedBy: ($blockers | split(",") | map(select(. != "") | split(":") | {number: (.[0] | tonumber), state: .[1]}))}'
@@ -44,7 +44,7 @@ run_suite() {
     board
     run_script
     check_that "an empty board is done" [ "$OUT" = '{"action":"done"}' ]
-    check_that "it reads the five columns in ONE call" [ "$(cat "$STUB_DIR/queue-args")" = "Triage Todo Doing Review Testing" ]
+    check_that "it reads the five columns and Done in ONE call" [ "$(cat "$STUB_DIR/queue-args")" = "Triage Todo Doing Review Testing Done" ]
 
     board "$(issue 1 Triage "" "" "" "")"
     run_script
@@ -146,6 +146,37 @@ run_suite() {
     board "$(issue 1 Triage "" needs-info "" "")" "$(issue 2 Todo "" "" "1:OPEN" "")"
     run_script
     answer_is "everything left waits for the user: both are listed" '.action == "waiting" and (.issues | length) == 2'
+
+    # The archive action: Done holds an issue closed before the current month (today is injected), nothing else can run.
+    export NEXT_ACTION_TODAY=2026-11-23
+    board "$(issue 1 Done "" "" "" "" 2026-10-31T23:59:59Z)"
+    run_script
+    answer_is "an issue of Done closed in an earlier month asks for the archive (no agent)" '.action == "archive" and (.reason | length) > 0 and (has("agent") | not)'
+    board "$(issue 1 Done "" "" "" "" 2026-11-01T00:00:00Z)"
+    run_script
+    answer_is "Done issues of the current month alone are all done, not archived" '.action == "done"'
+    board "$(issue 1 Done "" "" "" "" 2025-11-30T00:00:00Z)"
+    run_script
+    answer_is "a previous year counts as an earlier month" '.action == "archive"'
+    board "$(issue 1 Done "" "" "" "" 2026-11-05T00:00:00Z)" "$(issue 2 Todo "" "" "3:OPEN" "")"
+    run_script
+    answer_is "Done issues of the current month do not hide the waiting issues" '.action == "waiting" and (.issues | length) == 1'
+    board "$(issue 1 Done "" "" "" "" 2026-10-05T00:00:00Z)" "$(issue 2 Todo "" "" "" "")"
+    run_script
+    answer_is "an agent row comes before the archive" '.action == "run" and .agent == "coder"'
+    board "$(issue 1 Done "" "" "" "" 2026-10-05T00:00:00Z)" "$(issue 2 Todo "" "" "3:OPEN" "")"
+    run_script
+    answer_is "the archive comes before waiting" '.action == "archive"'
+    board "$(issue 1 Done "" "" "" "" 2026-10-05T00:00:00Z)" "$(issue 2 Todo "" needs-info "" "")"
+    run_script
+    answer_is "the archive comes before waiting for a parked issue too" '.action == "archive"'
+    board "$(issue 1 Done "" "" "" "" 2026-10-05T00:00:00Z)" "$(issue 2 Done-2026-09 "" "" "" "" 2026-09-05T00:00:00Z)"
+    run_script
+    answer_is "an issue in an archive column is not Done: not listed as waiting, not archived again" '.action == "archive"'
+    board "$(issue 2 Done-2026-09 "" "" "" "" 2026-09-05T00:00:00Z)"
+    run_script
+    answer_is "only archive columns left: all done" '.action == "done"'
+    unset NEXT_ACTION_TODAY
 
     printf '%s\n' '{"board": null, "issues": []}' > "$STUB_DIR/queue.json"
     run_script
