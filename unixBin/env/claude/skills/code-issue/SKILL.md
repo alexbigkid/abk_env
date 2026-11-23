@@ -17,13 +17,13 @@ H=~/.claude/skills/code-issue/scripts/with-https.sh     # git over HTTPS: no SSH
 
 ## 1. Pick the issue
 
-The user may name one; after an interrupted run (for example an API failure) the user names the issue again, it is still in Doing and claimed by Coder, so continue on its branch (`$H git fetch origin <branch> && git checkout <branch>`). Otherwise take the top Todo issue whose blockers are all closed (review rework comes back at the top of Todo):
+The user may name one; after an interrupted run (for example an API failure) the user names the issue again, it is still in Doing and claimed by Coder, so continue on its branch (`$H git fetch origin <branch> && git checkout <branch>`). Otherwise take the top Todo issue whose blockers are all closed and that is not waiting for a human (`needs-info`); review rework comes back at the top of Todo:
 
 ```bash
-$Q | jq -r '[.issues[] | select(.column == "Todo" and all(.blockedBy[]; .state == "CLOSED"))] | first | .number // empty'
+$Q | jq -r '[.issues[] | select(.column == "Todo" and (.labels | index("needs-info") | not) and all(.blockedBy[]; .state == "CLOSED"))] | first | .number // empty'
 ```
 
-Nothing found: report that no issue is ready. Read the issue, its comments and any agent brief. If it has open points that block you (a human decision), stop and report instead of guessing. `$P <n>` tells whether it already has an open PR: then it is rework, go to step 6.
+Nothing found: report that no issue is ready. Read the issue, its comments and any agent brief. If it has open points that block you (a human decision) or lacks information to implement it, park it (see Parking an issue in the project-board skill) instead of guessing. `$P <n>` tells whether it already has an open PR: then it is rework, go to step 6.
 
 ## 2. Start
 
@@ -71,7 +71,7 @@ The reviewer returns the issue to Todo with comments on the PR. `$P <n>` prints 
 
 Commit and push with `$C`. Post one PR comment that starts with the line `Review items handled:` and lists each item with `fixed in <sha>`, `follow-up #<m> (<reason>)` or `disputed (<reason>)`; `$P` then lists only feedback newer than that comment. Then `$B move <n> Review`, also when a dispute is the only open item (it is listed in that comment for the reviewer and the user).
 
-A `[must-fix]` you are unable to fix (not one you think is wrong) is neither skipped nor guessed: stop, report exactly what blocks you, and leave the issue in Doing with your claim.
+A `[must-fix]` you are unable to fix (not one you think is wrong) is neither skipped nor guessed: park the issue for the user and report exactly what blocks you.
 
 ## Follow-up issues
 
@@ -87,4 +87,4 @@ The board commands print `SKIPPED` and exit 0; the branch, commits and PR work a
 
 ## Stop and report
 
-Missing signing config, tests you cannot make pass, a blocking open point in the issue, a refused push, or a failing board or API call. Say what you did and what is left.
+Park the issue (see Parking an issue in the project-board skill) when only a human can help: missing information or a decision, a `[must-fix]` or tests you cannot make pass. For technical failures (missing signing config, a refused push, a failing board or API call) stop, report and leave the issue in Doing with your claim. Say what you did and what is left.

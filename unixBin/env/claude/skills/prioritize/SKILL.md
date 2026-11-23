@@ -35,6 +35,8 @@ The Relationships are the model of the order, so make them right before ranking:
 
 **Ready** = a clear description, acceptance criteria and none of the repo's `needs-info`, `wontfix` or duplicate labels (the label names come from the repo's triage label mapping, `docs/agents/triage-labels.md` created by `/setup-skills`; the defaults are `needs-info`, `wontfix`, `duplicate`). Not ready: stays in Triage, add the repo's `needs-info` label (create it first if missing), comment what is missing, point to `/triage`. Size XL: stays in Triage, recommend splitting with `/to-issues`.
 
+An issue that already has `needs-info` is parked for the user (see the project-board skill): leave it in Triage without a new comment until the label is removed, and list it in your report as waiting for the user.
+
 Choose Priority, Size and Estimate with RUBRICS.md. Issues already in Todo keep their values unless empty.
 
 ## 5. Order
