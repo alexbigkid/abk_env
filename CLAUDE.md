@@ -79,7 +79,6 @@ The `test_install.sh` script validates:
 **Version Management:**
 - `VERSION` file tracks current version in semantic versioning format (major.minor.patch)
 - `.github/workflows/pipeline.yml` - GitHub Actions workflow for testing and releases
-- `.github/scripts/handle_release_tags.sh` - Release tag handler (used by pipeline only)
 - `.github/scripts/AgentInfo.sh` - Runner information script
 
 **Shell Environment:**
