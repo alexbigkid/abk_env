@@ -27,6 +27,8 @@ mkdir -p "$TEST_TMP/bin"
 cat > "$TEST_TMP/bin/gh" <<'STUB'
 #!/usr/bin/env bash
 echo "$*" >> "$GH_LOG"
+# GH_STUB_FAIL: a call that starts with this text fails
+if [ -n "${GH_STUB_FAIL:-}" ] && [[ "$*" == "$GH_STUB_FAIL"* ]]; then exit 1; fi
 case "$*" in
     "api repos/o/r/git/ref/heads/main"*) echo "${GH_STUB_MAIN_SHA:-abc123}" ;;
     "api repos/o/r/contents/VERSION?ref=main"*) echo "blobsha" ;;
@@ -50,7 +52,7 @@ new_case() {
     echo "1.2.3" > VERSION
     git add VERSION && git commit -q -m "first"
     : > "$GH_LOG"
-    unset GH_STUB_MAIN_SHA
+    unset GH_STUB_MAIN_SHA GH_STUB_FAIL
 }
 
 # Run the script with a tag and a result; sets OUT and RC.
@@ -72,7 +74,8 @@ run_suite() {
 
     new_case
     run_release rel-patch fail
-    check_that "fail: succeeds" [ "$RC" -eq 0 ]
+    check_that "fail: exits non-zero" [ "$RC" -ne 0 ]
+    check_that "fail: says no release" grep -q "no release" <<< "$OUT"
     check_that "fail: rel tag deleted" grep -q "DELETE repos/o/r/git/refs/tags/rel-patch" "$GH_LOG"
     check_that "fail: nothing else" [ "$(wc -l < "$GH_LOG" | tr -d ' ')" = 1 ]
 
@@ -81,6 +84,18 @@ run_suite() {
     check_that "main moved: fails" [ "$RC" -ne 0 ]
     check_that "main moved: rel tag deleted" grep -q "DELETE repos/o/r/git/refs/tags/rel-patch" "$GH_LOG"
     check_that "main moved: no branch created" [ -z "$(grep 'refs/heads/release' "$GH_LOG")" ]
+
+    new_case
+    GH_STUB_FAIL="pr create" run_release rel-patch pass
+    check_that "pr create fails: fails" [ "$RC" -ne 0 ]
+    check_that "pr create fails: branch deleted" grep -q "DELETE repos/o/r/git/refs/heads/release/v1.2.4" "$GH_LOG"
+    check_that "pr create fails: rel tag deleted" grep -q "DELETE repos/o/r/git/refs/tags/rel-patch" "$GH_LOG"
+
+    new_case
+    GH_STUB_FAIL="api repos/o/r/git/refs -f ref=refs/heads" run_release rel-patch pass
+    check_that "branch creation fails: fails" [ "$RC" -ne 0 ]
+    check_that "branch creation fails: rel tag deleted" grep -q "DELETE repos/o/r/git/refs/tags/rel-patch" "$GH_LOG"
+    check_that "branch creation fails: branch not deleted" [ -z "$(grep 'DELETE.*refs/heads' "$GH_LOG")" ]
 
     new_case
     run_release rel-patch bogus

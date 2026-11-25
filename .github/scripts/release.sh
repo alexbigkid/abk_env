@@ -5,13 +5,14 @@
 #
 # usage: release.sh pass|fail
 #
-# fail: only delete the rel-<type> tag.
+# fail: delete the rel-<type> tag and exit non-zero, so a run without a release is red.
 # pass: bump VERSION on the branch release/vX.Y.Z with a commit made through the GitHub API
 #       (GitHub signs it), open the pull request "Release vX.Y.Z", squash-merge it, tag
 #       vX.Y.Z on the merge commit, delete the rel-<type> tag and the release branch.
 #
 # Needs GH_TOKEN (the run's GITHUB_TOKEN with contents and pull-requests write), GH_REPO,
 # GITHUB_REF_NAME (the rel-<type> tag) and GITHUB_SHA (the commit the tag points to).
+# When pass fails, the rel-<type> tag and the release branch (if this run created it) are deleted.
 # Pushes and merges made with that token start no workflow, so no second test run starts.
 #------------------------------------------------------------------------------
 set -euo pipefail
@@ -27,13 +28,22 @@ delete_ref() {
 }
 
 case "$RESULT" in
-    fail) delete_ref "tags/$TAG"; echo "Tests did not pass: $TAG deleted, no release"; exit 0 ;;
+    fail) delete_ref "tags/$TAG"; echo "Tests did not pass: $TAG deleted, no release" >&2; exit 1 ;;
     pass) ;;
     *) echo "usage: release.sh pass|fail" >&2; exit 1 ;;
 esac
 
-# On any failure below the tag is removed, so a new release can start.
-trap 'rc=$?; [ $rc -eq 0 ] || delete_ref "tags/$TAG"' EXIT
+# On any failure below the tag is removed, so a new release can start. The release branch is
+# removed too when this run created it; deleting the head branch also closes an opened release PR.
+BRANCH=""
+BRANCH_CREATED=""
+cleanup_failed_release() {
+    local rc=$?
+    [ $rc -eq 0 ] && return
+    [ -z "$BRANCH_CREATED" ] || delete_ref "heads/$BRANCH"
+    delete_ref "tags/$TAG"
+}
+trap cleanup_failed_release EXIT
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 CURRENT=$(cat VERSION)
@@ -45,6 +55,7 @@ MAIN_SHA=$(gh api "repos/$GH_REPO/git/ref/heads/main" --jq .object.sha)
 [ "$MAIN_SHA" = "$GITHUB_SHA" ] || { echo "main moved since the tests started" >&2; exit 1; }
 
 gh api "repos/$GH_REPO/git/refs" -f ref="refs/heads/$BRANCH" -f sha="$GITHUB_SHA" > /dev/null
+BRANCH_CREATED=1
 VERSION_BLOB=$(gh api "repos/$GH_REPO/contents/VERSION?ref=main" --jq .sha)
 gh api -X PUT "repos/$GH_REPO/contents/VERSION" -f message="Release v$NEXT" \
     -f content="$(printf '%s\n' "$NEXT" | base64 | tr -d '\n')" -f sha="$VERSION_BLOB" -f branch="$BRANCH" > /dev/null
