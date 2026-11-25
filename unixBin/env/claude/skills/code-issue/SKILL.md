@@ -38,9 +38,17 @@ $B claim Coder <n>
 
 Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words; for an issue the tester reopened after a failed QA, whose first PR is merged: `{Type}/{n}/{short-name}-fix`), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out instead of creating it:
 
+A new branch always starts at the freshly fetched `origin/main`, whatever branch is checked out when you start (an earlier issue's branch whose PR is not merged yet would otherwise leak its commits into this one). Go to `main` first, update it, then create the branch:
+
 ```bash
+$H git fetch origin
+git checkout main
+$H git pull --ff-only
 $H gh issue develop <n> --name F/<n>/<short-name> --base main --checkout
+git log origin/main..HEAD --oneline      # must print nothing
 ```
+
+If `git log origin/main..HEAD` prints anything on a new branch, stop and report; do not commit. Never create the branch with `git checkout -b` from the current checkout.
 
 ## 4. Implement
 
