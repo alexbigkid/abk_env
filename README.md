@@ -332,7 +332,7 @@ Run <code>./unixBin/setGitAliases.sh</code> to put the same git aliases on every
 It also sets <code>diff-so-fancy</code> as the git pager when it is installed.
 
 ### Releases
-On a clean, up-to-date <code>main</code>, run <code>git rel-patch</code>, <code>git rel-minor</code> or <code>git rel-major</code>. It creates the branch <code>release/vX.Y.Z</code>, bumps <code>VERSION</code> in a signed commit and opens the pull request "Release vX.Y.Z" (only one release pull request can be open). GitHub Actions runs the install/uninstall tests on macOS (15, 26, and 27 when the repository variable <code>MACOS_27_ENABLED</code> is <code>true</code>) first, then Ubuntu and WSL (it stops at the first failing job). Merge it (squash), or add <code>--auto-merge</code> (for example <code>git rel-patch --auto-merge</code>) to merge it when the checks are green. After the merge the workflow <code>release-tag.yml</code> creates the <code>vX.Y.Z</code> tag.
+On a clean, up-to-date <code>main</code>, run <code>git rel-patch</code>, <code>git rel-minor</code> or <code>git rel-major</code>. It creates the branch <code>release/vX.Y.Z</code>, bumps <code>VERSION</code> in a signed commit and opens the pull request "Release vX.Y.Z" (only one release pull request can be open). GitHub Actions runs the install/uninstall tests on macOS (15, 26, and 27 when the repository variable <code>MACOS_27_ENABLED</code> is <code>true</code>), Ubuntu and WSL in parallel (the first failing job cancels the whole run). Merge it (squash), or add <code>--auto-merge</code> (for example <code>git rel-patch --auto-merge</code>) to merge it when the checks are green. After the merge the workflow <code>release-tag.yml</code> creates the <code>vX.Y.Z</code> tag.
 
 
 ## Claude Code environment

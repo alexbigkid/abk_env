@@ -7,9 +7,17 @@ on:
         branches:
             - main
     workflow_dispatch:
+        inputs:
+            fail_job:
+                description: "Make one job fail on purpose to check cancel-on-first-failure"
+                type: choice
+                options: [none, macos, ubuntu, wsl]
+                default: none
 
+# actions: write lets a failed job cancel the whole run
 permissions:
     contents: read
+    actions: write
 
 # Prevent duplicate runs - prioritize by commit SHA
 concurrency:
@@ -33,6 +41,12 @@ jobs:
                 # Unset or any other value: 27 is not in the matrix, so a missing or slow runner never blocks a release.
                 version: ${{ fromJSON(vars.MACOS_27_ENABLED == 'true' && '[15, 26, 27]' || '[15, 26]') }}
         steps:
+            - name: Fail on purpose (manual check)
+              if: github.event_name == 'workflow_dispatch' && inputs.fail_job == 'macos'
+              run: |
+                echo "fail_job=macos: failing on purpose"
+                exit 1
+
             - name: checkout repo
               uses: actions/checkout@v6
 
@@ -90,8 +104,14 @@ jobs:
                 command -v gpg >/dev/null || brew install gnupg
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
+            - name: Cancel the whole run
+              if: failure()
+              env:
+                GH_TOKEN: ${{ github.token }}
+                GH_REPO: ${{ github.repository }}
+              run: gh run cancel ${{ github.run_id }}
+
     Ubuntu:
-        needs: MacOS
         if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: Ubuntu ${{ matrix.version }}
         runs-on: ubuntu-${{ matrix.version }}
@@ -99,6 +119,12 @@ jobs:
             matrix:
                 version: [22.04, 24.04, 26.04]
         steps:
+            - name: Fail on purpose (manual check)
+              if: github.event_name == 'workflow_dispatch' && inputs.fail_job == 'ubuntu'
+              run: |
+                echo "fail_job=ubuntu: failing on purpose"
+                exit 1
+
             - name: checkout repo
               uses: actions/checkout@v6
 
@@ -156,8 +182,14 @@ jobs:
                 command -v gpg >/dev/null || sudo apt-get install -y gnupg
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
+            - name: Cancel the whole run
+              if: failure()
+              env:
+                GH_TOKEN: ${{ github.token }}
+                GH_REPO: ${{ github.repository }}
+              run: gh run cancel ${{ github.run_id }}
+
     WSL:
-        needs: MacOS
         if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: WSL Ubuntu ${{ matrix.version }}
         runs-on: windows-latest
@@ -165,6 +197,13 @@ jobs:
             matrix:
                 version: [22.04, 24.04, 26.04]
         steps:
+            - name: Fail on purpose (manual check)
+              if: github.event_name == 'workflow_dispatch' && inputs.fail_job == 'wsl'
+              shell: bash
+              run: |
+                echo "fail_job=wsl: failing on purpose"
+                exit 1
+
             - name: checkout repo
               uses: actions/checkout@v6
 
@@ -215,3 +254,11 @@ jobs:
               shell: wsl-bash {0}
               run: |
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
+
+            - name: Cancel the whole run
+              if: failure()
+              shell: bash
+              env:
+                GH_TOKEN: ${{ github.token }}
+                GH_REPO: ${{ github.repository }}
+              run: gh run cancel ${{ github.run_id }}
