@@ -36,11 +36,19 @@ $B claim Coder <n>
 
 ## 3. Branch
 
-Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words; for an issue the tester reopened after a failed QA, whose first PR is merged: `{Type}/{n}/{short-name}-fix`), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out instead of creating it:
+Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words; for an issue the tester reopened after a failed QA, whose first PR is merged: `{Type}/{n}/{short-name}-fix`), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out (`$H git fetch origin <branch> && git checkout <branch>`) and skip the rest of this step.
+
+A new branch always starts at the freshly fetched `origin/main`, whatever branch is checked out when you start (an earlier issue's branch whose PR is not merged yet would otherwise leak its commits into this one). If the working tree is dirty (`git status --short` prints anything), stop and report; do not carry changes along. Otherwise go to `main` first, update it, then create the branch:
 
 ```bash
+$H git fetch origin
+git checkout main
+$H git pull --ff-only
 $H gh issue develop <n> --name F/<n>/<short-name> --base main --checkout
+git log origin/main..HEAD --oneline      # must print nothing
 ```
+
+If `git log origin/main..HEAD` prints anything on a new branch, stop and report; do not commit. Run the same `git log origin/main..HEAD --oneline` check again right before the first commit (it must list only your own commits). Never create the branch with `git checkout -b` from the current checkout.
 
 ## 4. Implement
 
