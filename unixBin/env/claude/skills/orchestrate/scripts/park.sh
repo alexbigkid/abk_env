@@ -30,7 +30,7 @@ esac
 require_issue_numbers "$1"
 [ -n "$2" ] || die "the reason must not be empty"
 
-gh label create "$LABEL_PARKED" --force >/dev/null
+gh label create "$LABEL_PARKED" --force --color D93F0B --description "Waiting for a decision or information" >/dev/null
 gh issue edit "$1" --add-label "$LABEL_PARKED" >/dev/null
 printf '%s\n%s\n' "$AI_LINE" "$2" | gh issue comment "$1" --body-file - >/dev/null
 "$BOARD_SCRIPT" move "$1" "$PARK_COLUMN"

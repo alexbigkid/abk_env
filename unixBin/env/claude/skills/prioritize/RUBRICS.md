@@ -49,6 +49,6 @@ gh issue comment <n> --body-file - <<'COMMENT'
 Queue position: #1 of 3
 ...
 COMMENT
-gh label create needs-info --force      # once, if the label does not exist (name per the repo's label mapping)
+gh label create needs-info --force --color D93F0B --description "Waiting for a decision or information"      # keeps the colour (name per the repo's label mapping)
 gh issue edit <n> --add-label needs-info
 ```

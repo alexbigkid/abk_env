@@ -92,7 +92,7 @@ gh api -X PUT repos/$REPO/actions/permissions/workflow \
 
 ## 4. Labels
 
-The agents use these labels (they create a missing one with `--force`, but creating them up front keeps the colours and descriptions the same). `--force` updates an existing label, so this is safe to rerun:
+The agents use these labels (they create a missing one with `--force --color ...`, but creating them up front keeps the colours and descriptions the same). `--force` updates an existing label, so this is safe to rerun; never use `--force` without `--color`, it recolours the label at random:
 
 ```bash
 gh label create bug         --force --color d73a4a --description "Something isn't working"

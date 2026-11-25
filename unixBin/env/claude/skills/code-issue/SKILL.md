@@ -36,7 +36,7 @@ $B claim Coder <n>
 
 ## 3. Branch
 
-Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force` first if it is missing, then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words; for an issue the tester reopened after a failed QA, whose first PR is merged: `{Type}/{n}/{short-name}-fix`), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out (`$H git fetch origin <branch> && git checkout <branch>`) and skip the rest of this step.
+Type from the issue label: `bug` → B, `feature` or `enhancement` → F, `docs` → D, `research` → R, `test` → T. No label, or none of its labels maps (for example only `question`): infer the type from title and description and assign the matching label (`gh label create <label> --force --color <color> --description "<text>"` first if it is missing, with the colour and description of that label in `repo-setup/SKILL.md` step 4: bug d73a4a, feature b40bb0, enhancement a2eeef, docs 0075ca, research 1d76db, test 0e8a16; never `--force` without `--color`; then `gh issue edit <n> --add-label <label>`). Branch `{Type}/{n}/{short-name}` (kebab-case, at most 5 words; for an issue the tester reopened after a failed QA, whose first PR is merged: `{Type}/{n}/{short-name}-fix`), created and linked to the issue (`--base` is the default branch, usually `main`). If the branch already exists (an interrupted run), check it out (`$H git fetch origin <branch> && git checkout <branch>`) and skip the rest of this step.
 
 A new branch always starts at the freshly fetched `origin/main`, whatever branch is checked out when you start (an earlier issue's branch whose PR is not merged yet would otherwise leak its commits into this one). If the working tree is dirty (`git status --short` prints anything), stop and report; do not carry changes along. Otherwise go to `main` first, update it, then create the branch:
 
@@ -100,7 +100,7 @@ A `[must-fix]` you are unable to fix (not one you think is wrong) is neither ski
 For a review item you do not fix now, or work you found but must not do here, open a follow-up issue and place it in Triage; you never prioritize it and **you never start the triager** (or any agent): the triager runs in its own context when whoever orchestrates starts it.
 
 - Body in the `/to-issues` template: `## What to build`, `## Acceptance criteria`, `## Blocked by`, and the line `Follow-up of #<n> (PR #<pr>)`. Name blockers in the text; the triager turns them into Relationships.
-- If you cannot fill it in because information is missing, add the label `needs-info` (`gh label create needs-info --force` first if it does not exist) and list what is missing under `## Open questions`. The triager leaves such issues in Triage.
+- If you cannot fill it in because information is missing, add the label `needs-info` (`gh label create needs-info --force --color D93F0B --description "Waiting for a decision or information"` first) and list what is missing under `## Open questions`. The triager leaves such issues in Triage.
 - `gh issue create ...`, then `$B add <issue>`. End your hand-over with the line `Triage needs a run: #<a> #<b>` (or `Triage: no new issues`).
 
 ## No board
