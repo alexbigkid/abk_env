@@ -6,7 +6,8 @@
 # usage: gitRelease.sh patch|minor|major
 #
 # Called by the git aliases rel-patch, rel-minor and rel-major (setGitAliases.sh).
-# Needs main checked out, clean and equal to origin/main, and no rel-* tag on origin.
+# Needs main checked out, clean and equal to origin/main, and no rel-* tag with a run in progress
+# (a stale rel-* tag without a run is deleted, with a message).
 # The tag push starts the pipeline (one test run for the release). When every job passed,
 # the release job (.github/scripts/release.sh) bumps VERSION through a pull request,
 # squash-merges it, tags vX.Y.Z and deletes the rel-* tag; on a failure it only deletes the tag.
@@ -34,11 +35,23 @@ esac
 git fetch -q origin "$MAIN_BRANCH" || die "Cannot fetch origin"
 [ "$(git rev-parse HEAD)" = "$(git rev-parse "origin/$MAIN_BRANCH")" ] ||
     die "$MAIN_BRANCH is not up to date with origin/$MAIN_BRANCH (pull or push first)"
-[ -z "$(git ls-remote --tags origin "$TAG_PREFIX*")" ] || die "A release is already running (a $TAG_PREFIX* tag exists on origin)"
+
+REPO=$(git remote get-url origin | sed -E 's#^.*github\.com[:/]##; s#\.git$##')
+
+# A rel-* tag on origin with a run in progress: refuse. Without one it is stale (a run that never got
+# a runner, or that was cancelled): delete it and go on.
+for OLD_REF in $(git ls-remote --tags origin "$TAG_PREFIX*" | cut -f2); do
+    OLD_TAG=${OLD_REF#refs/tags/}
+    RUNNING=$(gh run list --repo "$REPO" --branch "$OLD_TAG" --json status,url \
+        --jq '[.[] | select(.status != "completed")] | first | .url // empty') ||
+        die "Cannot check the runs of $OLD_TAG (gh failed)"
+    [ -z "$RUNNING" ] || die "A release is already running ($OLD_TAG): $RUNNING"
+    echo "Deleting stale tag $OLD_TAG (no run in progress)"
+    git push -q origin ":$OLD_REF"
+done
 
 # -f: a leftover local tag of an earlier release must not block this one.
 git tag -f "$TAG" > /dev/null
 git push -q origin "refs/tags/$TAG"
 
-REPO=$(git remote get-url origin | sed -E 's#^.*github\.com[:/]##; s#\.git$##')
 echo "Release $1 started: https://github.com/$REPO/actions"

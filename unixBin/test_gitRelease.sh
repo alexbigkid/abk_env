@@ -24,6 +24,12 @@ git config --file "$GIT_CONFIG_GLOBAL" user.name "Test"
 git config --file "$GIT_CONFIG_GLOBAL" user.email "test@example.invalid"
 git config --file "$GIT_CONFIG_GLOBAL" init.defaultBranch main
 
+# Stub gh: "gh run list" prints $GH_STUB_RUNNING (the url of a run in progress, empty = none) and exits with $GH_STUB_RC.
+mkdir -p "$TEST_TMP/bin"
+printf '%s\n' '#!/usr/bin/env bash' '[ -z "${GH_STUB_RUNNING:-}" ] || echo "$GH_STUB_RUNNING"' 'exit "${GH_STUB_RC:-0}"' > "$TEST_TMP/bin/gh"
+chmod +x "$TEST_TMP/bin/gh"
+export PATH="$TEST_TMP/bin:$PATH"
+
 # New case: origin + clone on main with one commit, pushed.
 new_repo() {
     CASE_NO=$((CASE_NO + 1))
@@ -93,7 +99,20 @@ run_suite() {
 
     new_repo
     git tag rel-minor && git push -q origin rel-minor 2>/dev/null
-    KEEP_TAG=rel-minor expect_refused "existing rel tag" "already running" patch
+    GH_STUB_RUNNING=https://github.com/x/y/actions/runs/1 KEEP_TAG=rel-minor expect_refused "rel tag with a run in progress" "already running" patch
+    check_that "run in progress: prints the run link" grep -q "actions/runs/1" <<< "$OUT"
+
+    new_repo
+    git tag rel-minor && git push -q origin rel-minor 2>/dev/null
+    run_rel patch
+    check_that "stale rel tag: succeeds" [ "$RC" -eq 0 ]
+    check_that "stale rel tag: says it deleted it" grep -q "stale tag rel-minor" <<< "$OUT"
+    check_that "stale rel tag: gone from origin" [ -z "$(git ls-remote --tags origin refs/tags/rel-minor)" ]
+    check_that "stale rel tag: new tag pushed" [ -n "$(git ls-remote --tags origin refs/tags/rel-patch)" ]
+
+    new_repo
+    git tag rel-minor && git push -q origin rel-minor 2>/dev/null
+    GH_STUB_RC=1 KEEP_TAG=rel-minor expect_refused "gh fails" "Cannot check" patch
 
     new_repo
     expect_refused "unknown type" "usage" bogus

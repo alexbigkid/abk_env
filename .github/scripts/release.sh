@@ -37,7 +37,7 @@ trap 'rc=$?; [ $rc -eq 0 ] || delete_ref "tags/$TAG"' EXIT
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 CURRENT=$(cat VERSION)
-NEXT=$(bash "$SCRIPT_DIR/../../unixBin/nextVersion.sh""$CURRENT" "$TYPE")
+NEXT=$(bash "$SCRIPT_DIR/../../unixBin/nextVersion.sh" "$CURRENT" "$TYPE")
 BRANCH="release/v$NEXT"
 
 # main must still be the commit that was tested
