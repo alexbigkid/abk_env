@@ -6,6 +6,7 @@ on:
     pull_request:
         branches:
             - main
+    workflow_dispatch:
 
 permissions:
     contents: read
@@ -20,7 +21,7 @@ env:
 
 jobs:
     MacOS:
-        if: github.event_name == 'push' || startsWith(github.head_ref, 'release/')
+        if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: MacOS ${{ matrix.version }}
         runs-on: macos-${{ matrix.version }}
         strategy:
@@ -41,6 +42,16 @@ jobs:
                 cat /etc/shells
                 echo "-------MacOS SW version-------------"
                 sw_vers
+
+            # The runner image ships ruby@3.3; the "brew upgrade" of the install flow upgrades it and
+            # its "brew link" fails on files of the old version. This is only a warning and NOT the cause
+            # of a failed install (see #38); upgrading first and linking with overwrite keeps the logs clean.
+            - name: Upgrade pre-installed ruby@3.3 and relink
+              run: |
+                if brew list --formula ruby@3.3 >/dev/null 2>&1; then
+                    brew upgrade ruby@3.3 || echo "::warning::ruby@3.3 upgrade reported an error; relinking"
+                    brew link --overwrite --force ruby@3.3
+                fi
 
             - name: zsh install tools
               shell: zsh {0}
@@ -77,7 +88,8 @@ jobs:
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     Ubuntu:
-        if: github.event_name == 'push' || startsWith(github.head_ref, 'release/')
+        needs: MacOS
+        if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: Ubuntu ${{ matrix.version }}
         runs-on: ubuntu-${{ matrix.version }}
         strategy:
@@ -142,7 +154,8 @@ jobs:
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     WSL:
-        if: github.event_name == 'push' || startsWith(github.head_ref, 'release/')
+        needs: MacOS
+        if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: WSL Ubuntu ${{ matrix.version }}
         runs-on: windows-latest
         strategy:

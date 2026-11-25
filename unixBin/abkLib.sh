@@ -412,6 +412,44 @@ AbkLib_WriteUninstallSteps() {
 }
 
 
+AbkLib_RunWithRetry() {
+    # Run one install step; a failure is retried twice (a download can fail once and work on the next try).
+    local LCL_STEP=$1
+    local LCL_MAX_ATTEMPTS=3
+    local LCL_ATTEMPT=1
+    local LCL_EXIT_CODE=0
+
+    while true; do
+        eval "$LCL_STEP"
+        LCL_EXIT_CODE=$?
+        [ $LCL_EXIT_CODE -eq 0 ] && return 0
+        [ $LCL_ATTEMPT -ge $LCL_MAX_ATTEMPTS ] && return $LCL_EXIT_CODE
+        PrintTrace "$TRACE_ERROR" "${ORG}WARNING: attempt $LCL_ATTEMPT of $LCL_MAX_ATTEMPTS failed ($LCL_EXIT_CODE), retrying: $LCL_STEP${NC}"
+        sleep "${ABK_RETRY_WAIT:-5}"
+        LCL_ATTEMPT=$((LCL_ATTEMPT + 1))
+    done
+}
+
+
+AbkLib_RecordFailedItem() {
+    # Add the name of an item that failed to install to the list of the tools json file.
+    mkdir -p "$INSTALLED_DIR"
+    echo "$2" >> "$INSTALLED_DIR/$1.failed"
+}
+
+
+AbkLib_ListFailedItems() {
+    # Print the names of the items that failed to install, on one line.
+    [ -f "$INSTALLED_DIR/$1.failed" ] && tr '\n' ' ' < "$INSTALLED_DIR/$1.failed" | sed 's/ $//'
+    return 0
+}
+
+
+AbkLib_ClearFailedItems() {
+    rm -f "$INSTALLED_DIR/$1.failed"
+}
+
+
 AbkLib_CheckInstallationCompatibility() {
     PrintTrace "$TRACE_FUNCTION" "-> ${FUNCNAME[0]} (hidden)"
     local LCL_INSTRUCTIONS=$1
