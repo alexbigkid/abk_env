@@ -36,10 +36,9 @@ The `test_install.sh` script validates:
 
 ### Version Management
 - `./unixBin/setGitAliases.sh` - Writes all git aliases (incl. `rel-*` release triggers) to the global `~/.gitconfig`, overwriting same-named aliases; `git alias` lists them
-- `git rel-patch` - Open a release pull request with the next patch version (`unixBin/gitRelease.sh patch`)
-- `git rel-minor` - Open a release pull request with the next minor version
-- `git rel-major` - Open a release pull request with the next major version
-- Add `--auto-merge` (e.g. `git rel-patch --auto-merge`) to squash-merge the release pull request when its checks are green
+- `git rel-patch` - Start a release with the next patch version: pushes the temporary tag `rel-patch` on `main` (`unixBin/gitRelease.sh patch`)
+- `git rel-minor` - Start a release with the next minor version
+- `git rel-major` - Start a release with the next major version
 
 ### Password Stores (pass)
 - `./unixBin/setPass.sh` - Clone/update pass stores (`passabk` → `~/.psws_abk/secrets` from repo `psws_abk`, `passta` → `~/.psws_ta/secrets` from repo `psws_ta`), create/allow each store's `.envrc`, check `.gpg-id` recipients, link `~/.envrc_common` → `unixBin/env/envrc_common` (store functions for direnv `source_env`). Store list: `PASS_STORES` in both set/reset scripts
@@ -337,10 +336,9 @@ The system integrates with shell configuration by:
 
 The repository uses semantic versioning (major.minor.patch) with automated release management:
 
-1. **Start the release**: on a clean, up-to-date `main` run `git rel-patch`, `git rel-minor`, or `git rel-major` (`unixBin/gitRelease.sh`). It refuses when a release pull request is already open, creates `release/vX.Y.Z`, bumps `VERSION` in a signed commit, pushes and opens the pull request "Release vX.Y.Z" (body: commits since the last tag). The pipeline never pushes to `main`.
-2. **Checks**: the pipeline runs the install/uninstall tests on macOS (26, and 27 on the runner label `xcode-27` when the repository variable `MACOS_27_ENABLED` is `true`), Ubuntu (22.04, 24.04, 26.04) and WSL Ubuntu (22.04, 24.04, 26.04), bash and zsh, on every push to `main` and to `release/**` branches (the release pull request shows the checks of its branch commit; make them required). The pipeline has no `pull_request` trigger, so feature branches and their pull requests start no run. macOS 15 is no longer tested (the tool files still list it as supported). The macOS, Ubuntu and WSL jobs run in parallel and the pipeline stops at the first failure: a failed job cancels the whole run (`gh run cancel`, needs `actions: write`), and one failing version cancels the rest of its matrix. It can also be started by hand (`workflow_dispatch`) on any branch; its input `fail_job` (`macos`, `ubuntu`, `wsl`, default `none`) makes that job fail on purpose to check the cancelling. A failed install names the packages that did not install; a package download is retried twice.
-3. **Merge**: you merge the pull request (squash), or it merges itself with `--auto-merge`.
-4. **Tag**: the workflow `release-tag.yml` runs on every push to `main` and creates the tag `vX.Y.Z` only when the pushed commit (the merge commit) changed `VERSION` and the tag does not exist yet.
+1. **Start the release**: on a clean, up-to-date `main` run `git rel-patch`, `git rel-minor`, or `git rel-major` (`unixBin/gitRelease.sh`). It refuses unless `main` is checked out, clean and equal to `origin/main`, or when a `rel-*` tag exists on origin; then it pushes the temporary tag `rel-<type>` on the HEAD of `main` and prints the link of the runs.
+2. **Checks**: the pipeline runs the install/uninstall tests on macOS (26, and 27 on the runner label `xcode-27` when the repository variable `MACOS_27_ENABLED` is `true`), Ubuntu (22.04, 24.04, 26.04) and WSL Ubuntu (22.04, 24.04, 26.04), bash and zsh, on every push to `main` and to the tags `rel-patch`, `rel-minor`, `rel-major`. The `rel-*` tag run cancels the `main` run of the same commit (concurrency group by SHA), so a release is tested once. The pipeline has no `pull_request` trigger, so feature branches and their pull requests start no run. macOS 15 is no longer tested (the tool files still list it as supported). The macOS, Ubuntu and WSL jobs run in parallel and the pipeline stops at the first failure: a failed job cancels the whole run (`gh run cancel`, needs `actions: write`), and one failing version cancels the rest of its matrix. It can also be started by hand (`workflow_dispatch`) on any branch; its input `fail_job` (`macos`, `ubuntu`, `wsl`, default `none`) makes that job fail on purpose to check the cancelling. A failed install names the packages that did not install; a package download is retried twice.
+3. **Release job**: when every job passed, the job `Release` (`.github/scripts/release.sh`, run's own `GITHUB_TOKEN`) computes the next version (`unixBin/nextVersion.sh`), creates `release/vX.Y.Z` with the `VERSION` bump as a commit through the GitHub API (GitHub signs it), opens the pull request "Release vX.Y.Z", squash-merges it right away (needs the setting "Allow GitHub Actions to create and approve pull requests"; a "pull request required" ruleset on `main` must not require status checks), tags `vX.Y.Z` on the merge commit and deletes the `rel-*` tag and the branch. Merges made with the run's token start no workflow. When a job failed or the run was cancelled, it only deletes the `rel-*` tag.
 5. **Setup**: Run `./unixBin/setGitAliases.sh` to configure git aliases
 
 **Release Types:**

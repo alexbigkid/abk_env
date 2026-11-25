@@ -13,9 +13,9 @@
 #   - Env tags: adt/rdt (dev), aqt/rqt (qa), art/rrt (release) - add/remove
 #     the tag locally and on origin
 #   - Releases: rel-patch, rel-minor, rel-major run unixBin/gitRelease.sh, which
-#     opens the pull request "Release vX.Y.Z" (bumps VERSION); add --auto-merge
-#     to merge it on green checks. After the merge the workflow release-tag.yml
-#     creates the tag vX.Y.Z.
+#     pushes the temporary tag rel-<type> on main. The pipeline runs the tests once;
+#     when they pass, its release job bumps VERSION through a pull request, merges
+#     it and creates the tag vX.Y.Z.
 #   - core.pager: diff-so-fancy if installed, otherwise the pager is unset
 #
 # Notes:
@@ -66,7 +66,7 @@ git config --global alias.stash-staged '!bash -c "git stash --keep-index; git st
 git config --global alias.move-staged '!bash -c "git stash-staged;git commit -m "temp"; git stash; git reset --hard HEAD^; git stash pop"'
 git config --global alias.sinceDate '!f() { git log --pretty=format:"%Cred%h %Cgreen%cd%Creset | %s%C(auto)%d %Cgreen[%an]%Creset" --date=local --since="$1"; }; f'
 
-# Releases: open a release pull request (extra arguments such as --auto-merge are passed on)
+# Releases: push the temporary tag rel-<type> on main (starts the pipeline)
 git config --global alias.rel-major "!$HOME_BIN_DIR/gitRelease.sh major"
 git config --global alias.rel-minor "!$HOME_BIN_DIR/gitRelease.sh minor"
 git config --global alias.rel-patch "!$HOME_BIN_DIR/gitRelease.sh patch"
