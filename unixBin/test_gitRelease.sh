@@ -114,6 +114,17 @@ run_suite() {
     git tag rel-minor && git push -q origin rel-minor 2>/dev/null
     GH_STUB_RC=1 KEEP_TAG=rel-minor expect_refused "gh fails" "Cannot check" patch
 
+    # tag.gpgsign = true: the trigger tag stays a plain lightweight tag (no editor, no signing).
+    new_repo
+    printf '%s\n' '#!/usr/bin/env bash' 'echo "signing program called" >&2' 'exit 1' > "$TEST_TMP/failsign"
+    chmod +x "$TEST_TMP/failsign"
+    git config tag.gpgsign true
+    git config gpg.program "$TEST_TMP/failsign"
+    GIT_EDITOR=false run_rel patch
+    check_that "gpgsign: succeeds" [ "$RC" -eq 0 ]
+    check_that "gpgsign: tag pushed" [ -n "$(git ls-remote --tags origin refs/tags/rel-patch)" ]
+    check_that "gpgsign: tag is lightweight" [ "$(git cat-file -t refs/tags/rel-patch)" = "commit" ]
+
     new_repo
     expect_refused "unknown type" "usage" bogus
 

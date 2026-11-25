@@ -51,7 +51,8 @@ for OLD_REF in $(git ls-remote --tags origin "$TAG_PREFIX*" | cut -f2); do
 done
 
 # -f: a leftover local tag of an earlier release must not block this one.
-git tag -f "$TAG" > /dev/null
+# --no-sign: only a trigger, so a plain lightweight tag whatever tag.gpgsign says (a signed tag opens the editor).
+git tag --no-sign -f "$TAG" > /dev/null
 git push -q origin "refs/tags/$TAG"
 
 echo "Release $1 started: https://github.com/$REPO/actions"
