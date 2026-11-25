@@ -1,11 +1,15 @@
 name: abk_env
 on:
-    # Only main, release branches and manual runs: a feature branch pull request starts no run.
-    # The release pull request shows the checks of its branch commit.
+    # Only main, the release tags and manual runs: a feature branch pull request starts no run.
+    # git rel-patch|minor|major pushes the tag rel-<type> on the HEAD of main; its run cancels the
+    # run of the push to main (same commit, see concurrency), so the tests run once per release.
     push:
         branches:
             - main
-            - "release/**"
+        tags:
+            - rel-patch
+            - rel-minor
+            - rel-major
     workflow_dispatch:
         inputs:
             fail_job:
@@ -14,9 +18,9 @@ on:
                 options: [none, macos, ubuntu, wsl]
                 default: none
 
-# actions: write lets a failed job cancel the whole run
+# actions: write lets a failed job cancel the whole run; contents: write lets it delete the rel-* tag first
 permissions:
-    contents: read
+    contents: write
     actions: write
 
 # Prevent duplicate runs - prioritize by commit SHA
@@ -108,7 +112,12 @@ jobs:
               env:
                 GH_TOKEN: ${{ github.token }}
                 GH_REPO: ${{ github.repository }}
-              run: gh run cancel ${{ github.run_id }}
+              run: |
+                # Release job is skipped when the run is cancelled: delete the rel-* tag here first.
+                case "$GITHUB_REF" in
+                    refs/tags/rel-*) gh api -X DELETE "repos/$GH_REPO/git/refs/tags/${GITHUB_REF#refs/tags/}" || true ;;
+                esac
+                gh run cancel ${{ github.run_id }}
 
     Ubuntu:
         name: Ubuntu ${{ matrix.version }}
@@ -185,7 +194,12 @@ jobs:
               env:
                 GH_TOKEN: ${{ github.token }}
                 GH_REPO: ${{ github.repository }}
-              run: gh run cancel ${{ github.run_id }}
+              run: |
+                # Release job is skipped when the run is cancelled: delete the rel-* tag here first.
+                case "$GITHUB_REF" in
+                    refs/tags/rel-*) gh api -X DELETE "repos/$GH_REPO/git/refs/tags/${GITHUB_REF#refs/tags/}" || true ;;
+                esac
+                gh run cancel ${{ github.run_id }}
 
     WSL:
         name: WSL Ubuntu ${{ matrix.version }}
@@ -258,4 +272,31 @@ jobs:
               env:
                 GH_TOKEN: ${{ github.token }}
                 GH_REPO: ${{ github.repository }}
-              run: gh run cancel ${{ github.run_id }}
+              run: |
+                # Release job is skipped when the run is cancelled: delete the rel-* tag here first.
+                case "$GITHUB_REF" in
+                    refs/tags/rel-*) gh api -X DELETE "repos/$GH_REPO/git/refs/tags/${GITHUB_REF#refs/tags/}" || true ;;
+                esac
+                gh run cancel ${{ github.run_id }}
+
+    # Only for a rel-* tag. Runs when the matrix ended (passed, failed or cancelled) and cleans up.
+    Release:
+        name: Release
+        if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/rel-') }}
+        needs: [MacOS, Ubuntu, WSL]
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: write
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v6
+              with:
+                fetch-depth: 0
+
+            - name: bump VERSION through a pull request, merge, tag
+              env:
+                GH_TOKEN: ${{ github.token }}
+                GH_REPO: ${{ github.repository }}
+                RESULT: ${{ needs.MacOS.result == 'success' && needs.Ubuntu.result == 'success' && needs.WSL.result == 'success' && 'pass' || 'fail' }}
+              run: bash .github/scripts/release.sh "$RESULT"
