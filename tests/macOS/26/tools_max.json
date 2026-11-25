@@ -5,9 +5,6 @@
     ],
     "kind": [
       "brew uninstall kind"
-    ],
-    "serverless": [
-      "brew uninstall serverless"
     ]
   },
   "installed_apps": {

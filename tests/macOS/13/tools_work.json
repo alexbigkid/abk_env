@@ -1,8 +1,5 @@
 {
   "installed_tools": {
-    "serverless": [
-      "brew uninstall serverless"
-    ],
     "typescript": [
       "brew uninstall typescript"
     ]

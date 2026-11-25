@@ -25,7 +25,6 @@ jobs:
         name: MacOS ${{ matrix.version }}
         runs-on: macos-${{ matrix.version }}
         strategy:
-            fail-fast: false
             matrix:
                 # macos-27 removed: no GitHub-hosted runner yet, job stays queued for 24h and blocks releases.
                 # Add 27 back once runs-on: macos-27 is available.
@@ -45,12 +44,12 @@ jobs:
                 sw_vers
 
             # The runner image ships ruby@3.3; the "brew upgrade" of the install flow upgrades it and
-            # its "brew link" fails on files of the old version. Upgrade it first and link with overwrite.
+            # its "brew link" fails on files of the old version. This is only a warning and NOT the cause
+            # of a failed install (see #38); upgrading first and linking with overwrite keeps the logs clean.
             - name: Upgrade pre-installed ruby@3.3 and relink
               run: |
-                brew update
                 if brew list --formula ruby@3.3 >/dev/null 2>&1; then
-                    brew upgrade ruby@3.3 || true
+                    brew upgrade ruby@3.3 || echo "::warning::ruby@3.3 upgrade reported an error; relinking"
                     brew link --overwrite --force ruby@3.3
                 fi
 
@@ -89,11 +88,11 @@ jobs:
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     Ubuntu:
+        needs: MacOS
         if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: Ubuntu ${{ matrix.version }}
         runs-on: ubuntu-${{ matrix.version }}
         strategy:
-            fail-fast: false
             matrix:
                 version: [22.04, 24.04, 26.04]
         steps:
@@ -155,11 +154,11 @@ jobs:
                 ./unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh
 
     WSL:
+        needs: MacOS
         if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: WSL Ubuntu ${{ matrix.version }}
         runs-on: windows-latest
         strategy:
-            fail-fast: false
             matrix:
                 version: [22.04, 24.04, 26.04]
         steps:

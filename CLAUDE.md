@@ -338,7 +338,7 @@ The system integrates with shell configuration by:
 The repository uses semantic versioning (major.minor.patch) with automated release management:
 
 1. **Start the release**: on a clean, up-to-date `main` run `git rel-patch`, `git rel-minor`, or `git rel-major` (`unixBin/gitRelease.sh`). It refuses when a release pull request is already open, creates `release/vX.Y.Z`, bumps `VERSION` in a signed commit, pushes and opens the pull request "Release vX.Y.Z" (body: commits since the last tag). The pipeline never pushes to `main`.
-2. **Checks**: the pipeline runs the install/uninstall tests on macOS (15, 26), Ubuntu (22.04, 24.04, 26.04) and WSL Ubuntu (22.04, 24.04, 26.04), bash and zsh, for pull requests from `release/**` branches (make these checks required). Other pull requests do not run the matrix.
+2. **Checks**: the pipeline runs the install/uninstall tests on macOS (15, 26), Ubuntu (22.04, 24.04, 26.04) and WSL Ubuntu (22.04, 24.04, 26.04), bash and zsh, for pull requests from `release/**` branches (make these checks required). Other pull requests do not run the matrix. The pipeline fails fast: macOS runs first, Ubuntu and WSL start only after it passed, and one failing version cancels the rest of its matrix. It can also be started by hand (`workflow_dispatch`) on any branch. A failed install names the packages that did not install; a package download is retried twice.
 3. **Merge**: you merge the pull request (squash), or it merges itself with `--auto-merge`.
 4. **Tag**: the workflow `release-tag.yml` creates the tag `vX.Y.Z` on the merge commit, only when the merged pull request came from `release/**` and changed `VERSION`.
 5. **Setup**: Run `./unixBin/setGitAliases.sh` to configure git aliases

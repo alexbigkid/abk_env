@@ -80,6 +80,7 @@ __createInstalledFile() {
 
     # ensure there is a directory to store the package information
     mkdir -p $INSTALLED_DIR || LCL_EXIT_CODE=$?
+    AbkLib_ClearFailedItems "$LCL_INSTALL_JSON_FILE"
     [ ! -f "$INSTALLED_DIR/$LCL_INSTALL_JSON_FILE" ] && echo {} > $INSTALLED_DIR/$LCL_INSTALL_JSON_FILE
 
     PrintTrace "$TRACE_FUNCTION" "<- ${FUNCNAME[0]} ($LCL_RETURN_VAL)"
@@ -151,7 +152,7 @@ __installItem() {
             fi
         fi
         while IFS= read -r INSTALL_STEP; do
-            eval "$INSTALL_STEP"
+            AbkLib_RunWithRetry "$INSTALL_STEP"
             LCL_EXIT_CODE=$?
             if [ $LCL_EXIT_CODE -ne 0 ]; then
                 PrintTrace "$TRACE_ERROR" "${RED}ERROR: $INSTALL_STEP failed with $LCL_EXIT_CODE${NC}"
@@ -204,7 +205,10 @@ __installItemList() {
             PrintTrace "$TRACE_DEBUG" "${ORG}INSTALL_STEPS = $INSTALL_STEPS${NC}"
             CHECK_STEP=$(echo $LCL_CHECK_ITEMS | jq -r ".\"$INSTALL_ITEM\"[]")
             PrintTrace "$TRACE_DEBUG" "${ORG}CHECK_STEP = $CHECK_STEP${NC}"
-            __installItem "$LCL_JSON_FILE_NAME" "$LCL_INSTALLED_TYPE" "$INSTALL_ITEM" "$CHECK_STEP" "$INSTALL_STEPS" "$LCL_UNINSTALL_ITEMS" "$LCL_DESCRIPTIONS" || PrintTrace "$TRACE_ERROR" "${RED}ERROR: $INSTALL_ITEM installation failed${NC}"
+            __installItem "$LCL_JSON_FILE_NAME" "$LCL_INSTALLED_TYPE" "$INSTALL_ITEM" "$CHECK_STEP" "$INSTALL_STEPS" "$LCL_UNINSTALL_ITEMS" "$LCL_DESCRIPTIONS" || {
+                PrintTrace "$TRACE_ERROR" "${RED}ERROR: $INSTALL_ITEM installation failed${NC}"
+                AbkLib_RecordFailedItem "$LCL_JSON_FILE_NAME" "$INSTALL_ITEM"
+            }
         done
     fi
 
