@@ -23,9 +23,9 @@ REF=alexbigkid/abk_env                                          # the reference 
 - The user is an admin of the repo: `gh api repos/$REPO --jq .permissions.admin` prints `true`.
 - Find whatever pushes to `main` directly, because the ruleset (step 1) refuses it from then on:
   ```bash
-  grep -rnE "git push[^|;]*(main|HEAD:main|HEAD:refs/heads/main)" .github/ unixBin/ scripts/ 2>/dev/null
+  grep -rnE "git push[^|;]*(main|HEAD:main|HEAD:refs/heads/main)" . --exclude-dir=.git --exclude-dir=node_modules 2>/dev/null
   ```
-  Report every hit to the user. A workflow or script that pushes to `main` must be changed to open a PR first (abk_env's release flow in step 6 shows how), or the user accepts that it breaks.
+  This searches the whole tree, so any layout is covered. Report every hit to the user. A workflow or script that pushes to `main` must be changed to open a PR first (abk_env's release flow in step 6 shows how), or the user accepts that it breaks.
 
 ## 1. Ruleset `protect-main`
 
@@ -43,7 +43,7 @@ The rules and why:
 Check first: `gh api repos/$REPO/rulesets --jq '.[] | "\(.id) \(.name) \(.enforcement)"'`. If `protect-main` exists, compare it (`gh api repos/$REPO/rulesets/<id>`) and update it with `PUT` instead of creating a second one. Rulesets of another name: show them to the user and leave them alone.
 
 ```bash
-cat > "$TMPDIR/ruleset.json" <<'EOF'
+gh api -X POST "repos/$REPO/rulesets" --input - <<'EOF'      # or: -X PUT repos/$REPO/rulesets/<id>
 {
   "name": "protect-main",
   "target": "branch",
@@ -64,7 +64,6 @@ cat > "$TMPDIR/ruleset.json" <<'EOF'
   ]
 }
 EOF
-gh api -X POST "repos/$REPO/rulesets" --input "$TMPDIR/ruleset.json"          # or: -X PUT repos/$REPO/rulesets/<id>
 ```
 
 A private repo on a free plan cannot have rulesets (the API answers 403 with an upgrade hint): stop this step and tell the user.
