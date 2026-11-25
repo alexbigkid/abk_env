@@ -92,6 +92,13 @@ run_suite() {
     check_that "pr create fails: rel tag deleted" grep -q "DELETE repos/o/r/git/refs/tags/rel-patch" "$GH_LOG"
 
     new_case
+    GH_STUB_FAIL="pr merge" MERGE_TRIES=2 MERGE_WAIT=0 run_release rel-patch pass
+    check_that "merge fails: fails" [ "$RC" -ne 0 ]
+    check_that "merge fails: tried twice" [ "$(grep -c 'pr merge' "$GH_LOG" | tr -d ' ')" = 2 ]
+    check_that "merge fails: branch deleted" grep -q "DELETE repos/o/r/git/refs/heads/release/v1.2.4" "$GH_LOG"
+    check_that "merge fails: rel tag deleted" grep -q "DELETE repos/o/r/git/refs/tags/rel-patch" "$GH_LOG"
+
+    new_case
     GH_STUB_FAIL="api repos/o/r/git/refs -f ref=refs/heads" run_release rel-patch pass
     check_that "branch creation fails: fails" [ "$RC" -ne 0 ]
     check_that "branch creation fails: rel tag deleted" grep -q "DELETE repos/o/r/git/refs/tags/rel-patch" "$GH_LOG"

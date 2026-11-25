@@ -20,7 +20,8 @@ set -euo pipefail
 RESULT=${1:-}
 TAG=$GITHUB_REF_NAME
 TYPE=${TAG#rel-}
-MERGE_TRIES=10
+MERGE_TRIES=${MERGE_TRIES:-10}
+MERGE_WAIT=${MERGE_WAIT:-6}
 
 # Delete a ref (tags/<name> or heads/<name>) on origin; a missing ref is fine.
 delete_ref() {
@@ -72,7 +73,7 @@ PR_URL=$(gh pr create --base main --head "$BRANCH" --title "Release v$NEXT" --bo
 for ((i = 1; i <= MERGE_TRIES; i++)); do
     gh pr merge "$PR_URL" --squash && break
     [ "$i" -lt "$MERGE_TRIES" ] || { echo "Cannot merge $PR_URL" >&2; exit 1; }
-    sleep 6
+    sleep "$MERGE_WAIT"
 done
 
 MERGE_SHA=$(gh pr view "$PR_URL" --json mergeCommit --jq .mergeCommit.oid)
