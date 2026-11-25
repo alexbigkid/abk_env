@@ -23,12 +23,15 @@ jobs:
     MacOS:
         if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: MacOS ${{ matrix.version }}
-        runs-on: macos-${{ matrix.version }}
+        # macOS 27 runs on the label xcode-27 (arm64); 15 and 26 keep macos-<version>.
+        runs-on: ${{ matrix.version == 27 && 'xcode-27' || format('macos-{0}', matrix.version) }}
+        # Limits the work only; a job queued for a missing runner is not limited by it.
+        timeout-minutes: 60
         strategy:
             matrix:
-                # macos-27 removed: no GitHub-hosted runner yet, job stays queued for 24h and blocks releases.
-                # Add 27 back once runs-on: macos-27 is available.
-                version: [15, 26]
+                # macOS 27 is switched by the repository variable MACOS_27_ENABLED=true (Settings > Variables).
+                # Unset or any other value: 27 is not in the matrix, so a missing or slow runner never blocks a release.
+                version: ${{ fromJSON(vars.MACOS_27_ENABLED == 'true' && '[15, 26, 27]' || '[15, 26]') }}
         steps:
             - name: checkout repo
               uses: actions/checkout@v6
