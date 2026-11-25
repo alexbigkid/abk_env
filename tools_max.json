@@ -188,11 +188,6 @@
                     "ls \"/Applications/MQTTX.app\"",
                     "ls \"~/Applications/MQTTX.app\""
                 ],
-                "onedrive": [
-                    "brew list --cask | grep ^onedrive$",
-                    "ls \"/Applications/OneDrive.app\"",
-                    "ls \"~/Applications/OneDrive.app\""
-                ],
                 "raspberry-pi-imager": [
                     "brew list --cask | grep ^raspberry-pi-imager$",
                     "ls \"/Applications/Raspberry Pi Imager.app\"",
@@ -220,7 +215,6 @@
                 "docker": ["brew install --cask docker"],
                 "flycut": ["brew install --cask flycut"],
                 "mqttx": ["brew install --cask mqttx"],
-                "onedrive": ["brew install --cask onedrive"],
                 "raspberry-pi-imager": ["brew install --cask raspberry-pi-imager"],
                 "spotify": ["brew install --cask spotify"],
                 "visual-studio-code": [
@@ -244,7 +238,6 @@
                 "docker": ["brew uninstall --cask docker"],
                 "flycut": ["brew uninstall --cask flycut"],
                 "mqttx": ["brew uninstall --cask mqttx"],
-                "onedrive": ["brew uninstall --cask onedrive"],
                 "raspberry-pi-imager": ["brew uninstall --cask raspberry-pi-imager"],
                 "spotify": ["brew uninstall --cask spotify"],
                 "visual-studio-code": [

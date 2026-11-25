@@ -173,7 +173,6 @@ For you convenience I prepared few installation packages listed below:
 | [brave-browser](https://github.com/brave/brave-browser)            | Secure, fast Web browser based on Chromium just like Chrome   |
 | [docker](https://github.com/docker)                                | Docker helps developers to abstract virtual environments      |
 | [flycut](https://github.com/TermiT/Flycut)                         | Flycut is a clean and simple clipboard manager for developers |
-| [onedrive](https://www.microsoft.com/en-us/microsoft-365/onedrive) | Company's online storage.                                     |
 | [visual-studio-code](https://github.com/microsoft/vscode)          | The best code editor ever :)                                  |
 
 
