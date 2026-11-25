@@ -8,7 +8,7 @@
 # Called by the git aliases rel-patch, rel-minor and rel-major (setGitAliases.sh).
 # Needs a clean working tree on an up-to-date main and no open release pull request.
 # It creates the branch release/vX.Y.Z from main, bumps VERSION in a signed commit,
-# pushes the branch and opens the pull request "Release vX.Y.Z". The body lists the
+# pushes the branch (the push starts the pipeline) and opens the pull request "Release vX.Y.Z". The body lists the
 # commits since the last tag. --auto-merge makes the pull request squash-merge itself
 # when its checks are green. When the pull request is merged into main, the workflow
 # release-tag.yml creates the tag vX.Y.Z (the pipeline never pushes to main).

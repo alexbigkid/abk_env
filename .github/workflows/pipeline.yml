@@ -1,11 +1,11 @@
 name: abk_env
 on:
+    # Only main, release branches and manual runs: a feature branch pull request starts no run.
+    # The release pull request shows the checks of its branch commit.
     push:
         branches:
             - main
-    pull_request:
-        branches:
-            - main
+            - "release/**"
     workflow_dispatch:
         inputs:
             fail_job:
@@ -29,9 +29,8 @@ env:
 
 jobs:
     MacOS:
-        if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: MacOS ${{ matrix.version }}
-        # macOS 27 runs on the label xcode-27 (arm64); 15 and 26 keep macos-<version>.
+        # macOS 27 runs on the label xcode-27 (arm64); 26 keeps macos-<version>.
         runs-on: ${{ matrix.version == 27 && 'xcode-27' || format('macos-{0}', matrix.version) }}
         # Limits the work only; a job queued for a missing runner is not limited by it.
         timeout-minutes: 60
@@ -39,7 +38,7 @@ jobs:
             matrix:
                 # macOS 27 is switched by the repository variable MACOS_27_ENABLED=true (Settings > Variables).
                 # Unset or any other value: 27 is not in the matrix, so a missing or slow runner never blocks a release.
-                version: ${{ fromJSON(vars.MACOS_27_ENABLED == 'true' && '[15, 26, 27]' || '[15, 26]') }}
+                version: ${{ fromJSON(vars.MACOS_27_ENABLED == 'true' && '[26, 27]' || '[26]') }}
         steps:
             - name: Fail on purpose (manual check)
               if: github.event_name == 'workflow_dispatch' && inputs.fail_job == 'macos'
@@ -112,7 +111,6 @@ jobs:
               run: gh run cancel ${{ github.run_id }}
 
     Ubuntu:
-        if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: Ubuntu ${{ matrix.version }}
         runs-on: ubuntu-${{ matrix.version }}
         strategy:
@@ -190,7 +188,6 @@ jobs:
               run: gh run cancel ${{ github.run_id }}
 
     WSL:
-        if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'release/')
         name: WSL Ubuntu ${{ matrix.version }}
         runs-on: windows-latest
         strategy:
