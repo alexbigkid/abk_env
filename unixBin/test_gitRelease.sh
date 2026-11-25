@@ -67,6 +67,7 @@ expect_tag() {
     run_rel "$type"
     check_that "$type: succeeds" [ "$RC" -eq 0 ]
     check_that "$type: tag rel-$type on origin at HEAD" [ "$(git ls-remote origin "refs/tags/rel-$type" | cut -f1)" = "$(git rev-parse HEAD)" ]
+    check_that "$type: no local rel-* tag left" [ -z "$(git tag -l 'rel-*')" ]
     check_that "$type: prints the run link" grep -q "actions" <<< "$OUT"
     check_that "$type: back on main, VERSION untouched" [ "$(cat VERSION)" = "1.2.3" ]
 }
@@ -123,7 +124,8 @@ run_suite() {
     GIT_EDITOR=false run_rel patch
     check_that "gpgsign: succeeds" [ "$RC" -eq 0 ]
     check_that "gpgsign: tag pushed" [ -n "$(git ls-remote --tags origin refs/tags/rel-patch)" ]
-    check_that "gpgsign: tag is lightweight" [ "$(git cat-file -t refs/tags/rel-patch)" = "commit" ]
+    check_that "gpgsign: no local rel-* tag left" [ -z "$(git tag -l 'rel-*')" ]
+    check_that "gpgsign: tag is lightweight (points at the commit)" [ "$(git ls-remote origin refs/tags/rel-patch | cut -f1)" = "$(git rev-parse HEAD)" ]
 
     new_repo
     expect_refused "unknown type" "usage" bogus
