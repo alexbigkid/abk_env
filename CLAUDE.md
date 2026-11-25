@@ -34,6 +34,9 @@ The `test_install.sh` script validates:
 
 - `unixBin/env/claude/skills/project-board/scripts/run-unit-tests.sh` - Run all skill unit tests (`skills/*/scripts/test_*.sh`, stubs only, no install tests): one line per file and a total, non-zero exit on a failure or when none is found. The coder, reviewer and tester use it and CI runs it on macOS, Ubuntu and WSL (includes `test_commit-push.sh`, a self-contained test of the coder's signed-commit script: throwaway GPG key, local remotes, once per shell found).
 
+### Setting up another repo
+- `repo-setup` skill (`unixBin/env/claude/skills/repo-setup/SKILL.md`) - Bring another GitHub repo to the same GitHub-side state as this one (ruleset `protect-main`, board and its workflows, labels, Actions permissions, optional release flow), checking and verifying each step
+
 ### Version Management
 - `./unixBin/setGitAliases.sh` - Writes all git aliases (incl. `rel-*` release triggers) to the global `~/.gitconfig`, overwriting same-named aliases; `git alias` lists them
 - `git rel-patch` - Start a release with the next patch version: pushes the temporary tag `rel-patch` on `main` (`unixBin/gitRelease.sh patch`)
