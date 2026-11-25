@@ -224,11 +224,6 @@
                     "ls \"/Applications/Flycut.app\"",
                     "ls \"~/Applications/Flycut.app\""
                 ],
-                "onedrive": [
-                    "brew list --cask | grep ^onedrive$",
-                    "ls \"/Applications/OneDrive.app\"",
-                    "ls \"~/Applications/OneDrive.app\""
-                ],
                 "visual-studio-code": [
                     "brew list --cask | grep ^visual-studio-code$",
                     "ls \"/Applications/Visual Studio Code.app\"",
@@ -240,7 +235,6 @@
                 "brave-browser": ["brew install --cask brave-browser"],
                 "docker": ["brew install --cask docker"],
                 "flycut": ["brew install --cask flycut"],
-                "onedrive": ["brew install --cask onedrive"],
                 "visual-studio-code": [
                     "brew install --cask visual-studio-code",
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
@@ -260,7 +254,6 @@
                 "brave-browser": ["brew uninstall --cask brave-browser"],
                 "docker": ["brew uninstall --cask docker"],
                 "flycut": ["brew uninstall --cask flycut"],
-                "onedrive": ["brew uninstall --cask onedrive"],
                 "visual-studio-code": [
                     "ABK_VSCODE_USER_CONFIG_DIR=\"$HOME/Library/Application Support/Code/User\"",
                     "ABK_VSCODE_USER_CONFIG_SETTING=\"$ABK_VSCODE_USER_CONFIG_DIR/settings.json\"",

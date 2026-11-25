@@ -188,11 +188,6 @@
                     "ls \"/Applications/MQTTX.app\"",
                     "ls \"~/Applications/MQTTX.app\""
                 ],
-                "onedrive": [
-                    "brew list --cask | grep ^onedrive$",
-                    "ls \"/Applications/OneDrive.app\"",
-                    "ls \"~/Applications/OneDrive.app\""
-                ],
                 "raspberry-pi-imager": [
                     "brew list --cask | grep ^raspberry-pi-imager$",
                     "ls \"/Applications/Raspberry Pi Imager.app\"",
@@ -224,12 +219,7 @@
                 "brave-browser": ["brew install --cask brave-browser"],
                 "docker": ["brew install --cask docker"],
                 "flycut": ["brew install --cask flycut"],
-                "microsoft-teams": [
-                    "brew install --cask microsoft-teams",
-                    "brew uninstall --cask microsoft-auto-update || true"
-                ],
                 "mqttx": ["brew install --cask mqttx"],
-                "onedrive": ["brew install --cask onedrive"],
                 "raspberry-pi-imager": ["brew install --cask raspberry-pi-imager"],
                 "rectangle": ["brew install --cask rectangle"],
                 "slack": ["brew install --cask slack"],
@@ -253,9 +243,7 @@
                 "brave-browser": ["brew uninstall --cask brave-browser"],
                 "docker": ["brew uninstall --cask docker"],
                 "flycut": ["brew uninstall --cask flycut"],
-                "microsoft-teams": ["brew uninstall --cask microsoft-teams"],
                 "mqttx": ["brew uninstall --cask mqttx"],
-                "onedrive": ["brew uninstall --cask onedrive"],
                 "raspberry-pi-imager": ["brew uninstall --cask raspberry-pi-imager"],
                 "rectangle": ["brew uninstall --cask rectangle"],
                 "slack": ["brew uninstall --cask slack"],
