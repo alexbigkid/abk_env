@@ -15,7 +15,7 @@ source "$(dirname "$0")/../../project-board/scripts/lib.sh"
 # shellcheck disable=SC1091
 source "$(dirname "$0")/https-env.sh"
 
-BRANCH_PATTERN='^[BDFRT]/[0-9]+/[A-Za-z0-9._-]+$'
+BRANCH_PATTERN='^[BCDFRST]/[0-9]+/[A-Za-z0-9._-]+$'
 GOOD_SIGNATURE_PATTERN="^[GU]$"
 PUSH_ERROR_PATTERN="rejected|error:|fatal:|denied|failed|Permission"
 SECRET_PATTERN='(^|/)(\.env(\.[^/]+)?|id_(rsa|ed25519|ecdsa|dsa)[^/]*|[^/]*\.(pem|key|p12|pfx))$'
@@ -29,9 +29,10 @@ usage() {
 usage: commit-push.sh "<commit message>" ($ALL_FLAG | <file>...)
 Stages the given files (or all changes, untracked files included), makes ONE commit signed with
 the coder key and pushes the current branch over HTTPS. It refuses, and leaves nothing pushed:
-  - any branch that is not {Type}/{n}/{name} (Type is one of B D F R T)
+  - any branch that is not {Type}/{n}/{name} (Type is one of B C D F R S T)
   - missing coder config, or a signing key that is not in the gpg keyring
-  - an index that already has staged changes (they would end up in the commit)
+  - an index that already has staged changes other than deletions and renames (they would end up in the commit);
+    deletions staged with git rm and renames staged with git mv are fine and go into the commit
   - nothing to commit, or staged files that look like secrets (.env, *.pem, *.key, id_rsa ...);
     deleting such a file is fine
   - any commit that is on no remote ref yet whose signature is not good (when origin has no refs at
@@ -70,7 +71,8 @@ gpg --list-secret-keys "$signing_key" >/dev/null 2>&1 || die "the coder signing 
 if ! fetch_out=$(git fetch --quiet --prune "$REMOTE" 2>&1); then
     die "cannot fetch '$REMOTE', so it is unknown what is already pushed; nothing was committed: $(tail -n "$ERROR_LINES" <<<"$fetch_out" | tr '\n' ' ')"
 fi
-git diff --cached --quiet || die "the index already has staged changes; unstage them (git reset) or commit them yourself first, the coder only commits what it stages itself"
+# --quiet would skip rename detection (a git mv would count as add + delete), so check the list of names instead.
+[ -z "$(git diff --cached --name-only --find-renames --diff-filter=dr)" ] || die "the index already has staged changes other than deletions and renames; unstage them (git reset) or commit them yourself first, the coder only commits what it stages itself (and git rm / git mv)"
 
 if [ -n "$stage_all" ]; then git add -A; else git add -- "$@"; fi
 if git diff --cached --quiet; then die "nothing staged to commit"; fi
