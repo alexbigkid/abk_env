@@ -152,6 +152,25 @@ run_suite() {
     git reset -q
 
     new_repo
+    git rm -q base.txt
+    echo after-rm > after-rm.txt
+    expect_pushed "a deletion staged with git rm goes into the commit" "drop base" --all
+    check_that "base.txt is deleted in the pushed commit" [ -z "$(git ls-tree --name-only HEAD base.txt)" ]
+
+    new_repo
+    git mv base.txt moved.txt
+    expect_pushed "a rename staged with git mv goes into the commit" "move base" --all
+    check_that "moved.txt is in the pushed commit" [ -n "$(git ls-tree --name-only HEAD moved.txt)" ]
+
+    new_repo
+    git mv base.txt moved.txt
+    echo changed >> moved.txt
+    git add moved.txt
+    echo other > other.txt
+    expect_refused "refuses a staged rename that also stages a content change" "already has staged changes" "m" other.txt
+    git reset -q
+
+    new_repo
     for name in ".env" ".env.production" "ä.pem" "a b.pem" "id_rsa" "server.key"; do
         echo secret > "$name"
         expect_refused "refuses secret-looking file '$name'" "look like secrets" "m" --all
