@@ -99,12 +99,14 @@ gh label create bug         --force --color d73a4a --description "Something isn'
 gh label create feature     --force --color b40bb0 --description "New feature"
 gh label create enhancement --force --color a2eeef --description "New feature or request"
 gh label create docs        --force --color 0075ca --description "Improvements or additions to documentation"
-gh label create research    --force --color 1d76db --description "Research task"
+gh label create refactor    --force --color 5319e7 --description "Restructure code without changing behaviour"
+gh label create study       --force --color 1d76db --description "Research or study task"
+gh label create cleanup     --force --color c5def5 --description "Remove dead code, files or settings"
 gh label create test        --force --color 0e8a16 --description "Tests"
 gh label create needs-info  --force --color D93F0B --description "Waiting for a decision or information"
 ```
 
-The coder takes the branch type from the label: `bug` B, `feature`/`enhancement` F, `docs` D, `research` R, `test` T.
+The coder takes the branch type from the label: `bug` B, `feature`/`enhancement` F, `docs` D, `refactor` R, `study` S (`research` is the old name of `study`), `cleanup` C, `test` T.
 
 ## 5. Project board
 
