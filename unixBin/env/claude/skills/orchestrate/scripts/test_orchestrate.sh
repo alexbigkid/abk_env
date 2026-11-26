@@ -23,7 +23,7 @@ make_stubs() {
     printf '%s\n' '#!/usr/bin/env bash' 'n=$(cat "$STUB_DIR/calls" 2>/dev/null || echo 0); n=$((n + 1)); echo "$n" > "$STUB_DIR/calls"' \
         '[ -f "$STUB_DIR/next-fails" ] && { echo "ERROR: board unreachable" >&2; exit 1; }' \
         'if [ -f "$STUB_DIR/actions/$n.json" ]; then cat "$STUB_DIR/actions/$n.json"; else echo "{\"action\":\"done\"}"; fi' > "$STUB_DIR/next-action.sh"
-    printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$*" >> "$STUB_DIR/claude.log"' 'cat "$STUB_DIR/claude-out" 2>/dev/null' 'exit "$(cat "$STUB_DIR/claude-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/claude"
+    printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$*" >> "$STUB_DIR/claude.log"' 'echo "${MISE_TRUSTED_CONFIG_PATHS-unset}" >> "$STUB_DIR/mise.log"' 'cat "$STUB_DIR/claude-out" 2>/dev/null' 'exit "$(cat "$STUB_DIR/claude-rc" 2>/dev/null || echo 0)"' > "$STUB_DIR/claude"
     printf '%s\n' '#!/usr/bin/env bash' 'printf "park %s | %s\n" "$1" "$2" >> "$STUB_DIR/park.log"' > "$STUB_DIR/park.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo /stub/worktree-root' > "$STUB_DIR/review-worktree.sh"
     printf '%s\n' '#!/usr/bin/env bash' 'echo "{\"capped\": $(cat "$STUB_DIR/capped" 2>/dev/null || echo false), \"headReviewed\": $(cat "$STUB_DIR/head-reviewed" 2>/dev/null || echo false)}"' > "$STUB_DIR/review-state.sh"
@@ -36,10 +36,11 @@ printf '%s\n' "model-tester: haiku" "coder: Read, Edit, Bash(~/.claude/skills/x/
 export STUB_DIR NEXT_ACTION_SCRIPT="$STUB_DIR/next-action.sh" CLAUDE_BIN="$STUB_DIR/claude" PARK_SCRIPT="$STUB_DIR/park.sh" ARCHIVE_SCRIPT="$STUB_DIR/archive-done.sh" CLEANUP_SCRIPT="$STUB_DIR/cleanup-merged.sh" \
     REVIEW_STATE_SCRIPT="$STUB_DIR/review-state.sh" WORKTREE_SCRIPT="$STUB_DIR/review-worktree.sh" ORCHESTRATE_ALLOWED_TOOLS="$STUB_DIR/allowed.conf" \
     ORCHESTRATE_USAGE_LOG="$TEST_TMP/usage.log" ORCHESTRATE_LOCK_DIR="$TEST_TMP/lock" GH_REPO="o/r"
+unset MISE_TRUSTED_CONFIG_PATHS    # a value of the user's own shell would change what the runs below see
 
 # Reset the stubs: no actions, no logs, claude succeeds, nothing capped, no lock.
 reset_stubs() {
-    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/park.log" "$STUB_DIR/archive.log" "$STUB_DIR/archive-rc" "$STUB_DIR/cleanup.log" "$STUB_DIR/cleanup-rc" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/claude-out" "$TEST_TMP/usage.log" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
+    rm -f "$STUB_DIR"/actions/*.json "$STUB_DIR/calls" "$STUB_DIR/claude.log" "$STUB_DIR/mise.log" "$STUB_DIR/park.log" "$STUB_DIR/archive.log" "$STUB_DIR/archive-rc" "$STUB_DIR/cleanup.log" "$STUB_DIR/cleanup-rc" "$STUB_DIR/next-fails" "$STUB_DIR/claude-rc" "$STUB_DIR/claude-out" "$TEST_TMP/usage.log" "$STUB_DIR/capped" "$STUB_DIR/head-reviewed"
     rm -f "$TEST_TMP/lock/pid"; rmdir "$TEST_TMP/lock" 2>/dev/null
     return 0
 }
@@ -223,6 +224,12 @@ run_suite() {
     run_script
     check_that "the tester may enter the worktree root too" grep -q -- "--add-dir /stub/worktree-root" "$STUB_DIR/claude.log"
     check_that "the tester may run scripts below the worktree root (the tests of the pull request)" grep -q -- "Bash(/stub/worktree-root/\*)" "$STUB_DIR/claude.log"
+    check_that "the tester run trusts the worktree root for mise" [ "$(cat "$STUB_DIR/mise.log")" = "/stub/worktree-root" ]
+    check_that "(the orchestrator's own environment stays unchanged)" [ -z "${MISE_TRUSTED_CONFIG_PATHS:-}" ]
+    reset_stubs
+    act 1 coder 12 "in Todo"
+    run_script
+    check_that "the coder gets no mise trust path" [ "$(cat "$STUB_DIR/mise.log")" = "unset" ]
     reset_stubs
     act 1 reviewer 12 "in Review"
     run_script
