@@ -178,6 +178,7 @@ while :; do
     fi
     tools=$(allowed_tools "$agent")
     extra_dirs=()
+    child_env=()
     case "$agent" in
         reviewer|tester)
             # The tests of the pull request run from the review worktree, whose root differs per machine: allow its scripts here.
@@ -185,7 +186,8 @@ while :; do
             extra_dirs=(--add-dir "$worktree_root")
             tools="$tools,Bash($worktree_root/*)"
             # Repos run through mise (just recipes) need the worktree's mise config trusted, else every recipe fails there.
-            export MISE_TRUSTED_CONFIG_PATHS="$worktree_root${MISE_TRUSTED_CONFIG_PATHS:+:$MISE_TRUSTED_CONFIG_PATHS}" ;;
+            # Set for the child process only, so the orchestrator's own value stays unchanged.
+            child_env=("MISE_TRUSTED_CONFIG_PATHS=$worktree_root${MISE_TRUSTED_CONFIG_PATHS:+:$MISE_TRUSTED_CONFIG_PATHS}") ;;
     esac
     dispatches=$((dispatches + 1))
     if [ "$dispatches" -gt "$MAX_DISPATCHES" ]; then echo "dispatch limit ($MAX_DISPATCHES) reached, stopping" >&2; exit "$EXIT_LIMIT"; fi
@@ -197,7 +199,7 @@ while :; do
     [ -z "$model" ] || model_args=(--model "$model")
     agent_rc=0
     started=$SECONDS
-    run_out=$("$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" --output-format json ${model_args[@]+"${model_args[@]}"} ${extra_dirs[@]+"${extra_dirs[@]}"}) || agent_rc=$?
+    run_out=$(env ${child_env[@]+"${child_env[@]}"} "$CLAUDE_BIN" -p "$(prompt_for "$action")" --agent "$agent" --allowedTools "$tools" --max-budget-usd "$BUDGET_USD" --output-format json ${model_args[@]+"${model_args[@]}"} ${extra_dirs[@]+"${extra_dirs[@]}"}) || agent_rc=$?
     report_run "$run_out" "$agent" "$issue" "$((SECONDS - started))"
     if [ "$agent_rc" -ne 0 ]; then
         echo "agent $agent failed (exit $agent_rc) on ${issue:+#$issue}${issue:-its column}; its claim stays; start the orchestrator again to resume" >&2
