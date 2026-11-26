@@ -73,7 +73,7 @@ After the merge, when the repo defines it: `docs/agents/qa-testing.md` lists per
 
 **Passed**: `$B move <n> Done "End date=today"` (`=`, so a second Done after a reopen replaces the old date) and post a comment: what you tested, the merge commit, QA run (which tests) or skipped. If the move fails after the merge, retry it; if it still fails, report that the PR is merged and the board move is missing, the next run finishes it (step 1).
 
-**Failed**: post a comment with exactly what failed (criterion, check or command), the output, and how to reproduce it; then `$B move <n> Todo` and `$B order <n>` so it comes first.
+**Failed**: post a comment with exactly what failed (criterion, check or command), the output, and how to reproduce it; then `$B move <n> Todo` and `$B order <n>` so it comes first. While the PR is still open, post the same text also on the PR (`gh pr comment <pr> --body-file - <<'COMMENT'`): the coder reads its rework from the PR feedback (`pr-feedback.sh`), which does not see issue comments.
 - Before the merge the PR is still open and the coder continues on its branch.
 - After the merge (a QA failure) the PR is merged and the issue is closed by it: `gh issue reopen <n>`. The fix goes in a **new** PR: the comment says so and names the merged PR and the merge commit; the coder starts a new branch `{Type}/<n>/<short-name>-fix`.
 
