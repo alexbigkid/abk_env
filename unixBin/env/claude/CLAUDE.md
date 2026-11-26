@@ -7,7 +7,9 @@
 - Python projects: the virtual environment must always be a real `.venv` subdirectory of the project (never in a cache or elsewhere, never a symlink; don't set `UV_PREVIEW`, `UV_PROJECT_ENVIRONMENT` or similar that move it). `.venv` must be listed in the project's `.gitignore`.
 - Git branch naming convention: `{Type}/{issue_number}/{short-issue-name}`
   - **B** - Bug fixes (B/{issue_number}/{short-issue-name})
+  - **C** - Cleanup (C/{issue_number}/{short-issue-name})
   - **D** - Documentation (D/{issue_number}/{short-issue-name})
   - **F** - Features (F/{issue_number}/{short-issue-name})
-  - **R** - Research (R/{issue_number}/{short-issue-name})
+  - **R** - Refactor (R/{issue_number}/{short-issue-name})
+  - **S** - Study (S/{issue_number}/{short-issue-name})
   - **T** - Tests (T/{issue_number}/{short-issue-name})
