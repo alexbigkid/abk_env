@@ -183,7 +183,9 @@ while :; do
             # The tests of the pull request run from the review worktree, whose root differs per machine: allow its scripts here.
             worktree_root=$("$WORKTREE_SCRIPT" root)
             extra_dirs=(--add-dir "$worktree_root")
-            tools="$tools,Bash($worktree_root/*)" ;;
+            tools="$tools,Bash($worktree_root/*)"
+            # Repos run through mise (just recipes) need the worktree's mise config trusted, else every recipe fails there.
+            export MISE_TRUSTED_CONFIG_PATHS="$worktree_root${MISE_TRUSTED_CONFIG_PATHS:+:$MISE_TRUSTED_CONFIG_PATHS}" ;;
     esac
     dispatches=$((dispatches + 1))
     if [ "$dispatches" -gt "$MAX_DISPATCHES" ]; then echo "dispatch limit ($MAX_DISPATCHES) reached, stopping" >&2; exit "$EXIT_LIMIT"; fi
