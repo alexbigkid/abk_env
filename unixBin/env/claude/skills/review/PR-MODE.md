@@ -46,7 +46,7 @@ Standards, Spec and Quality as in SKILL.md (sources of standards, the issue as s
 - `handledIsNew: true`: read `handledComment` (the coder's `Review items handled:` summary, `pr-feedback.sh` hides it) and the unresolved threads, and check each item.
 - `handledIsNew: false` (no comment since your last review, the coder gave no answer): ignore the old comment; every earlier `[must-fix]` is open unless the code shows it fixed.
 - A `[must-fix]` must be really fixed in the code.
-- A `[suggestion]` is settled when the coder fixed it, declined it (`declined (<reason>)`, accepted as given) or deferred it to a follow-up issue that exists and has acceptance criteria (`gh issue view <m>`). A deferral without such an issue is re-marked `[must-fix]`.
+- A `[suggestion]` is settled when the coder fixed it, declined it (`declined (<reason>)`) or deferred it to a follow-up issue that exists and has acceptance criteria (`gh issue view <m>`). A deferral without such an issue is re-marked `[must-fix]`. For a declined suggestion, weigh the coder's reason: if it convinces you, it is settled. If you still think the suggestion is valid, it does not block this PR, but you open a follow-up issue for it: `gh issue create --title "<short title>" --label needs-info --body-file - <<'ISSUE'` with what to change, why (your finding and the coder's reason), the acceptance criteria and `Follow-up of #<n> (PR #<pr>)`, then `$B add <m>`. The label `needs-info` keeps it waiting for the user. List the new issue in your review summary as `declined, follow-up #<m>`.
 - `disputed (<reason>)` on a must-fix: do not argue it again, go to step 6.
 
 **Classify every finding**, no untagged ones:
@@ -82,7 +82,7 @@ It is refused when another review was posted meanwhile (`--round` no longer matc
 
 - Any `[must-fix]` open, or a deferral you did not accept: `$B move <n> Todo`, then `$B order <n>` so the rework comes first.
 - Round 1 with any finding at all, also only `[suggestion]`s: the same move to Todo, so the coder evaluates each suggestion once (fix, decline with a reason, or follow-up issue). `round` is 0 in the state you read for your first review.
-- Otherwise (nothing open; suggestions you add in a later round do not send it back, the coder has had its pass): `$B move <n> Testing`.
+- Otherwise (nothing open; suggestions you add in a later round do not send it back, the coder has had its pass): `$B move <n> Testing`. So that a later-round suggestion you consider valid is not lost, open a follow-up issue for it the same way as for a declined suggestion (`gh issue create ... --label needs-info`, then `$B add <m>`) and list it in your summary as `follow-up #<m>`.
 
 `move` clears your claim. Then `$W remove "$dir"`.
 
